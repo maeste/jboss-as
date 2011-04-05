@@ -39,6 +39,7 @@ import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.RuntimeTask;
 import org.jboss.as.controller.RuntimeTaskContext;
 import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.server.ServerOperationContext;
 import org.jboss.dmr.ModelNode;
 import org.jboss.jca.core.api.management.DataSource;
 import org.jboss.jca.core.api.management.ManagementRepository;
@@ -121,8 +122,8 @@ class DataSourcePoolConfigurationRWHandler {
                                 resultHandler.handleResultFragment(new String[0], result);
                                 resultHandler.handleResultComplete();
                             } catch (Exception e) {
-                                throw new OperationFailedException(
-                                        new ModelNode().set("failed to get metrics" + e.getMessage()));
+                                throw new OperationFailedException(new ModelNode().set("failed to get attribute"
+                                        + e.getMessage()));
                             }
                         }
                     }
@@ -164,7 +165,6 @@ class DataSourcePoolConfigurationRWHandler {
                     public void execute(RuntimeTaskContext runtimeCtx) throws OperationFailedException {
                         final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
                         final String jndiName = address.getLastElement().getValue();
-                        final String attributeName = operation.require(NAME).asString();
 
                         final ServiceController<?> managementRepoService = runtimeCtx.getServiceRegistry().getService(
                                 ConnectorServices.MANAGEMENT_REPOSISTORY_SERVICE);
@@ -174,31 +174,31 @@ class DataSourcePoolConfigurationRWHandler {
                                 if (repository.getDataSources() != null) {
                                     for (DataSource ds : repository.getDataSources()) {
                                         if (jndiName.equalsIgnoreCase(ds.getJndiName())) {
-                                            if (MAX_POOL_SIZE.equals(attributeName)) {
+                                            if (MAX_POOL_SIZE.equals(name)) {
                                                 ds.getPoolConfiguration().setMaxSize(value.asInt());
                                             }
-                                            if (MIN_POOL_SIZE.equals(attributeName)) {
+                                            if (MIN_POOL_SIZE.equals(name)) {
                                                 ds.getPoolConfiguration().setMinSize(value.asInt());
                                             }
-                                            if (BLOCKING_TIMEOUT.equals(attributeName)) {
+                                            if (BLOCKING_TIMEOUT.equals(name)) {
                                                 ds.getPoolConfiguration().setBlockingTimeout(value.asLong());
                                             }
-                                            if (IDLE_TIMEOUT_MINUTES.equals(attributeName)) {
+                                            if (IDLE_TIMEOUT_MINUTES.equals(name)) {
                                                 ds.getPoolConfiguration().setIdleTimeout(value.asLong());
                                             }
-                                            if (BACKGROUND_VALIDATION.equals(attributeName)) {
+                                            if (BACKGROUND_VALIDATION.equals(name)) {
                                                 ds.getPoolConfiguration().setBackgroundValidation(value.asBoolean());
                                             }
-                                            if (BACKGROUND_VALIDATION_MINUTES.equals(attributeName)) {
+                                            if (BACKGROUND_VALIDATION_MINUTES.equals(name)) {
                                                 ds.getPoolConfiguration().setBackgroundValidationMinutes(value.asInt());
                                             }
-                                            if (POOL_PREFILL.equals(attributeName)) {
+                                            if (POOL_PREFILL.equals(name)) {
                                                 ds.getPoolConfiguration().setPrefill(value.asBoolean());
                                             }
-                                            if (POOL_USE_STRICT_MIN.equals(attributeName)) {
+                                            if (POOL_USE_STRICT_MIN.equals(name)) {
                                                 ds.getPoolConfiguration().setStrictMin(value.asBoolean());
                                             }
-                                            if (USE_FAST_FAIL.equals(attributeName)) {
+                                            if (USE_FAST_FAIL.equals(name)) {
                                                 ds.getPoolConfiguration().setUseFastFail(value.asBoolean());
                                             }
                                         }
@@ -209,8 +209,8 @@ class DataSourcePoolConfigurationRWHandler {
                                 modelChanged(context, operation, resultHandler, name, value, currentValue);
 
                             } catch (Exception e) {
-                                throw new OperationFailedException(
-                                        new ModelNode().set("failed to get metrics" + e.getMessage()));
+                                throw new OperationFailedException(new ModelNode().set("failed to set attribute"
+                                        + e.getMessage()));
                             }
                         }
                     }
@@ -228,18 +228,14 @@ class DataSourcePoolConfigurationRWHandler {
 
             resultHandler.handleResultComplete();
             // TODO evaluate something like that for "PerContainer" operations
-            // if (context.getRuntimeContext() != null) {
-            // validateResolvedValue(attributeName, newValue);
-            // boolean restartRequired = applyUpdateToRuntime(context,
-            // operation, resultHandler, attributeName, newValue, currentValue);
-            // if (restartRequired && context instanceof ServerOperationContext)
-            // {
-            // ServerOperationContext.class.cast(context).restartRequired();
-            // }
-            // }
-            // else {
-            // resultHandler.handleResultComplete();
-            // }
+            if (context.getRuntimeContext() != null) {
+                boolean restartRequired = attributeName.equals(POOL_PREFILL);
+                if (restartRequired && context instanceof ServerOperationContext) {
+                    ServerOperationContext.class.cast(context).restartRequired();
+                }
+            } else {
+                resultHandler.handleResultComplete();
+            }
         }
     }
 }
