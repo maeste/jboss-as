@@ -109,6 +109,8 @@ import java.util.Locale;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import org.jboss.as.connector.subsystems.datasources.DataSourcePoolConfigurationRWHandler.DataSourcePoolConfigurationReadHandler;
+import org.jboss.as.connector.subsystems.datasources.DataSourcePoolConfigurationRWHandler.DataSourcePoolConfigurationWriteHandler;
 import org.jboss.as.controller.BasicOperationResult;
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
@@ -125,6 +127,7 @@ import org.jboss.as.controller.descriptions.common.CommonDescriptions;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
+import org.jboss.as.controller.registry.AttributeAccess.Storage;
 import org.jboss.as.controller.registry.ModelNodeRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
 import org.jboss.dmr.ModelNode;
@@ -185,6 +188,11 @@ public class DataSourcesExtension implements Extension {
             dataSources.registerMetric(attributeName, DataSourcesMetrics.INSTANCE);
         }
 
+        for (final String attributeName : DataSourcePoolConfigurationRWHandler.ATTRIBUTES) {
+            dataSources.registerReadWriteAttribute(attributeName, DataSourcePoolConfigurationReadHandler.INSTANCE,
+                    DataSourcePoolConfigurationWriteHandler.INSTANCE, Storage.CONFIGURATION);
+        }
+
         final ModelNodeRegistration xaDataSources = subsystem.registerSubModel(PathElement.pathElement(XA_DATA_SOURCE),
                 XA_DATA_SOURCE_DESC);
         xaDataSources.registerOperationHandler(ADD, XaDataSourceAdd.INSTANCE, ADD_XA_DATA_SOURCE_DESC, false);
@@ -195,6 +203,7 @@ public class DataSourcesExtension implements Extension {
         for (final String attributeName : XaDataSourcesMetrics.ATTRIBUTES) {
             xaDataSources.registerMetric(attributeName, XaDataSourcesMetrics.INSTANCE);
         }
+
     }
 
     @Override
