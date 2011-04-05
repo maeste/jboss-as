@@ -59,6 +59,8 @@ public final class ConnectorServices {
 
     public static final ServiceName DATASOURCES_SERVICE = ServiceName.JBOSS.append("datasources");
 
+    public static final ServiceName CCM_SERVICE = ServiceName.JBOSS.append("cached-connection-manager");
+
     private ConnectorServices() {
     }
 

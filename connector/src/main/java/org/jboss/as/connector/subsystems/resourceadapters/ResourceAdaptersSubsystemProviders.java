@@ -48,6 +48,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SECUR
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SECURITY_DOMAIN_AND_APPLICATION;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.TRANSACTIONSUPPORT;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USETRYLOCK;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_CCM;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_FAST_FAIL;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_JAVA_CONTEXT;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.XA_RESOURCE_TIMEOUT;
@@ -98,7 +99,7 @@ class ResourceAdaptersSubsystemProviders {
             new NodeAttribute(USETRYLOCK, ModelType.BOOLEAN, false),
             new NodeAttribute(BACKGROUNDVALIDATIONMINUTES, ModelType.INT, false),
             new NodeAttribute(BACKGROUNDVALIDATION, ModelType.BOOLEAN, false),
-            new NodeAttribute(USE_FAST_FAIL, ModelType.BOOLEAN, false) };
+            new NodeAttribute(USE_FAST_FAIL, ModelType.BOOLEAN, false), new NodeAttribute(USE_CCM, ModelType.BOOLEAN, false) };
 
     static final NodeAttribute[] ADMIN_OBJECTS_NODEATTRIBUTE = new NodeAttribute[] {
             new NodeAttribute(CLASS_NAME, ModelType.STRING, true), new NodeAttribute(JNDINAME, ModelType.STRING, true),

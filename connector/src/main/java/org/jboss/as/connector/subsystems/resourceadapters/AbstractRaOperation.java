@@ -31,6 +31,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.RESOU
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SECURITY_DOMAIN;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SECURITY_DOMAIN_AND_APPLICATION;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.TRANSACTIONSUPPORT;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_CCM;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_FAST_FAIL;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_JAVA_CONTEXT;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.XA_RESOURCE_TIMEOUT;
@@ -53,6 +54,7 @@ import org.jboss.jca.common.api.metadata.common.CommonTimeOut;
 import org.jboss.jca.common.api.metadata.common.CommonValidation;
 import org.jboss.jca.common.api.metadata.common.Credential;
 import org.jboss.jca.common.api.metadata.common.Extension;
+import org.jboss.jca.common.api.metadata.common.FlushStrategy;
 import org.jboss.jca.common.api.metadata.common.Recovery;
 import org.jboss.jca.common.api.metadata.common.TransactionSupportEnum;
 import org.jboss.jca.common.api.metadata.resourceadapter.ResourceAdapter;
@@ -117,6 +119,7 @@ public abstract class AbstractRaOperation {
             String poolName = getStringIfSetOrGetDefault(conDefNode, POOL_NAME, null);
             boolean enabled = getBooleanIfSetOrGetDefault(conDefNode, ENABLED, false);
             boolean useJavaContext = getBooleanIfSetOrGetDefault(conDefNode, USE_JAVA_CONTEXT, false);
+            boolean useCcm = getBooleanIfSetOrGetDefault(conDefNode, USE_CCM, false);
 
             Integer maxPoolSize = getIntIfSetOrGetDefault(conDefNode, MAX_POOL_SIZE, null);
             Integer minPoolSize = getIntIfSetOrGetDefault(conDefNode, MIN_POOL_SIZE, null);
@@ -130,7 +133,8 @@ public abstract class AbstractRaOperation {
             Integer xaResourceTimeout = getIntIfSetOrGetDefault(conDefNode, XA_RESOURCE_TIMEOUT, null);
             CommonTimeOut timeOut = new CommonTimeOutImpl(blockingTimeoutMillis, idleTimeoutMinutes, allocationRetry,
                     allocationRetryWaitMillis, xaResourceTimeout);
-            CommonPool pool = new CommonPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin);
+            CommonPool pool = new CommonPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin,
+                    FlushStrategy.FAILING_CONNECTION_ONLY);
 
             String securityDomain = getStringIfSetOrGetDefault(conDefNode, SECURITY_DOMAIN, null);
             String securityDomainAndApplication = getStringIfSetOrGetDefault(conDefNode, SECURITY_DOMAIN_AND_APPLICATION, null);
@@ -152,7 +156,7 @@ public abstract class AbstractRaOperation {
             final boolean noRecovery = getBooleanIfSetOrGetDefault(conDefNode, NO_RECOVERY, false);
             Recovery recovery = new Recovery(credential, recoverPlugin, noRecovery);
             CommonConnDef connectionDefinition = new CommonConnDefImpl(configProperties, className, jndiName, poolName,
-                    enabled, useJavaContext, pool, timeOut, validation, security, recovery);
+                    enabled, useJavaContext, useCcm, pool, timeOut, validation, security, recovery);
 
             connDefs.add(connectionDefinition);
         }

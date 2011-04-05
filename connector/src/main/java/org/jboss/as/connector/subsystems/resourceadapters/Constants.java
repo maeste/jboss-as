@@ -105,6 +105,8 @@ class Constants {
 
     static final String USE_FAST_FAIL = "use-fast-fail";
 
+    static final String USE_CCM = "use-ccm";
+
     static final String CONFIG_PROPERTIES = "config-properties";
 
     static final String ARCHIVE = "archive";

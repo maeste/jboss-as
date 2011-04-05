@@ -57,6 +57,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SAME_
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SECURITY_DOMAIN;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SECURITY_DOMAIN_AND_APPLICATION;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.TRANSACTIONSUPPORT;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_CCM;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_FAST_FAIL;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.USE_JAVA_CONTEXT;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.WRAP_XA_DATASOURCE;
@@ -249,6 +250,7 @@ public class ResourceAdaptersExtension implements Extension {
             writeAttributeIfHas(streamWriter, conDef, CommonConnDef.Attribute.ENABLED, ENABLED);
             writeAttributeIfHas(streamWriter, conDef, CommonConnDef.Attribute.USEJAVACONTEXT, USE_JAVA_CONTEXT);
             writeAttributeIfHas(streamWriter, conDef, CommonConnDef.Attribute.POOL_NAME, POOL_NAME);
+            writeAttributeIfHas(streamWriter, conDef, CommonConnDef.Attribute.USECCM, USE_CCM);
 
             writeConfigProperties(streamWriter, conDef);
 
@@ -520,6 +522,7 @@ public class ResourceAdaptersExtension implements Extension {
             setStringIfNotNull(condefModel, POOL_NAME, conDef.getPoolName());
             setBooleanIfNotNull(condefModel, ENABLED, conDef.isEnabled());
             setBooleanIfNotNull(condefModel, USE_JAVA_CONTEXT, conDef.isUseJavaContext());
+            setBooleanIfNotNull(condefModel, USE_CCM, conDef.isUseCcm());
 
             if (conDef.getPool() != null) {
                 setIntegerIfNotNull(condefModel, MAX_POOL_SIZE, conDef.getPool().getMaxPoolSize());

@@ -66,13 +66,14 @@ public enum AttributeDefinition {
     USE_FAST_FAIL(Constants.USE_FAST_FAIL, ModelType.BOOLEAN, false),
     VALIDATEONMATCH(Constants.VALIDATEONMATCH, ModelType.BOOLEAN, false),
     SPY(Constants.SPY, ModelType.BOOLEAN, false),
-    XADATASOURCECLASS(Constants.SPY, ModelType.STRING, true),
-    INTERLIVING(Constants.SPY, ModelType.BOOLEAN, false),
-    NOTXSEPARATEPOOL(Constants.SPY, ModelType.BOOLEAN, false),
-    PAD_XID(Constants.SPY, ModelType.BOOLEAN, false),
-    SAME_RM_OVERRIDE(Constants.SPY, ModelType.BOOLEAN, false),
-    WRAP_XA_DATASOURCE(Constants.SPY, ModelType.BOOLEAN, false),
-    XA_RESOURCE_TIMEOUT(Constants.SPY, ModelType.INT, false);
+    USE_CCM(Constants.USE_CCM, ModelType.BOOLEAN, false),
+    XADATASOURCECLASS(Constants.XADATASOURCECLASS, ModelType.STRING, true),
+    INTERLIVING(Constants.INTERLIVING, ModelType.BOOLEAN, false),
+    NOTXSEPARATEPOOL(Constants.NOTXSEPARATEPOOL, ModelType.BOOLEAN, false),
+    PAD_XID(Constants.PAD_XID, ModelType.BOOLEAN, false),
+    SAME_RM_OVERRIDE(Constants.SAME_RM_OVERRIDE, ModelType.BOOLEAN, false),
+    WRAP_XA_DATASOURCE(Constants.WRAP_XA_DATASOURCE, ModelType.BOOLEAN, false),
+    XA_RESOURCE_TIMEOUT(Constants.XA_RESOURCE_TIMEOUT, ModelType.INT, false);
 
     private final String propertyName;
     private final ModelType modelType;

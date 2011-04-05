@@ -115,6 +115,8 @@ class Constants {
 
     static final String SPY = "spy";
 
+    static final String USE_CCM = "use-ccm";
+
     static final String STALECONNECTIONCHECKERCLASSNAME = "stale-connection-checker-class-name";
 
     static final String BACKGROUNDVALIDATIONMINUTES = "background-validation-minutes";

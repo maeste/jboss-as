@@ -40,6 +40,9 @@ import javax.transaction.TransactionSynchronizationRegistry;
 import org.jboss.as.connector.ConnectorServices;
 import org.jboss.as.connector.bootstrap.DefaultBootStrapContextService;
 import org.jboss.as.connector.deployers.RaDeploymentActivator;
+import org.jboss.as.connector.mdr.MdrService;
+import org.jboss.as.connector.services.CcmService;
+import org.jboss.as.connector.services.ManagementRepositoryService;
 import org.jboss.as.connector.transactionintegration.TransactionIntegrationService;
 import org.jboss.as.connector.workmanager.WorkManagerService;
 import org.jboss.as.controller.BasicOperationResult;
@@ -59,6 +62,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.jca.core.api.bootstrap.CloneableBootstrapContext;
 import org.jboss.jca.core.api.workmanager.WorkManager;
 import org.jboss.jca.core.bootstrapcontext.BaseCloneableBootstrapContext;
+import org.jboss.jca.core.spi.transaction.TransactionIntegration;
 import org.jboss.jca.core.workmanager.WorkManagerImpl;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceTarget;
@@ -132,6 +136,13 @@ class ConnectorSubsystemAdd implements ModelAddOperationHandler, BootOperationHa
 
                             .addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER, TransactionLocalDelegate.class,
                                     tiService.getTldInjector()).setInitialMode(Mode.ACTIVE).install();
+
+                    CcmService ccmService = new CcmService();
+                    serviceTarget
+                            .addService(ConnectorServices.CCM_SERVICE, ccmService)
+                            .addDependency(ConnectorServices.TRANSACTION_INTEGRATION_SERVICE, TransactionIntegration.class,
+                                    ccmService.getTransactionIntegrationInjector()).install();
+
                     WorkManager wm = new WorkManagerImpl();
 
                     final WorkManagerService wmService = new WorkManagerService(wm);

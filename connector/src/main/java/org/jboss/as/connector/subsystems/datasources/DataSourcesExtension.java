@@ -129,9 +129,9 @@ import org.jboss.as.controller.descriptions.common.CommonDescriptions;
 import org.jboss.as.controller.operations.common.Util;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
+import org.jboss.as.controller.registry.AttributeAccess.Storage;
 import org.jboss.as.controller.registry.ModelNodeRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
-import org.jboss.as.controller.registry.AttributeAccess.Storage;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.jboss.jca.common.api.metadata.common.CommonPool;
@@ -188,6 +188,7 @@ public class DataSourcesExtension implements Extension {
 
         for (final String attributeName : DataSourcesMetrics.ATTRIBUTES) {
             dataSources.registerMetric(attributeName, DataSourcesMetrics.INSTANCE);
+
         }
 
         for (final String attributeName : DataSourcePoolConfigurationRWHandler.ATTRIBUTES) {
