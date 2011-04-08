@@ -160,6 +160,8 @@ class DataSourcePoolConfigurationRWHandler {
             compensating.get(NAME).set(name);
             compensating.get(VALUE).set(currentValue);
 
+            submodel.get(name).set(value);
+
             if (context.getRuntimeContext() != null) {
                 context.getRuntimeContext().setRuntimeTask(new RuntimeTask() {
                     public void execute(RuntimeTaskContext runtimeCtx) throws OperationFailedException {
@@ -204,7 +206,6 @@ class DataSourcePoolConfigurationRWHandler {
                                         }
                                     }
                                 }
-                                submodel.get(name).set(value);
 
                                 modelChanged(context, operation, resultHandler, name, value, currentValue);
 
@@ -226,7 +227,7 @@ class DataSourcePoolConfigurationRWHandler {
                 final ResultHandler resultHandler, final String attributeName, final ModelNode newValue,
                 final ModelNode currentValue) throws OperationFailedException {
 
-            resultHandler.handleResultComplete();
+            // resultHandler.handleResultComplete();
             // TODO evaluate something like that for "PerContainer" operations
             if (context.getRuntimeContext() != null) {
                 boolean restartRequired = attributeName.equals(POOL_PREFILL);

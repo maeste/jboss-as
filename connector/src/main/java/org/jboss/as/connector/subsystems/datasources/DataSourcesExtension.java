@@ -103,6 +103,7 @@ import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -192,7 +193,7 @@ public class DataSourcesExtension implements Extension {
 
         for (final String attributeName : DataSourcePoolConfigurationRWHandler.ATTRIBUTES) {
             dataSources.registerReadWriteAttribute(attributeName, DataSourcePoolConfigurationReadHandler.INSTANCE,
-                    DataSourcePoolConfigurationWriteHandler.INSTANCE, Storage.CONFIGURATION);
+                    DataSourcePoolConfigurationWriteHandler.INSTANCE, Storage.RUNTIME);
         }
 
         final ModelNodeRegistration xaDataSources = subsystem.registerSubModel(PathElement.pathElement(XA_DATA_SOURCE),
@@ -239,6 +240,19 @@ public class DataSourcesExtension implements Extension {
                             XADATASOURCEPROPERTIES);
                     writer.writeStartElement(isXADataSource ? DataSources.Tag.XA_DATASOURCE.getLocalName()
                             : DataSources.Tag.DATASOURCE.getLocalName());
+
+                    if (dataSourceNode.hasDefined(CONNECTION_PROPERTIES)) {
+                        // connectionProperties = new HashMap<String,
+                        // String>(dataSourceNode.get(CONNECTION_PROPERTIES).asList().size());
+                        for (Property prop : dataSourceNode.get(CONNECTION_PROPERTIES).asPropertyList()) {
+                            writer.writeStartElement(DataSource.Tag.CONNECTIONPROPERTY.getLocalName());
+                            writer.writeAttribute("name", prop.getName());
+                            writer.writeCharacters(prop.getValue().asString());
+                            writer.writeEndElement();
+
+                        }
+
+                    }
 
                     writeAttributeIfHas(writer, dataSourceNode, DataSource.Attribute.JNDINAME, JNDINAME);
                     writeAttributeIfHas(writer, dataSourceNode, DataSource.Attribute.POOL_NAME, POOLNAME);
