@@ -512,7 +512,7 @@ public class DataSourcesExtension implements Extension {
                     case DATASOURCES_1_0: {
                         localName = reader.getLocalName();
                         Element element = Element.forName(reader.getLocalName());
-                        log.infof("%s -> %s", localName, element);
+                        log.tracef("%s -> %s", localName, element);
                         switch (element) {
                             case SUBSYSTEM: {
 
