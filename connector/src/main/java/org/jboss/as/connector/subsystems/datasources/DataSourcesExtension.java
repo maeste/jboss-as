@@ -103,7 +103,6 @@ import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -209,7 +208,7 @@ public class DataSourcesExtension implements Extension {
 
         for (final String attributeName : XaDataSourcePoolConfigurationRWHandler.ATTRIBUTES) {
             xaDataSources.registerReadWriteAttribute(attributeName, XaDataSourcePoolConfigurationReadHandler.INSTANCE,
-                    XaDataSourcePoolConfigurationWriteHandler.INSTANCE, Storage.CONFIGURATION);
+                    XaDataSourcePoolConfigurationWriteHandler.INSTANCE, Storage.RUNTIME);
         }
 
     }

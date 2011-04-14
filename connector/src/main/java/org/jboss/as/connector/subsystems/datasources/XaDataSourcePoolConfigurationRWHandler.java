@@ -22,15 +22,21 @@
 
 package org.jboss.as.connector.subsystems.datasources;
 
+import static org.jboss.as.connector.subsystems.datasources.Constants.BACKGROUNDVALIDATION;
+import static org.jboss.as.connector.subsystems.datasources.Constants.BACKGROUNDVALIDATIONMINUTES;
+import static org.jboss.as.connector.subsystems.datasources.Constants.BLOCKING_TIMEOUT_WAIT_MILLIS;
+import static org.jboss.as.connector.subsystems.datasources.Constants.IDLETIMEOUTMINUTES;
+import static org.jboss.as.connector.subsystems.datasources.Constants.MAX_POOL_SIZE;
+import static org.jboss.as.connector.subsystems.datasources.Constants.MIN_POOL_SIZE;
+import static org.jboss.as.connector.subsystems.datasources.Constants.POOL_PREFILL;
+import static org.jboss.as.connector.subsystems.datasources.Constants.POOL_USE_STRICT_MIN;
+import static org.jboss.as.connector.subsystems.datasources.Constants.USE_FAST_FAIL;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
 
 import org.jboss.as.connector.ConnectorServices;
 import org.jboss.as.controller.BasicOperationResult;
 import org.jboss.as.controller.ModelQueryOperationHandler;
-import org.jboss.as.controller.ModelUpdateOperationHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.OperationResult;
@@ -38,9 +44,11 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.RuntimeTask;
 import org.jboss.as.controller.RuntimeTaskContext;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.server.ServerOperationContext;
+import org.jboss.as.controller.operations.validation.ModelTypeValidator;
+import org.jboss.as.controller.operations.validation.ParameterValidator;
+import org.jboss.as.server.operations.ServerWriteAttributeOperationHandler;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
 import org.jboss.jca.core.api.management.DataSource;
 import org.jboss.jca.core.api.management.ManagementRepository;
 import org.jboss.msc.service.ServiceController;
@@ -52,21 +60,12 @@ import org.jboss.msc.service.ServiceController;
 class XaDataSourcePoolConfigurationRWHandler {
 
     static final String[] NO_LOCATION = new String[0];
-    private static final String MAX_POOL_SIZE = "max-pool-size";
-    private static final String MIN_POOL_SIZE = "min-pool-size";
-    private static final String BLOCKING_TIMEOUT = "blocking-timeout-wait-millis";
-    private static final String IDLE_TIMEOUT_MINUTES = "idle-timeout-minutes";
-    private static final String BACKGROUND_VALIDATION = "background-validation";
-    private static final String BACKGROUND_VALIDATION_MINUTES = "background-validation-minutes";
-    private static final String POOL_PREFILL = "pool-prefill";
-    private static final String POOL_USE_STRICT_MIN = "pool-use-strict-min";
-    private static final String USE_FAST_FAIL = "use-fast-fail";
 
-    static final String[] ATTRIBUTES = new String[] { MAX_POOL_SIZE, MIN_POOL_SIZE, BLOCKING_TIMEOUT, IDLE_TIMEOUT_MINUTES,
-            BACKGROUND_VALIDATION, BACKGROUND_VALIDATION_MINUTES, POOL_PREFILL, POOL_USE_STRICT_MIN, USE_FAST_FAIL };
+    static final String[] ATTRIBUTES = new String[] { MAX_POOL_SIZE, MIN_POOL_SIZE, BLOCKING_TIMEOUT_WAIT_MILLIS,
+        IDLETIMEOUTMINUTES, BACKGROUNDVALIDATION, BACKGROUNDVALIDATIONMINUTES, POOL_PREFILL, POOL_USE_STRICT_MIN,
+        USE_FAST_FAIL };
 
     static class XaDataSourcePoolConfigurationReadHandler implements ModelQueryOperationHandler {
-
         static XaDataSourcePoolConfigurationReadHandler INSTANCE = new XaDataSourcePoolConfigurationReadHandler();
 
         /** {@inheritDoc} */
@@ -74,93 +73,33 @@ class XaDataSourcePoolConfigurationRWHandler {
         public OperationResult execute(final OperationContext context, final ModelNode operation,
                 final ResultHandler resultHandler) throws OperationFailedException {
 
-            if (context.getRuntimeContext() != null) {
-                context.getRuntimeContext().setRuntimeTask(new RuntimeTask() {
-                    public void execute(RuntimeTaskContext context) throws OperationFailedException {
-                        final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
-                        final String jndiName = address.getLastElement().getValue();
-                        final String attributeName = operation.require(NAME).asString();
+            final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
+            final String jndiName = address.getLastElement().getValue();
+            final String parameterName = operation.require(NAME).asString();
 
-                        final ServiceController<?> managementRepoService = context.getServiceRegistry().getService(
-                                ConnectorServices.MANAGEMENT_REPOSISTORY_SERVICE);
-                        if (managementRepoService != null) {
-                            try {
-                                final ManagementRepository repository = (ManagementRepository) managementRepoService.getValue();
-                                final ModelNode result = new ModelNode();
-                                if (repository.getDataSources() != null) {
-                                    for (DataSource ds : repository.getDataSources()) {
-                                        if (jndiName.equalsIgnoreCase(ds.getJndiName())) {
-                                            if (MAX_POOL_SIZE.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().getMaxSize());
-                                            }
-                                            if (MIN_POOL_SIZE.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().getMinSize());
-                                            }
-                                            if (BLOCKING_TIMEOUT.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().getBlockingTimeout());
-                                            }
-                                            if (IDLE_TIMEOUT_MINUTES.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().getIdleTimeout());
-                                            }
-                                            if (BACKGROUND_VALIDATION.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().isBackgroundValidation());
-                                            }
-                                            if (BACKGROUND_VALIDATION_MINUTES.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().getBackgroundValidationMinutes());
-                                            }
-                                            if (POOL_PREFILL.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().isPrefill());
-                                            }
-                                            if (POOL_USE_STRICT_MIN.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().isStrictMin());
-                                            }
-                                            if (USE_FAST_FAIL.equals(attributeName)) {
-                                                result.set("" + ds.getPoolConfiguration().isUseFastFail());
-                                            }
-                                        }
-                                    }
-                                }
-                                resultHandler.handleResultFragment(new String[0], result);
-                                resultHandler.handleResultComplete();
-                            } catch (Exception e) {
-                                throw new OperationFailedException(new ModelNode().set("failed to get attribute"
-                                        + e.getMessage()));
-                            }
-                        }
-                    }
-                });
-            } else {
-                resultHandler.handleResultFragment(NO_LOCATION, new ModelNode().set("no metrics available"));
-                resultHandler.handleResultComplete();
-            }
+            final ModelNode submodel = context.getSubModel();
+            final ModelNode currentValue = submodel.get(parameterName).clone();
+
+            resultHandler.handleResultFragment(new String[0], currentValue);
+            resultHandler.handleResultComplete();
+
             return new BasicOperationResult();
         }
     }
 
-    static class XaDataSourcePoolConfigurationWriteHandler implements ModelUpdateOperationHandler {
+    static class XaDataSourcePoolConfigurationWriteHandler extends ServerWriteAttributeOperationHandler {
 
-        static XaDataSourcePoolConfigurationWriteHandler INSTANCE = new XaDataSourcePoolConfigurationWriteHandler();
+        static XaDataSourcePoolConfigurationWriteHandler INSTANCE = new XaDataSourcePoolConfigurationWriteHandler(
+            new PoolConfigurationValidator());
 
-        /** {@inheritDoc} */
+        protected XaDataSourcePoolConfigurationWriteHandler(ParameterValidator validator) {
+            super(validator);
+        }
+
         @Override
-        public OperationResult execute(final OperationContext context, final ModelNode operation,
-                final ResultHandler resultHandler) throws OperationFailedException {
-
-            final String name = operation.require(NAME).asString();
-            // Don't require VALUE. Let validateValue decide if it's bothered
-            // by and undefined value
-            final ModelNode value = operation.get(VALUE);
-
-            // TODO evaluate if a validation is needed
-            // validateValue(name, value);
-
-            final ModelNode submodel = context.getSubModel();
-            final ModelNode currentValue = submodel.get(name).clone();
-
-            final ModelNode compensating = Util.getEmptyOperation(operation.require(OP).asString(), operation.require(OP_ADDR));
-            compensating.get(NAME).set(name);
-            compensating.get(VALUE).set(currentValue);
-
+        protected boolean applyUpdateToRuntime(final OperationContext context, final ModelNode operation,
+                final ResultHandler resultHandler, final String parameterName, final ModelNode newValue,
+                final ModelNode currentValue) throws OperationFailedException {
             if (context.getRuntimeContext() != null) {
                 context.getRuntimeContext().setRuntimeTask(new RuntimeTask() {
                     public void execute(RuntimeTaskContext runtimeCtx) throws OperationFailedException {
@@ -175,39 +114,26 @@ class XaDataSourcePoolConfigurationRWHandler {
                                 if (repository.getDataSources() != null) {
                                     for (DataSource ds : repository.getDataSources()) {
                                         if (jndiName.equalsIgnoreCase(ds.getJndiName())) {
-                                            if (MAX_POOL_SIZE.equals(name)) {
-                                                ds.getPoolConfiguration().setMaxSize(value.asInt());
+                                            if (MAX_POOL_SIZE.equals(parameterName)) {
+                                                ds.getPoolConfiguration().setMaxSize(newValue.asInt());
                                             }
-                                            if (MIN_POOL_SIZE.equals(name)) {
-                                                ds.getPoolConfiguration().setMinSize(value.asInt());
+                                            if (MIN_POOL_SIZE.equals(parameterName)) {
+                                                ds.getPoolConfiguration().setMinSize(newValue.asInt());
                                             }
-                                            if (BLOCKING_TIMEOUT.equals(name)) {
-                                                ds.getPoolConfiguration().setBlockingTimeout(value.asLong());
+                                            if (BLOCKING_TIMEOUT_WAIT_MILLIS.equals(parameterName)) {
+                                                ds.getPoolConfiguration().setBlockingTimeout(newValue.asLong());
                                             }
-                                            if (IDLE_TIMEOUT_MINUTES.equals(name)) {
-                                                ds.getPoolConfiguration().setIdleTimeout(value.asLong());
+                                            if (POOL_USE_STRICT_MIN.equals(parameterName)) {
+                                                ds.getPoolConfiguration().setStrictMin(newValue.asBoolean());
                                             }
-                                            if (BACKGROUND_VALIDATION.equals(name)) {
-                                                ds.getPoolConfiguration().setBackgroundValidation(value.asBoolean());
-                                            }
-                                            if (BACKGROUND_VALIDATION_MINUTES.equals(name)) {
-                                                ds.getPoolConfiguration().setBackgroundValidationMinutes(value.asInt());
-                                            }
-                                            if (POOL_PREFILL.equals(name)) {
-                                                ds.getPoolConfiguration().setPrefill(value.asBoolean());
-                                            }
-                                            if (POOL_USE_STRICT_MIN.equals(name)) {
-                                                ds.getPoolConfiguration().setStrictMin(value.asBoolean());
-                                            }
-                                            if (USE_FAST_FAIL.equals(name)) {
-                                                ds.getPoolConfiguration().setUseFastFail(value.asBoolean());
+                                            if (USE_FAST_FAIL.equals(parameterName)) {
+                                                ds.getPoolConfiguration().setUseFastFail(newValue.asBoolean());
                                             }
                                         }
                                     }
                                 }
-                                submodel.get(name).set(value);
 
-                                modelChanged(context, operation, resultHandler, name, value, currentValue);
+                                modelChanged(context, operation, resultHandler, parameterName, newValue, currentValue);
 
                             } catch (Exception e) {
                                 throw new OperationFailedException(new ModelNode().set("failed to set attribute"
@@ -219,24 +145,49 @@ class XaDataSourcePoolConfigurationRWHandler {
             } else {
                 resultHandler.handleResultComplete();
             }
-            return new BasicOperationResult(compensating);
+            return (IDLETIMEOUTMINUTES.equals(parameterName) || BACKGROUNDVALIDATION.equals(parameterName)
+                    || BACKGROUNDVALIDATIONMINUTES.equals(parameterName) || POOL_PREFILL.equals(parameterName));
 
         }
+    }
 
-        protected void modelChanged(final OperationContext context, final ModelNode operation,
-                final ResultHandler resultHandler, final String attributeName, final ModelNode newValue,
-                final ModelNode currentValue) throws OperationFailedException {
+    static class PoolConfigurationValidator implements ParameterValidator {
 
-            resultHandler.handleResultComplete();
-            // TODO evaluate something like that for "PerContainer" operations
-            if (context.getRuntimeContext() != null) {
-                boolean restartRequired = attributeName.equals(POOL_PREFILL);
-                if (restartRequired && context instanceof ServerOperationContext) {
-                    ServerOperationContext.class.cast(context).restartRequired();
-                }
+        static final ModelTypeValidator intValidator = new ModelTypeValidator(ModelType.INT);
+        static final ModelTypeValidator longValidator = new ModelTypeValidator(ModelType.LONG);
+        static final ModelTypeValidator boolValidator = new ModelTypeValidator(ModelType.BOOLEAN);
+
+        @Override
+        public void validateParameter(String parameterName, ModelNode value) throws OperationFailedException {
+
+            if (MAX_POOL_SIZE.equals(parameterName)) {
+                intValidator.validateParameter(parameterName, value);
+            } else if (MIN_POOL_SIZE.equals(parameterName)) {
+                intValidator.validateParameter(parameterName, value);
+            } else if (BLOCKING_TIMEOUT_WAIT_MILLIS.equals(parameterName)) {
+                longValidator.validateParameter(parameterName, value);
+            } else if (IDLETIMEOUTMINUTES.equals(parameterName)) {
+                longValidator.validateParameter(parameterName, value);
+            } else if (BACKGROUNDVALIDATION.equals(parameterName)) {
+                boolValidator.validateParameter(parameterName, value);
+            } else if (BACKGROUNDVALIDATIONMINUTES.equals(parameterName)) {
+                intValidator.validateParameter(parameterName, value);
+            } else if (POOL_PREFILL.equals(parameterName)) {
+                boolValidator.validateParameter(parameterName, value);
+            } else if (POOL_USE_STRICT_MIN.equals(parameterName)) {
+                boolValidator.validateParameter(parameterName, value);
+            } else if (USE_FAST_FAIL.equals(parameterName)) {
+                boolValidator.validateParameter(parameterName, value);
             } else {
-                resultHandler.handleResultComplete();
+                throw new OperationFailedException(new ModelNode().set("Wrong parameter name for " + parameterName));
             }
+
         }
+
+        @Override
+        public void validateResolvedParameter(String parameterName, ModelNode value) throws OperationFailedException {
+            validateParameter(parameterName, value.resolve());
+        }
+
     }
 }
