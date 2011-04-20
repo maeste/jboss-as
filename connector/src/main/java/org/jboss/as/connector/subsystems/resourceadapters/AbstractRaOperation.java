@@ -14,6 +14,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CLASS
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONFIG_PROPERTIES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONNECTIONDEFINITIONS;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ENABLED;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.IDLETIMEOUTMINUTES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.JNDI_NAME;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.MAX_POOL_SIZE;
@@ -42,9 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.connector.subsystems.resourceadapters.ResourceAdaptersService.ModifiableResourceAdapeters;
-import org.jboss.as.controller.ModelAddOperationHandler;
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.server.BootOperationHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.jca.common.api.metadata.common.CommonAdminObject;
 import org.jboss.jca.common.api.metadata.common.CommonConnDef;
@@ -67,7 +66,6 @@ import org.jboss.jca.common.metadata.common.CommonTimeOutImpl;
 import org.jboss.jca.common.metadata.common.CommonValidationImpl;
 import org.jboss.jca.common.metadata.common.CredentialImpl;
 import org.jboss.jca.common.metadata.resourceadapter.ResourceAdapterImpl;
-import org.jboss.logging.Logger;
 
 public abstract class AbstractRaOperation {
 
@@ -119,12 +117,14 @@ public abstract class AbstractRaOperation {
             String poolName = getStringIfSetOrGetDefault(conDefNode, POOL_NAME, null);
             boolean enabled = getBooleanIfSetOrGetDefault(conDefNode, ENABLED, false);
             boolean useJavaContext = getBooleanIfSetOrGetDefault(conDefNode, USE_JAVA_CONTEXT, false);
-            boolean useCcm = getBooleanIfSetOrGetDefault(conDefNode, USE_CCM, false);
+            boolean useCcm = getBooleanIfSetOrGetDefault(conDefNode, USE_CCM, true);
 
             Integer maxPoolSize = getIntIfSetOrGetDefault(conDefNode, MAX_POOL_SIZE, null);
             Integer minPoolSize = getIntIfSetOrGetDefault(conDefNode, MIN_POOL_SIZE, null);
             boolean prefill = getBooleanIfSetOrGetDefault(conDefNode, POOL_PREFILL, false);
             boolean useStrictMin = getBooleanIfSetOrGetDefault(conDefNode, POOL_USE_STRICT_MIN, false);
+            final FlushStrategy flushStrategy = conDefNode.hasDefined(FLUSH_STRATEGY) ? FlushStrategy.valueOf(conDefNode.get(
+                    FLUSH_STRATEGY).asString()) : FlushStrategy.FAILING_CONNECTION_ONLY;
 
             Integer allocationRetry = getIntIfSetOrGetDefault(conDefNode, ALLOCATION_RETRY, null);
             Long allocationRetryWaitMillis = getLongIfSetOrGetDefault(conDefNode, ALLOCATION_RETRY_WAIT_MILLIS, null);
@@ -133,8 +133,7 @@ public abstract class AbstractRaOperation {
             Integer xaResourceTimeout = getIntIfSetOrGetDefault(conDefNode, XA_RESOURCE_TIMEOUT, null);
             CommonTimeOut timeOut = new CommonTimeOutImpl(blockingTimeoutMillis, idleTimeoutMinutes, allocationRetry,
                     allocationRetryWaitMillis, xaResourceTimeout);
-            CommonPool pool = new CommonPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin,
-                    FlushStrategy.FAILING_CONNECTION_ONLY);
+            CommonPool pool = new CommonPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin, flushStrategy);
 
             String securityDomain = getStringIfSetOrGetDefault(conDefNode, SECURITY_DOMAIN, null);
             String securityDomainAndApplication = getStringIfSetOrGetDefault(conDefNode, SECURITY_DOMAIN_AND_APPLICATION, null);

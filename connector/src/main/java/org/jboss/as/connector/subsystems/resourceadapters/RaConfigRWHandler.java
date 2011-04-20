@@ -25,6 +25,7 @@ package org.jboss.as.connector.subsystems.resourceadapters;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.BACKGROUNDVALIDATION;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.BACKGROUNDVALIDATIONMINUTES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.BLOCKING_TIMEOUT_WAIT_MILLIS;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.IDLETIMEOUTMINUTES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.MAX_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.MIN_POOL_SIZE;
@@ -49,6 +50,7 @@ import org.jboss.as.controller.operations.validation.ParameterValidator;
 import org.jboss.as.server.operations.ServerWriteAttributeOperationHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.jboss.jca.common.api.metadata.common.FlushStrategy;
 import org.jboss.jca.core.api.connectionmanager.pool.PoolConfiguration;
 import org.jboss.jca.core.api.management.Connector;
 import org.jboss.jca.core.api.management.ManagementRepository;
@@ -63,7 +65,7 @@ class RaConfigRWHandler {
 
     static final String[] ATTRIBUTES = new String[] { MAX_POOL_SIZE, MIN_POOL_SIZE, BLOCKING_TIMEOUT_WAIT_MILLIS,
             IDLETIMEOUTMINUTES, BACKGROUNDVALIDATION, BACKGROUNDVALIDATIONMINUTES, POOL_PREFILL, POOL_USE_STRICT_MIN,
-            USE_FAST_FAIL };
+            FLUSH_STRATEGY, USE_FAST_FAIL };
 
     static class RaConfigReadHandler implements ModelQueryOperationHandler {
         static RaConfigReadHandler INSTANCE = new RaConfigReadHandler();
@@ -151,7 +153,8 @@ class RaConfigRWHandler {
                 resultHandler.handleResultComplete();
             }
             return (IDLETIMEOUTMINUTES.equals(parameterName) || BACKGROUNDVALIDATION.equals(parameterName)
-                    || BACKGROUNDVALIDATIONMINUTES.equals(parameterName) || POOL_PREFILL.equals(parameterName));
+                    || BACKGROUNDVALIDATIONMINUTES.equals(parameterName) || POOL_PREFILL.equals(parameterName) || FLUSH_STRATEGY
+                    .equals(parameterName));
 
         }
     }
@@ -183,6 +186,13 @@ class RaConfigRWHandler {
                 boolValidator.validateParameter(parameterName, value);
             } else if (USE_FAST_FAIL.equals(parameterName)) {
                 boolValidator.validateParameter(parameterName, value);
+            } else if (FLUSH_STRATEGY.equals(parameterName)) {
+                try {
+                    FlushStrategy.valueOf(value.asString());
+                } catch (IllegalArgumentException e) {
+                    throw new OperationFailedException(new ModelNode().set("Wrong type for " + parameterName
+                            + ". Expected one of" + FlushStrategy.values() + " but was " + value.getType()));
+                }
             } else {
                 throw new OperationFailedException(new ModelNode().set("Wrong parameter name for " + parameterName));
             }

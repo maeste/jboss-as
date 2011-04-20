@@ -294,16 +294,6 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
         protected ManagedConnectionFactory createMcf(XaDataSource arg0, String arg1, ClassLoader arg2)
                 throws NotFoundException, DeployException {
             final XAManagedConnectionFactory xaManagedConnectionFactory = new XAManagedConnectionFactory();
-
-            xaManagedConnectionFactory.setJndiName(jndiName);
-            xaManagedConnectionFactory.setSpy(true);
-
-            if (dataSourceConfig.getNewConnectionSql() != null) {
-                xaManagedConnectionFactory.setNewConnectionSQL(dataSourceConfig.getNewConnectionSql());
-            }
-            if (dataSourceConfig.getTransactionIsolation() != null) {
-                xaManagedConnectionFactory.setTransactionIsolation(dataSourceConfig.getTransactionIsolation().name());
-            }
             if (dataSourceConfig.getUrlDelimiter() != null) {
                 try {
                     xaManagedConnectionFactory.setURLDelimiter(dataSourceConfig.getUrlDelimiter());
@@ -311,85 +301,7 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
                     throw new DeployException("failed to get url delimiter", e);
                 }
             }
-            if (dataSourceConfig.getUrlSelectorStrategyClassName() != null) {
-                xaManagedConnectionFactory.setUrlSelectorStrategyClassName(dataSourceConfig.getUrlSelectorStrategyClassName());
-            }
-
-            final DsSecurity security = dataSourceConfig.getSecurity();
-            if (security != null) {
-                if (security.getUserName() != null) {
-                    xaManagedConnectionFactory.setUserName(security.getUserName());
-                }
-                if (security.getPassword() != null) {
-                    xaManagedConnectionFactory.setPassword(security.getPassword());
-                }
-            }
-
-            final TimeOut timeOut = dataSourceConfig.getTimeOut();
-            if (timeOut != null) {
-                if (timeOut.getUseTryLock() != null) {
-                    xaManagedConnectionFactory.setUseTryLock(timeOut.getUseTryLock().intValue());
-                }
-                if (timeOut.getQueryTimeout() != null) {
-                    xaManagedConnectionFactory.setQueryTimeout(timeOut.getQueryTimeout().intValue());
-                }
-            }
-
-            final Statement statement = dataSourceConfig.getStatement();
-            if (statement != null) {
-                if (statement.getTrackStatements() != null) {
-                    xaManagedConnectionFactory.setTrackStatements(statement.getTrackStatements().name());
-                }
-                if (statement.isSharePreparedStatements() != null) {
-                    xaManagedConnectionFactory.setSharePreparedStatements(statement.isSharePreparedStatements());
-                }
-                if (statement.getPreparedStatementsCacheSize() != null) {
-                    xaManagedConnectionFactory.setPreparedStatementCacheSize(statement.getPreparedStatementsCacheSize()
-                            .intValue());
-                }
-            }
-
-            final Validation validation = dataSourceConfig.getValidation();
-            if (validation != null) {
-                if (validation.isValidateOnMatch()) {
-                    xaManagedConnectionFactory.setValidateOnMatch(validation.isValidateOnMatch());
-                }
-                if (validation.getCheckValidConnectionSql() != null) {
-                    xaManagedConnectionFactory.setCheckValidConnectionSQL(validation.getCheckValidConnectionSql());
-                }
-                final Extension validConnectionChecker = validation.getValidConnectionChecker();
-                if (validConnectionChecker != null) {
-                    if (validConnectionChecker.getClassName() != null) {
-                        xaManagedConnectionFactory.setValidConnectionCheckerClassName(validConnectionChecker.getClassName());
-                    }
-                    if (validConnectionChecker.getConfigPropertiesMap() != null) {
-                        xaManagedConnectionFactory
-                                .setValidConnectionCheckerProperties(buildConfigPropsString(validConnectionChecker
-                                        .getConfigPropertiesMap()));
-                    }
-                }
-                final Extension exceptionSorter = validation.getExceptionSorter();
-                if (exceptionSorter != null) {
-                    if (exceptionSorter.getClassName() != null) {
-                        xaManagedConnectionFactory.setExceptionSorterClassName(exceptionSorter.getClassName());
-                    }
-                    if (exceptionSorter.getConfigPropertiesMap() != null) {
-                        xaManagedConnectionFactory.setExceptionSorterProperties(buildConfigPropsString(exceptionSorter
-                                .getConfigPropertiesMap()));
-                    }
-                }
-                final Extension staleConnectionChecker = validation.getStaleConnectionChecker();
-                if (staleConnectionChecker != null) {
-                    if (staleConnectionChecker.getClassName() != null) {
-                        xaManagedConnectionFactory.setStaleConnectionCheckerClassName(staleConnectionChecker.getClassName());
-                    }
-                    if (staleConnectionChecker.getConfigPropertiesMap() != null) {
-                        xaManagedConnectionFactory
-                                .setStaleConnectionCheckerProperties(buildConfigPropsString(staleConnectionChecker
-                                        .getConfigPropertiesMap()));
-                    }
-                }
-            }
+            setMcfProperties(xaManagedConnectionFactory);
             return xaManagedConnectionFactory;
 
         }
@@ -398,11 +310,8 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
         protected ManagedConnectionFactory createMcf(org.jboss.jca.common.api.metadata.ds.DataSource arg0, String arg1,
                 ClassLoader arg2) throws NotFoundException, DeployException {
             final LocalManagedConnectionFactory managedConnectionFactory = new LocalManagedConnectionFactory();
-
             managedConnectionFactory.setUserTransactionJndiName("java:comp/UserTransaction");
             managedConnectionFactory.setDriverClass(dataSourceConfig.getDriverClass());
-            managedConnectionFactory.setJndiName(jndiName);
-            managedConnectionFactory.setSpy(true);
 
             if (dataSourceConfig.getConnectionProperties() != null) {
                 managedConnectionFactory.setConnectionProperties(buildConfigPropsString(dataSourceConfig
@@ -411,15 +320,23 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
             if (dataSourceConfig.getConnectionUrl() != null) {
                 managedConnectionFactory.setConnectionURL(dataSourceConfig.getConnectionUrl());
             }
+            if (dataSourceConfig.getUrlDelimiter() != null) {
+                managedConnectionFactory.setURLDelimiter(dataSourceConfig.getUrlDelimiter());
+            }
+            setMcfProperties(managedConnectionFactory);
+
+            return managedConnectionFactory;
+        }
+
+        private void setMcfProperties(final BaseWrapperManagedConnectionFactory managedConnectionFactory) {
+
             if (dataSourceConfig.getNewConnectionSql() != null) {
                 managedConnectionFactory.setNewConnectionSQL(dataSourceConfig.getNewConnectionSql());
             }
             if (dataSourceConfig.getTransactionIsolation() != null) {
                 managedConnectionFactory.setTransactionIsolation(dataSourceConfig.getTransactionIsolation().name());
             }
-            if (dataSourceConfig.getUrlDelimiter() != null) {
-                managedConnectionFactory.setURLDelimiter(dataSourceConfig.getUrlDelimiter());
-            }
+
             if (dataSourceConfig.getUrlSelectorStrategyClassName() != null) {
                 managedConnectionFactory.setUrlSelectorStrategyClassName(dataSourceConfig.getUrlSelectorStrategyClassName());
             }
@@ -499,8 +416,6 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
                     }
                 }
             }
-
-            return managedConnectionFactory;
         }
 
     }

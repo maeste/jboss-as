@@ -35,6 +35,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CLASS
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONFIG_PROPERTIES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONNECTIONDEFINITIONS;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ENABLED;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.IDLETIMEOUTMINUTES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.INTERLIVING;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.JNDI_NAME;
@@ -262,6 +263,7 @@ public class ResourceAdaptersExtension implements Extension {
                     writeElementIfHas(streamWriter, conDef, CommonPool.Tag.MIN_POOL_SIZE, MIN_POOL_SIZE);
                     writeElementIfHas(streamWriter, conDef, CommonPool.Tag.MAXPOOLSIZE, MAX_POOL_SIZE);
                     writeElementIfHas(streamWriter, conDef, CommonPool.Tag.PREFILL, POOL_PREFILL);
+                    writeElementIfHas(streamWriter, conDef, CommonPool.Tag.FLUSH_STRATEGY, FLUSH_STRATEGY);
                     writeElementIfHas(streamWriter, conDef, CommonPool.Tag.USE_STRICT_MIN, POOL_USE_STRICT_MIN);
 
                     writeElementIfHas(streamWriter, conDef, CommonXaPool.Tag.ISSAMERMOVERRIDEVALUE, SAME_RM_OVERRIDE);
@@ -529,10 +531,9 @@ public class ResourceAdaptersExtension implements Extension {
                 setIntegerIfNotNull(condefModel, MIN_POOL_SIZE, conDef.getPool().getMinPoolSize());
                 setBooleanIfNotNull(condefModel, POOL_PREFILL, conDef.getPool().isPrefill());
                 setBooleanIfNotNull(condefModel, POOL_USE_STRICT_MIN, conDef.getPool().isUseStrictMin());
-                condefModel.get(MAX_POOL_SIZE).set(conDef.getPool().getMaxPoolSize());
-                condefModel.get(MIN_POOL_SIZE).set(conDef.getPool().getMinPoolSize());
-                condefModel.get(POOL_PREFILL).set(conDef.getPool().isPrefill());
-                condefModel.get(POOL_USE_STRICT_MIN).set(conDef.getPool().isUseStrictMin());
+                if (conDef.getPool().getFlushStrategy() != null) {
+                    setStringIfNotNull(condefModel, FLUSH_STRATEGY, conDef.getPool().getFlushStrategy().name());
+                }
                 if (conDef.isXa()) {
                     CommonXaPool xaPool = (CommonXaPool) conDef.getPool();
                     setBooleanIfNotNull(condefModel, INTERLIVING, xaPool.isInterleaving());

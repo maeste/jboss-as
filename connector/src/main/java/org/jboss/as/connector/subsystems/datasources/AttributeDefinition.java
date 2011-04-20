@@ -44,6 +44,7 @@ public enum AttributeDefinition {
     MIN_POOL_SIZE(Constants.MIN_POOL_SIZE, ModelType.INT, false),
     POOL_PREFILL(Constants.POOL_PREFILL, ModelType.BOOLEAN, false),
     POOL_USE_STRICT_MIN(Constants.POOL_USE_STRICT_MIN, ModelType.BOOLEAN, false),
+    FLUSH_STRATEGY(Constants.FLUSH_STRATEGY, ModelType.STRING, false),
     USERNAME(Constants.USERNAME, ModelType.STRING, false),
     PASSWORD(Constants.PASSWORD, ModelType.STRING, false),
     PREPAREDSTATEMENTSCACHESIZE(Constants.PREPAREDSTATEMENTSCACHESIZE, ModelType.LONG, false),

@@ -63,6 +63,8 @@ class Constants {
 
     static final String POOL_USE_STRICT_MIN = "pool-use-strict-min";
 
+    static final String FLUSH_STRATEGY = "flush-strategy";
+
     static final String ALLOCATION_RETRY = "allocation-retry";
 
     static final String ALLOCATION_RETRY_WAIT_MILLIS = "allocation-retry-wait-millis";

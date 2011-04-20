@@ -107,6 +107,8 @@ class Constants {
 
     static final String TRACKSTATEMENTS = "track-statements";
 
+    static final String FLUSH_STRATEGY = "flush-strategy";
+
     static final String VALIDCONNECTIONCHECKERCLASSNAME = "valid-connection-checker-class-name";
 
     static final String CHECKVALIDCONNECTIONSQL = "check-valid-connection-sql";

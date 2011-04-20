@@ -46,6 +46,7 @@ import static org.jboss.as.connector.subsystems.datasources.Constants.NO_RECOVER
 import static org.jboss.as.connector.subsystems.datasources.Constants.PAD_XID;
 import static org.jboss.as.connector.subsystems.datasources.Constants.PASSWORD;
 import static org.jboss.as.connector.subsystems.datasources.Constants.POOLNAME;
+import static org.jboss.as.connector.subsystems.datasources.Constants.FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.datasources.Constants.POOL_PREFILL;
 import static org.jboss.as.connector.subsystems.datasources.Constants.POOL_USE_STRICT_MIN;
 import static org.jboss.as.connector.subsystems.datasources.Constants.PREPAREDSTATEMENTSCACHESIZE;
@@ -139,6 +140,9 @@ class DataSourceModelNodeUtil {
             setIntegerIfNotNull(dataSourceModel, MIN_POOL_SIZE, pool.getMinPoolSize());
             setBooleanIfNotNull(dataSourceModel, POOL_PREFILL, pool.isPrefill());
             setBooleanIfNotNull(dataSourceModel, POOL_USE_STRICT_MIN, pool.isUseStrictMin());
+            if (pool.getFlushStrategy() != null) {
+                setStringIfNotNull(dataSourceModel, FLUSH_STRATEGY, pool.getFlushStrategy().name());
+            }
         }
         DsSecurity security = dataSource.getSecurity();
         if (security != null) {
@@ -212,6 +216,9 @@ class DataSourceModelNodeUtil {
             setIntegerIfNotNull(xaDataSourceModel, MIN_POOL_SIZE, pool.getMinPoolSize());
             setBooleanIfNotNull(xaDataSourceModel, POOL_PREFILL, pool.isPrefill());
             setBooleanIfNotNull(xaDataSourceModel, POOL_USE_STRICT_MIN, pool.isUseStrictMin());
+            if (pool.getFlushStrategy() != null) {
+                setStringIfNotNull(xaDataSourceModel, FLUSH_STRATEGY, pool.getFlushStrategy().name());
+            }
             setBooleanIfNotNull(xaDataSourceModel, INTERLIVING, pool.isInterleaving());
             setBooleanIfNotNull(xaDataSourceModel, NOTXSEPARATEPOOL, pool.isNoTxSeparatePool());
             setBooleanIfNotNull(xaDataSourceModel, PAD_XID, pool.isPadXid());
@@ -311,8 +318,10 @@ class DataSourceModelNodeUtil {
         final Integer minPoolSize = getIntIfSetOrGetDefault(dataSourceNode, MIN_POOL_SIZE, null);
         final boolean prefill = getBooleanIfSetOrGetDefault(dataSourceNode, POOL_PREFILL, false);
         final boolean useStrictMin = getBooleanIfSetOrGetDefault(dataSourceNode, POOL_USE_STRICT_MIN, false);
-        final CommonPool pool = new CommonPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin,
-                FlushStrategy.FAILING_CONNECTION_ONLY);
+        final FlushStrategy flushStrategy = dataSourceNode.hasDefined(FLUSH_STRATEGY) ? FlushStrategy.valueOf(dataSourceNode
+                .get(FLUSH_STRATEGY).asString()) : FlushStrategy.FAILING_CONNECTION_ONLY;
+
+        final CommonPool pool = new CommonPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin, flushStrategy);
 
         final String username = getStringIfSetOrGetDefault(dataSourceNode, USERNAME, null);
         final String password = getStringIfSetOrGetDefault(dataSourceNode, PASSWORD, null);
@@ -353,7 +362,7 @@ class DataSourceModelNodeUtil {
         final boolean useFastFail = getBooleanIfSetOrGetDefault(dataSourceNode, USE_FAST_FAIL, false);
         final boolean validateOnMatch = getBooleanIfSetOrGetDefault(dataSourceNode, VALIDATEONMATCH, false);
         final boolean spy = getBooleanIfSetOrGetDefault(dataSourceNode, SPY, false);
-        final boolean useCcm = getBooleanIfSetOrGetDefault(dataSourceNode, USE_CCM, false);
+        final boolean useCcm = getBooleanIfSetOrGetDefault(dataSourceNode, USE_CCM, true);
 
         final Validation validation = new ValidationImpl(backgroundValidation, backgroundValidationMinutes, useFastFail,
                 validConnectionChecker, checkValidConnectionSql, validateOnMatch, staleConnectionChecker, exceptionSorter);
@@ -388,9 +397,11 @@ class DataSourceModelNodeUtil {
         final boolean padXid = getBooleanIfSetOrGetDefault(dataSourceNode, PAD_XID, false);
         final boolean isSameRmOverride = getBooleanIfSetOrGetDefault(dataSourceNode, SAME_RM_OVERRIDE, false);
         final boolean wrapXaDataSource = getBooleanIfSetOrGetDefault(dataSourceNode, WRAP_XA_DATASOURCE, false);
-        final CommonXaPool xaPool = new CommonXaPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin,
-                FlushStrategy.FAILING_CONNECTION_ONLY, isSameRmOverride, interleaving, padXid, wrapXaDataSource,
-                noTxSeparatePool);
+        final FlushStrategy flushStrategy = dataSourceNode.hasDefined(FLUSH_STRATEGY) ? FlushStrategy.valueOf(dataSourceNode
+                .get(FLUSH_STRATEGY).asString()) : FlushStrategy.FAILING_CONNECTION_ONLY;
+
+        final CommonXaPool xaPool = new CommonXaPoolImpl(minPoolSize, maxPoolSize, prefill, useStrictMin, flushStrategy,
+                isSameRmOverride, interleaving, padXid, wrapXaDataSource, noTxSeparatePool);
 
         final String username = getStringIfSetOrGetDefault(dataSourceNode, USERNAME, null);
         final String password = getStringIfSetOrGetDefault(dataSourceNode, PASSWORD, null);
@@ -432,7 +443,7 @@ class DataSourceModelNodeUtil {
         final boolean useFastFail = getBooleanIfSetOrGetDefault(dataSourceNode, USE_FAST_FAIL, false);
         final boolean validateOnMatch = getBooleanIfSetOrGetDefault(dataSourceNode, VALIDATEONMATCH, false);
         final boolean spy = getBooleanIfSetOrGetDefault(dataSourceNode, SPY, false);
-        final boolean useCcm = getBooleanIfSetOrGetDefault(dataSourceNode, USE_CCM, false);
+        final boolean useCcm = getBooleanIfSetOrGetDefault(dataSourceNode, USE_CCM, true);
         final Validation validation = new ValidationImpl(backgroundValidation, backgroundValidationMinutes, useFastFail,
                 validConnectionChecker, checkValidConnectionSql, validateOnMatch, staleConnectionChecker, exceptionSorter);
 

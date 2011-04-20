@@ -36,6 +36,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CLASS
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONFIG_PROPERTIES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONNECTIONDEFINITIONS;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ENABLED;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.IDLETIMEOUTMINUTES;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.JNDINAME;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.MAX_POOL_SIZE;
@@ -88,6 +89,7 @@ class ResourceAdaptersSubsystemProviders {
             new NodeAttribute(ENABLED, ModelType.BOOLEAN, false), new NodeAttribute(MAX_POOL_SIZE, ModelType.INT, false),
             new NodeAttribute(MIN_POOL_SIZE, ModelType.INT, false),
             new NodeAttribute(POOL_USE_STRICT_MIN, ModelType.BOOLEAN, false),
+            new NodeAttribute(FLUSH_STRATEGY, ModelType.STRING, false),
             new NodeAttribute(SECURITY_DOMAIN_AND_APPLICATION, ModelType.STRING, false),
             new NodeAttribute(APPLICATION, ModelType.STRING, false),
             new NodeAttribute(SECURITY_DOMAIN, ModelType.STRING, false),
