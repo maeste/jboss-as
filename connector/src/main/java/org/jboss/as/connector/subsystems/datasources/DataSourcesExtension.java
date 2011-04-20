@@ -83,6 +83,8 @@ import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystem
 import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.DISABLE_XA_DATA_SOURCE_DESC;
 import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.ENABLE_DATA_SOURCE_DESC;
 import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.ENABLE_XA_DATA_SOURCE_DESC;
+import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.FLUSH_ALL_CONNECTION_DESC;
+import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.FLUSH_IDLE_CONNECTION_DESC;
 import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.JDBC_DRIVER_DESC;
 import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.REMOVE_DATA_SOURCE_DESC;
 import static org.jboss.as.connector.subsystems.datasources.DataSourcesSubsystemProviders.REMOVE_JDBC_DRIVER_DESC;
@@ -186,6 +188,10 @@ public class DataSourcesExtension implements Extension {
         dataSources.registerOperationHandler(REMOVE, DataSourceRemove.INSTANCE, REMOVE_DATA_SOURCE_DESC, false);
         dataSources.registerOperationHandler(ENABLE, DataSourceEnable.INSTANCE, ENABLE_DATA_SOURCE_DESC, false);
         dataSources.registerOperationHandler(DISABLE, DataSourceDisable.INSTANCE, DISABLE_DATA_SOURCE_DESC, false);
+        dataSources.registerOperationHandler("flush-idle-connection-in-pool", FlushIdleConnectionInPool.FLUSH_IDLE,
+                FLUSH_IDLE_CONNECTION_DESC, false);
+        dataSources.registerOperationHandler("flush-all-connection-in-pool", FlushIdleConnectionInPool.FLUSH_ALL,
+                FLUSH_ALL_CONNECTION_DESC, false);
 
         for (final String attributeName : DataSourcesMetrics.ATTRIBUTES) {
             dataSources.registerMetric(attributeName, DataSourcesMetrics.INSTANCE);

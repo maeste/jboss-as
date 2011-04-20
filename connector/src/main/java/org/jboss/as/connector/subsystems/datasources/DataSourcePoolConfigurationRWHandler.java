@@ -22,13 +22,19 @@
 
 package org.jboss.as.connector.subsystems.datasources;
 
+import static org.jboss.as.connector.subsystems.datasources.Constants.BACKGROUNDVALIDATION;
+import static org.jboss.as.connector.subsystems.datasources.Constants.BACKGROUNDVALIDATIONMINUTES;
+import static org.jboss.as.connector.subsystems.datasources.Constants.BLOCKING_TIMEOUT_WAIT_MILLIS;
+import static org.jboss.as.connector.subsystems.datasources.Constants.IDLETIMEOUTMINUTES;
+import static org.jboss.as.connector.subsystems.datasources.Constants.MAX_POOL_SIZE;
+import static org.jboss.as.connector.subsystems.datasources.Constants.MIN_POOL_SIZE;
+import static org.jboss.as.connector.subsystems.datasources.Constants.POOL_PREFILL;
+import static org.jboss.as.connector.subsystems.datasources.Constants.POOL_USE_STRICT_MIN;
+import static org.jboss.as.connector.subsystems.datasources.Constants.USE_FAST_FAIL;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE;
 
 import org.jboss.as.connector.ConnectorServices;
-import static org.jboss.as.connector.subsystems.datasources.Constants.*;
 import org.jboss.as.controller.BasicOperationResult;
 import org.jboss.as.controller.ModelQueryOperationHandler;
 import org.jboss.as.controller.OperationContext;
@@ -38,11 +44,8 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.RuntimeTask;
 import org.jboss.as.controller.RuntimeTaskContext;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.controller.operations.global.GlobalOperationHandlers.ReadAttributeHandler;
 import org.jboss.as.controller.operations.validation.ModelTypeValidator;
 import org.jboss.as.controller.operations.validation.ParameterValidator;
-import org.jboss.as.server.ServerOperationContext;
 import org.jboss.as.server.operations.ServerWriteAttributeOperationHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
