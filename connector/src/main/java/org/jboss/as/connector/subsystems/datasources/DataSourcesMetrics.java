@@ -25,6 +25,11 @@ package org.jboss.as.connector.subsystems.datasources;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jboss.as.connector.ConnectorServices;
 import org.jboss.as.controller.BasicOperationResult;
 import org.jboss.as.controller.ModelQueryOperationHandler;
@@ -36,8 +41,10 @@ import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.RuntimeTask;
 import org.jboss.as.controller.RuntimeTaskContext;
 import org.jboss.dmr.ModelNode;
+import org.jboss.jca.adapters.jdbc.statistics.JdbcStatisticsPlugin;
 import org.jboss.jca.core.api.management.DataSource;
 import org.jboss.jca.core.api.management.ManagementRepository;
+import org.jboss.jca.core.connectionmanager.pool.mcp.ManagedConnectionPoolStatisticsImpl;
 import org.jboss.msc.service.ServiceController;
 
 /**
@@ -49,18 +56,20 @@ class DataSourcesMetrics implements ModelQueryOperationHandler {
     static DataSourcesMetrics INSTANCE = new DataSourcesMetrics();
 
     static final String[] NO_LOCATION = new String[0];
-    private static final String MAX_POOL_SIZE = "metrics-max-pool-size";
-    private static final String MIN_POOL_SIZE = "metrics-min-pool-size";
-    private static final String BLOCKING_TIMEOUT = "metrics-blocking-timeout-wait-millis";
-    private static final String IDLE_TIMEOUT_MINUTES = "metrics-idle-timeout-minutes";
-    private static final String BACKGROUND_VALIDATION = "metrics-background-validation";
-    private static final String BACKGROUND_VALIDATION_MINUTES = "metrics-background-validation-minutes";
-    private static final String POOL_PREFILL = "metrics-pool-prefill";
-    private static final String POOL_USE_STRICT_MIN = "metrics-pool-use-strict-min";
-    private static final String USE_FAST_FAIL = "metrics-use-fast-fail";
 
-    static final String[] ATTRIBUTES = new String[] { MAX_POOL_SIZE, MIN_POOL_SIZE, BLOCKING_TIMEOUT, IDLE_TIMEOUT_MINUTES,
-            BACKGROUND_VALIDATION, BACKGROUND_VALIDATION_MINUTES, POOL_PREFILL, POOL_USE_STRICT_MIN, USE_FAST_FAIL };
+    static final Set<String> JDBC_ATTRIBUTES = (new JdbcStatisticsPlugin()).getNames();
+
+    // here it's not imortant the value used in the constructor, it's just to
+    // get attributes name
+    // this instance will be never really used
+    static final Set<String> POOL_ATTRIBUTES = (new ManagedConnectionPoolStatisticsImpl(1)).getNames();
+
+    static final Set<String> ATTRIBUTES = new HashSet<String>(JDBC_ATTRIBUTES.size() + POOL_ATTRIBUTES.size());
+
+    static {
+        ATTRIBUTES.addAll(JDBC_ATTRIBUTES);
+        ATTRIBUTES.addAll(POOL_ATTRIBUTES);
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -83,32 +92,12 @@ class DataSourcesMetrics implements ModelQueryOperationHandler {
                             if (repository.getDataSources() != null) {
                                 for (DataSource ds : repository.getDataSources()) {
                                     if (jndiName.equalsIgnoreCase(ds.getJndiName())) {
-                                        if (MAX_POOL_SIZE.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().getMaxSize());
+                                        if (JDBC_ATTRIBUTES.contains(attributeName) && ds.getStatistics() != null) {
+                                            result.set("" + ds.getStatistics().getValue(attributeName));
                                         }
-                                        if (MIN_POOL_SIZE.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().getMinSize());
-                                        }
-                                        if (BLOCKING_TIMEOUT.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().getBlockingTimeout());
-                                        }
-                                        if (IDLE_TIMEOUT_MINUTES.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().getIdleTimeout());
-                                        }
-                                        if (BACKGROUND_VALIDATION.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().isBackgroundValidation());
-                                        }
-                                        if (BACKGROUND_VALIDATION_MINUTES.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().getBackgroundValidationMinutes());
-                                        }
-                                        if (POOL_PREFILL.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().isPrefill());
-                                        }
-                                        if (POOL_USE_STRICT_MIN.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().isStrictMin());
-                                        }
-                                        if (USE_FAST_FAIL.equals(attributeName)) {
-                                            result.set("" + ds.getPoolConfiguration().isUseFastFail());
+                                        if (POOL_ATTRIBUTES.contains(attributeName) && ds.getPool() != null
+                                                && ds.getPool().getStatistics() != null) {
+                                            result.set("" + ds.getPool().getStatistics().getValue(attributeName));
                                         }
                                     }
                                 }
@@ -116,7 +105,8 @@ class DataSourcesMetrics implements ModelQueryOperationHandler {
                             resultHandler.handleResultFragment(new String[0], result);
                             resultHandler.handleResultComplete();
                         } catch (Exception e) {
-                            throw new OperationFailedException(new ModelNode().set("failed to get metrics" + e.getMessage()));
+                            e.printStackTrace();
+                            throw new OperationFailedException(new ModelNode().set("failed to get metrics " + e.getMessage()));
                         }
                     }
                 }
