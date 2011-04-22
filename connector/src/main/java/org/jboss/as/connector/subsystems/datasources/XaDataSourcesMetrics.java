@@ -25,6 +25,8 @@ package org.jboss.as.connector.subsystems.datasources;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,6 +41,10 @@ import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.RuntimeTask;
 import org.jboss.as.controller.RuntimeTaskContext;
 import org.jboss.dmr.ModelNode;
+import org.jboss.jca.adapters.jdbc.statistics.JdbcStatisticsPlugin;
+import org.jboss.jca.core.api.management.DataSource;
+import org.jboss.jca.core.api.management.ManagementRepository;
+import org.jboss.jca.core.connectionmanager.pool.mcp.ManagedConnectionPoolStatisticsImpl;
 import org.jboss.msc.service.ServiceController;
 
 /**
