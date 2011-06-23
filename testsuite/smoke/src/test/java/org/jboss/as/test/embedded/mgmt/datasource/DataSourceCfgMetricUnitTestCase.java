@@ -31,9 +31,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUC
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import junit.framework.Assert;
 
@@ -44,20 +41,18 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.protocol.old.StreamUtils;
 import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
 import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.Property;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Datasource resources unit test.
- * @author Emanuel Muckenhuber
+ * Datasource configuration and metrics unit test.
  * @author <a href="mailto:jeff.zhang@jboss.org">Jeff Zhang</a>
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class DataSourceResourcesUnitTestCase {
+public class DataSourceCfgMetricUnitTestCase {
 
     private ModelControllerClient client;
 
@@ -79,37 +74,21 @@ public class DataSourceResourcesUnitTestCase {
     }
 
     @Test
-    public void testReadChildrenResources() throws IOException {
+    public void testReadAttribute() throws IOException {
 
         final ModelNode address = new ModelNode();
         address.add("subsystem", "datasources");
+        address.add("data-source", "java:/H2DS");
         address.protect();
 
         final ModelNode operation = new ModelNode();
-        operation.get(OP).set("read-children-resources");
-        operation.get("child-type").set("data-source");
+        operation.get(OP).set("read-attribute");
+        operation.get("name").set("background-validation");
         operation.get(OP_ADDR).set(address);
 
         final ModelNode result = getModelControllerClient().execute(operation);
         Assert.assertTrue(result.hasDefined(RESULT));
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        final Map<String, ModelNode> children = getChildren(result.get(RESULT));
-        Assert.assertFalse(children.isEmpty());
-        for (final Entry<String, ModelNode> child : children.entrySet()) {
-            Assert.assertTrue(child.getKey() != null);
-            Assert.assertTrue(child.getValue().hasDefined("connection-url"));
-            Assert.assertTrue(child.getValue().hasDefined("jndi-name"));
-            Assert.assertTrue(child.getValue().hasDefined("driver-name"));
-        }
+        Assert.assertFalse(result.get(RESULT).asBoolean());
     }
-
-    protected static Map<String, ModelNode> getChildren(final ModelNode result) {
-        Assert.assertTrue(result.isDefined());
-        final Map<String, ModelNode> steps = new HashMap<String, ModelNode>();
-        for (final Property property : result.asPropertyList()) {
-            steps.put(property.getName(), property.getValue());
-        }
-        return steps;
-    }
-
 }

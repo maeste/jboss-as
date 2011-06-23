@@ -49,7 +49,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Basic management operation unit test.
+ * Datasource operation unit test.
  * @author Emanuel Muckenhuber
  * @author <a href="mailto:jeff.zhang@jboss.org">Jeff Zhang</a>
  */
