@@ -33,8 +33,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUC
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -45,7 +43,6 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.protocol.old.StreamUtils;
 import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
 import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.Property;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
 import org.junit.Test;
@@ -130,15 +127,6 @@ public class DataSourceOperationsUnitTestCase {
         operation.get(OP_ADDR).set(address);
         operation.get(NAME).set(attributeName);
         return operation;
-    }
-
-    protected static Map<String, ModelNode> getChildren(final ModelNode result) {
-        Assert.assertTrue(result.isDefined());
-        final Map<String, ModelNode> steps = new HashMap<String, ModelNode>();
-        for (final Property property : result.asPropertyList()) {
-            steps.put(property.getName(), property.getValue());
-        }
-        return steps;
     }
 
 }

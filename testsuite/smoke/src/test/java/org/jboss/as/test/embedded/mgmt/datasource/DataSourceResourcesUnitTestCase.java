@@ -22,11 +22,9 @@
 
 package org.jboss.as.test.embedded.mgmt.datasource;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.READ_ATTRIBUTE_OPERATION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
 
@@ -103,19 +101,6 @@ public class DataSourceResourcesUnitTestCase {
             Assert.assertTrue(child.getValue().hasDefined("jndi-name"));
             Assert.assertTrue(child.getValue().hasDefined("driver-name"));
         }
-    }
-
-    static void assertSuccessful(final ModelNode result) {
-        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        Assert.assertTrue(result.hasDefined(RESULT));
-    }
-
-    static ModelNode createReadAttributeOperation(final ModelNode address, final String attributeName) {
-        final ModelNode operation = new ModelNode();
-        operation.get(OP).set(READ_ATTRIBUTE_OPERATION);
-        operation.get(OP_ADDR).set(address);
-        operation.get(NAME).set(attributeName);
-        return operation;
     }
 
     protected static Map<String, ModelNode> getChildren(final ModelNode result) {
