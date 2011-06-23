@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.embedded.mgmt;
+package org.jboss.as.test.embedded.mgmt.datasource;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
@@ -55,10 +55,11 @@ import org.junit.runner.RunWith;
 /**
  * Basic management operation unit test.
  * @author Emanuel Muckenhuber
+ * @author <a href="mailto:jeff.zhang@jboss.org">Jeff Zhang</a>
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class DataSourcesOperationsUnitTestCase {
+public class DataSourceResourcesUnitTestCase {
 
     private ModelControllerClient client;
 
@@ -102,46 +103,6 @@ public class DataSourcesOperationsUnitTestCase {
             Assert.assertTrue(child.getValue().hasDefined("jndi-name"));
             Assert.assertTrue(child.getValue().hasDefined("driver-name"));
         }
-    }
-
-    @Test
-    public void testAddDsAndTestConnection() throws IOException {
-
-        final ModelNode address = new ModelNode();
-        address.add("subsystem", "datasources");
-        address.add("data-source", "MyNewDs");
-        address.protect();
-
-        final ModelNode operation = new ModelNode();
-        operation.get(OP).set("add");
-        operation.get(OP_ADDR).set(address);
-
-        operation.get("name").set("MyNewDs");
-        operation.get("jndi-name").set("java:/MyNewDs");
-        operation.get("enabled").set(true);
-
-        operation.get("driver-name").set("h2");
-        operation.get("pool-name").set("MyNewDs_Pool");
-
-        operation.get("connection-url").set("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
-        operation.get("user-name").set("sa");
-        operation.get("password").set("sa");
-
-        final ModelNode result = getModelControllerClient().execute(operation);
-        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-
-        final ModelNode address2 = new ModelNode();
-        address2.add("subsystem", "datasources");
-        address2.add("data-source", "MyNewDs");
-        address2.protect();
-
-        final ModelNode operation2 = new ModelNode();
-        operation2.get(OP).set("test-connection-in-pool");
-        operation2.get(OP_ADDR).set(address2);
-
-        final ModelNode result2 = getModelControllerClient().execute(operation2);
-        Assert.assertEquals(SUCCESS, result2.get(OUTCOME).asString());
-
     }
 
     static void assertSuccessful(final ModelNode result) {
