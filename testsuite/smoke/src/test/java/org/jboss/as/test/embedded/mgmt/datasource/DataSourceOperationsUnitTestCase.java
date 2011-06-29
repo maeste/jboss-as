@@ -30,20 +30,39 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REA
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
 
-import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 
 import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.as.connector.subsystems.datasources.DataSourcesExtension.NewDataSourceSubsystemParser;
+import org.jboss.as.connector.subsystems.datasources.Namespace;
 import org.jboss.as.controller.client.ModelControllerClient;
+import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.as.protocol.old.StreamUtils;
 import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.staxmapper.XMLExtendedStreamWriter;
+import org.jboss.staxmapper.XMLExtendedStreamWriterFactory;
+import org.jboss.staxmapper.XMLMapper;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,7 +96,7 @@ public class DataSourceOperationsUnitTestCase {
     }
 
     @Test
-    public void testAddDsAndTestConnection() throws IOException {
+    public void testAddDsAndTestConnection() throws Exception {
 
         final ModelNode address = new ModelNode();
         address.add("subsystem", "datasources");
@@ -114,8 +133,58 @@ public class DataSourceOperationsUnitTestCase {
         final ModelNode result2 = getModelControllerClient().execute(operation2);
         Assert.assertEquals(SUCCESS, result2.get(OUTCOME).asString());
 
+        List<ModelNode> newList = marshalAndReparseDsResources();
+
+        Assert.assertNotNull(newList);
+
+        final Map<String, ModelNode> parseChildren = getChildren(newList.get(1));
+        Assert.assertFalse(parseChildren.isEmpty());
+        Assert.assertEquals("java:/MyNewDs", parseChildren.get("jndi-name").asString());
     }
 
+    public List<ModelNode> marshalAndReparseDsResources() throws Exception {
+
+        final ModelNode address = new ModelNode();
+        address.add("subsystem", "datasources");
+        address.protect();
+
+        final ModelNode operation = new ModelNode();
+        operation.get(OP).set("read-children-resources");
+        operation.get("child-type").set("data-source");
+        operation.get(OP_ADDR).set(address);
+
+        final ModelNode result = getModelControllerClient().execute(operation);
+        Assert.assertTrue(result.hasDefined(RESULT));
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
+        final Map<String, ModelNode> children = getChildren(result.get(RESULT));
+        Assert.assertFalse(children.isEmpty());
+        for (final Entry<String, ModelNode> child : children.entrySet()) {
+            Assert.assertTrue(child.getKey() != null);
+            Assert.assertTrue(child.getValue().hasDefined("connection-url"));
+            Assert.assertTrue(child.getValue().hasDefined("jndi-name"));
+            Assert.assertTrue(child.getValue().hasDefined("driver-name"));
+        }
+
+        ModelNode dsNode = new ModelNode();
+        dsNode.get("data-source").set(result.get("result"));
+
+        StringWriter strWriter = new StringWriter();
+        XMLExtendedStreamWriter writer = XMLExtendedStreamWriterFactory.create(XMLOutputFactory.newFactory()
+                .createXMLStreamWriter(strWriter));
+        NewDataSourceSubsystemParser parser = new NewDataSourceSubsystemParser();
+        parser.writeContent(writer, new SubsystemMarshallingContext(dsNode, writer));
+        writer.flush();
+
+        XMLMapper mapper = XMLMapper.Factory.create();
+        mapper.registerRootElement(new QName(Namespace.CURRENT.getUriString(), "subsystem"), parser);
+
+        StringReader strReader = new StringReader(strWriter.toString());
+
+        XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StreamSource(strReader));
+        List<ModelNode> newList = new ArrayList<ModelNode>();
+        mapper.parseDocument(newList, reader);
+        return newList;
+    }
     static void assertSuccessful(final ModelNode result) {
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         Assert.assertTrue(result.hasDefined(RESULT));
@@ -129,4 +198,12 @@ public class DataSourceOperationsUnitTestCase {
         return operation;
     }
 
+    protected static Map<String, ModelNode> getChildren(final ModelNode result) {
+        Assert.assertTrue(result.isDefined());
+        final Map<String, ModelNode> steps = new HashMap<String, ModelNode>();
+        for (final Property property : result.asPropertyList()) {
+            steps.put(property.getName(), property.getValue());
+        }
+        return steps;
+    }
 }
