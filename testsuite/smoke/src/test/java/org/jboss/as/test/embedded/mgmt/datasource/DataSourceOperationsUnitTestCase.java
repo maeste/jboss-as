@@ -70,6 +70,7 @@ import org.junit.runner.RunWith;
 /**
  * Datasource operation unit test.
  * @author Emanuel Muckenhuber
+ * author <a href="mailto:stefano.maestri@redhat.com">Stefano Maestri</a>
  * @author <a href="mailto:jeff.zhang@jboss.org">Jeff Zhang</a>
  */
 @RunWith(Arquillian.class)
@@ -185,6 +186,7 @@ public class DataSourceOperationsUnitTestCase {
         mapper.parseDocument(newList, reader);
         return newList;
     }
+
     static void assertSuccessful(final ModelNode result) {
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         Assert.assertTrue(result.hasDefined(RESULT));
