@@ -78,7 +78,7 @@ public class DataSourceCfgMetricUnitTestCase {
 
         final ModelNode address = new ModelNode();
         address.add("subsystem", "datasources");
-        address.add("data-source", "java:/H2DS");
+        address.add("data-source", "java:jboss/datasources/ExampleDS");
         address.protect();
 
         final ModelNode operation = new ModelNode();
