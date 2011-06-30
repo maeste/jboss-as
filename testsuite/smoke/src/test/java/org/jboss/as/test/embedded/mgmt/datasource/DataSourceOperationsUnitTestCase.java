@@ -69,8 +69,7 @@ import org.junit.runner.RunWith;
 
 /**
  * Datasource operation unit test.
- * @author Emanuel Muckenhuber
- * author <a href="mailto:stefano.maestri@redhat.com">Stefano Maestri</a>
+ * @author <a href="mailto:stefano.maestri@redhat.com">Stefano Maestri</a>
  * @author <a href="mailto:jeff.zhang@jboss.org">Jeff Zhang</a>
  */
 @RunWith(Arquillian.class)
