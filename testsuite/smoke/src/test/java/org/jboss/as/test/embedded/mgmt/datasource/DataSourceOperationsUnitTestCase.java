@@ -109,7 +109,7 @@ public class DataSourceOperationsUnitTestCase {
         operation.get(OP_ADDR).set(address);
 
         operation.get("name").set("MyNewDs");
-        operation.get("jndi-name").set("java:/MyNewDs");
+        operation.get("jndi-name").set("java:jboss/datasources/MyNewDs");
         operation.get("enabled").set(true);
 
         operation.get("driver-name").set("h2");
@@ -140,7 +140,61 @@ public class DataSourceOperationsUnitTestCase {
 
         final Map<String, ModelNode> parseChildren = getChildren(newList.get(1));
         Assert.assertFalse(parseChildren.isEmpty());
-        Assert.assertEquals("java:/MyNewDs", parseChildren.get("jndi-name").asString());
+        Assert.assertEquals("java:jboss/datasources/MyNewDs", parseChildren.get("jndi-name").asString());
+
+        final ModelNode compensatingOperation = new ModelNode();
+        compensatingOperation.get(OP).set("remove");
+        compensatingOperation.get(OP_ADDR).set(address);
+
+        getModelControllerClient().execute(compensatingOperation);
+    }
+
+    @Test
+    public void testAddDsWithConnectionProperties() throws Exception {
+
+        final ModelNode address = new ModelNode();
+        address.add("subsystem", "datasources");
+        address.add("data-source", "MyNewDs");
+        address.protect();
+
+        final ModelNode operation = new ModelNode();
+        operation.get(OP).set("add");
+        operation.get(OP_ADDR).set(address);
+
+        operation.get("name").set("MyNewDs");
+        operation.get("jndi-name").set("java:jboss/datasources/MyNewDs");
+        operation.get("enabled").set(true);
+        operation.get("connection-properties", "MyKey").set("MyValue");
+
+        operation.get("driver-name").set("h2");
+        operation.get("pool-name").set("MyNewDs_Pool");
+
+        operation.get("connection-url").set("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+        operation.get("user-name").set("sa");
+        operation.get("password").set("sa");
+
+        final ModelNode result = getModelControllerClient().execute(operation);
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
+
+        List<ModelNode> newList = marshalAndReparseDsResources();
+
+        Assert.assertNotNull(newList);
+
+        final Map<String, ModelNode> parseChildren = getChildren(newList.get(1));
+        Assert.assertFalse(parseChildren.isEmpty());
+        Assert.assertEquals("java:jboss/datasources/MyNewDs", parseChildren.get("jndi-name").asString());
+        for (Entry<String, ModelNode> entry : parseChildren.entrySet()) {
+            System.out.println(entry.getKey());
+        }
+
+        Assert.assertEquals("MyKey", parseChildren.get("connection-properties").asProperty().getName());
+        Assert.assertEquals("MyValue", parseChildren.get("connection-properties").asProperty().getValue().asString());
+
+        final ModelNode compensatingOperation = new ModelNode();
+        compensatingOperation.get(OP).set("remove");
+        compensatingOperation.get(OP_ADDR).set(address);
+
+        getModelControllerClient().execute(compensatingOperation);
     }
 
     public List<ModelNode> marshalAndReparseDsResources() throws Exception {
