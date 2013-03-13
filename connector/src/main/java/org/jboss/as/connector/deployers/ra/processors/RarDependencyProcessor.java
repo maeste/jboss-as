@@ -42,6 +42,8 @@ public class RarDependencyProcessor implements DeploymentUnitProcessor {
     private static ModuleIdentifier VALIDATION_ID = ModuleIdentifier.create("javax.validation.api");
     private static ModuleIdentifier HIBERNATE_VALIDATOR_ID = ModuleIdentifier.create("org.hibernate.validator");
     private static ModuleIdentifier RESOURCE_API_ID = ModuleIdentifier.create("javax.resource.api");
+    private static ModuleIdentifier JGROUPS_ID = ModuleIdentifier.create("org.jgroups");
+    private static ModuleIdentifier CLUSTERING_JGROUPS_ID = ModuleIdentifier.create("org.jboss.as.clustering.jgroups");
 
     /**
      * Add dependencies for modules required for ra deployments
@@ -68,6 +70,9 @@ public class RarDependencyProcessor implements DeploymentUnitProcessor {
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, IRON_JACAMAR_ID, false, false, false, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, IRON_JACAMAR_IMPL_ID, false, true, false, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, HIBERNATE_VALIDATOR_ID, false, false, true, false));
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, CLUSTERING_JGROUPS_ID, true, false, true, false));
+        moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, JGROUPS_ID, true, false, true, false));
+
     }
 
     public void undeploy(final DeploymentUnit context) {

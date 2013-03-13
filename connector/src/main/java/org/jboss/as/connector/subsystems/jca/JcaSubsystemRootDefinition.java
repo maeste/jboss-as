@@ -72,6 +72,8 @@ public class JcaSubsystemRootDefinition extends SimpleResourceDefinition {
 
         resourceRegistration.registerSubModel(JcaWorkManagerDefinition.createInstance(registerRuntimeOnly));
 
+        resourceRegistration.registerSubModel(JcaDistributedWorkManagerDefinition.createInstance(registerRuntimeOnly));
+
         resourceRegistration.registerSubModel(JcaBootstrapContextDefinition.INSTANCE);
 
     }
@@ -79,6 +81,7 @@ public class JcaSubsystemRootDefinition extends SimpleResourceDefinition {
     static void registerTransformers(SubsystemRegistration subsystem) {
         ResourceTransformationDescriptionBuilder builder = TransformationDescriptionBuilder.Factory.createSubsystemInstance();
         JcaWorkManagerDefinition.registerTransformers110(builder);
+        JcaCachedConnectionManagerDefinition.registerTransformers110(builder);
         TransformationDescription.Tools.register(builder.build(), subsystem, ModelVersion.create(1, 1, 0));
     }
 }

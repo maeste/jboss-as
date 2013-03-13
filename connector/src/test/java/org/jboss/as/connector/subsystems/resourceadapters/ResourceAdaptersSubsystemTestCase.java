@@ -77,36 +77,47 @@ public class ResourceAdaptersSubsystemTestCase extends AbstractSubsystemBaseTest
 
     @Test
     public void testTransformerAS712() throws Exception {
-        testTransformer1_1_0("resource-adapters-xapool.xml", ModelTestControllerVersion.V7_1_2_FINAL);
+        testTransformer("resource-adapters-xapool.xml", ModelTestControllerVersion.V7_1_2_FINAL, ModelVersion.create(1, 1, 0));
     }
 
     @Test
     public void testTransformerAS713() throws Exception {
-        testTransformer1_1_0("resource-adapters-xapool.xml", ModelTestControllerVersion.V7_1_3_FINAL);
+        testTransformer("resource-adapters-xapool.xml", ModelTestControllerVersion.V7_1_3_FINAL, ModelVersion.create(1, 1, 0));
+    }
+
+    @Test
+    public void testTransformerAS720() throws Exception {
+        testTransformer("resource-adapters-xapool.xml", ModelTestControllerVersion.MASTER, ModelVersion.create(1, 2, 0));
     }
 
     @Test
     public void tesExpressionsAS712() throws Exception {
         //this file contain expression for all supported fields except bean-validation-groups and recovery-plugin-properties
         // for a limitation in test suite not permitting to have expression in type LIST or OBJECT for legacyServices
-        testTransformer1_1_0("resource-adapters-xapool-expression2.xml", ModelTestControllerVersion.V7_1_2_FINAL);
+        testTransformer("resource-adapters-xapool-expression2.xml", ModelTestControllerVersion.V7_1_2_FINAL, ModelVersion.create(1, 1, 0));
     }
 
     @Test
     public void testExpressionsAS713() throws Exception {
         //this file contain expression for all supported fields except bean-validation-groups and recovery-plugin-properties
         // for a limitation in test suite not permitting to have expression in type LIST or OBJECT for legacyServices
-        testTransformer1_1_0("resource-adapters-xapool-expression2.xml", ModelTestControllerVersion.V7_1_3_FINAL);
+        testTransformer("resource-adapters-xapool-expression2.xml", ModelTestControllerVersion.V7_1_3_FINAL, ModelVersion.create(1, 1, 0));
+    }
+
+    @Test
+    public void testExpressionsAS720() throws Exception {
+        //this file contain expression for all supported fields except bean-validation-groups and recovery-plugin-properties
+        // for a limitation in test suite not permitting to have expression in type LIST or OBJECT for legacyServices
+        testTransformer("resource-adapters-xapool-expression2.xml", ModelTestControllerVersion.MASTER, ModelVersion.create(1, 2, 0));
     }
 
 
     /**
-     * Tests transformation of model from 1.1.1 version into 1.1.0 version.
+     * Tests transformation of model from current to passed one
      *
      * @throws Exception
      */
-    private void testTransformer1_1_0(String subsystemXml, ModelTestControllerVersion controllerVersion) throws Exception {
-        ModelVersion modelVersion = ModelVersion.create(1, 1, 0); //The old model version
+    private void testTransformer(String subsystemXml, ModelTestControllerVersion controllerVersion, ModelVersion modelVersion) throws Exception {
         //Use the non-runtime version of the extension which will happen on the HC
         KernelServicesBuilder builder = createKernelServicesBuilder(AdditionalInitialization.MANAGEMENT)
                 .setSubsystemXmlResource(subsystemXml);
@@ -128,7 +139,6 @@ public class ResourceAdaptersSubsystemTestCase extends AbstractSubsystemBaseTest
 
         checkSubsystemModelTransformation(mainServices, modelVersion);
     }
-
 
     protected AdditionalInitialization createAdditionalInitialization() {
         return AdditionalInitialization.MANAGEMENT;

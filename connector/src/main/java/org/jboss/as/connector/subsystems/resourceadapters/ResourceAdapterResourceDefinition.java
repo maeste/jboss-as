@@ -79,9 +79,14 @@ public class ResourceAdapterResourceDefinition extends SimpleResourceDefinition 
     }
 
 
-    static void registerTransformers(ResourceTransformationDescriptionBuilder parentBuilder) {
+    static void registerTransformers120(ResourceTransformationDescriptionBuilder parentBuilder) {
+        ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PathElement.pathElement(RESOURCEADAPTER_NAME));
+        ConnectionDefinitionResourceDefinition.registerTransformer120(builder);
+    }
+
+    static void registerTransformers110(ResourceTransformationDescriptionBuilder parentBuilder) {
         ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PathElement.pathElement(RESOURCEADAPTER_NAME)).getAttributeBuilder()
                 .setDiscard(DiscardAttributeChecker.UNDEFINED, Constants.MODULE).end();
-        ConnectionDefinitionResourceDefinition.registerTransformers(builder);
+        ConnectionDefinitionResourceDefinition.registerTransformer110(builder);
     }
 }

@@ -81,4 +81,9 @@ public class JBossMessageEndpointFactory implements MessageEndpointFactory {
     public String getActivationName() {
         return service.getActivationName();
     }
+
+    @Override
+    public Class<?> getEndpointClass() {
+        return MessageEndpointInvocationHandler.class;
+    }
 }
