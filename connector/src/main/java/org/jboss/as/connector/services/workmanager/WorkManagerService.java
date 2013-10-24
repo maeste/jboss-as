@@ -24,6 +24,7 @@ package org.jboss.as.connector.services.workmanager;
 
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.jca.core.api.workmanager.WorkManager;
+import org.jboss.jca.core.security.CallbackImpl;
 import org.jboss.jca.core.tx.jbossts.XATerminatorImpl;
 import org.jboss.jca.core.workmanager.WorkManagerCoordinator;
 import org.jboss.msc.inject.Injector;
@@ -85,7 +86,7 @@ public final class WorkManagerService implements Service<WorkManager> {
             this.value.setShortRunningThreadPool((BlockingExecutor) executorShort.getValue());
 
         }
-
+        this.value.setCallbackSecurity(new CallbackImpl(false, "other", null, null, null, null));
         this.value.setXATerminator(new XATerminatorImpl(xaTerminator.getValue()));
 
         if (value.getName().equals(DEFAULT_NAME)) {

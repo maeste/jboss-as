@@ -62,7 +62,7 @@ import org.jboss.jca.common.api.metadata.common.CommonPool;
 import org.jboss.jca.common.api.metadata.common.FlushStrategy;
 import org.jboss.jca.common.api.metadata.common.Recovery;
 import org.jboss.jca.common.api.metadata.common.TransactionSupportEnum;
-import org.jboss.jca.common.api.metadata.common.v10.CommonConnDef;
+import org.jboss.jca.common.api.metadata.common.v11.CommonConnDef;
 import org.jboss.jca.common.api.metadata.ironjacamar.IronJacamar;
 import org.jboss.jca.common.api.metadata.ra.AdminObject;
 import org.jboss.jca.common.api.metadata.ra.AuthenticationMechanism;
@@ -87,8 +87,10 @@ import org.jboss.jca.common.metadata.common.CommonTimeOutImpl;
 import org.jboss.jca.common.metadata.common.CommonValidationImpl;
 import org.jboss.jca.common.metadata.common.CommonXaPoolImpl;
 import org.jboss.jca.common.metadata.common.CredentialImpl;
-import org.jboss.jca.common.metadata.common.v10.CommonConnDefImpl;
-import org.jboss.jca.common.metadata.ironjacamar.v10.IronJacamarImpl;
+import org.jboss.jca.common.metadata.common.v11.CommonConnDefImpl;
+import org.jboss.jca.common.metadata.common.v11.WorkManagerImpl;
+import org.jboss.jca.common.metadata.common.v11.WorkManagerSecurityImpl;
+import org.jboss.jca.common.metadata.ironjacamar.v11.IronJacamarImpl;
 import org.jboss.jca.common.metadata.ra.common.AuthenticationMechanismImpl;
 import org.jboss.jca.common.metadata.ra.common.ConfigPropertyImpl;
 import org.jboss.jca.common.metadata.ra.common.ConnectionDefinitionImpl;
@@ -453,7 +455,7 @@ public class PooledConnectionFactoryService implements Service<Void> {
 
     private static IronJacamarImpl createIron(CommonConnDef common, TransactionSupportEnum transactionSupport) {
         List<CommonConnDef> definitions = Collections.singletonList(common);
-        return new IronJacamarImpl(transactionSupport, Collections.<String, String>emptyMap(), Collections.<CommonAdminObject>emptyList(), definitions, Collections.<String>emptyList(), null);
+        return new IronJacamarImpl(transactionSupport, Collections.<String, String>emptyMap(), Collections.<CommonAdminObject>emptyList(), definitions, Collections.<String>emptyList(), null, new WorkManagerImpl(new WorkManagerSecurityImpl(false, "other", null, null, null, null)));
     }
 
 
@@ -480,7 +482,7 @@ public class PooledConnectionFactoryService implements Service<Void> {
         // when its ResourceAdapter is started
         Recovery recovery = new Recovery(new CredentialImpl(null, null, null), null, Boolean.TRUE);
         CommonValidationImpl validation = new CommonValidationImpl(null, null, false);
-        return new CommonConnDefImpl(Collections.<String, String>emptyMap(), RAMANAGED_CONN_FACTORY, jndiName, HQ_CONN_DEF, true, true, true, pool, timeOut, validation, security, recovery);
+        return new CommonConnDefImpl(Collections.<String, String>emptyMap(), RAMANAGED_CONN_FACTORY, jndiName, HQ_CONN_DEF, true, true, true, true, true, pool, timeOut, validation, security, recovery);
     }
 
     private static Connector15Impl createConnector15(ResourceAdapter1516 ra) {
