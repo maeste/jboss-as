@@ -46,11 +46,7 @@
                 <wrap-xa-resource>${test.expr:false}</wrap-xa-resource>
             </xa-pool>
           <!--Optional:-->
-          <security>
-            <!--You have a CHOICE of the next 3 items at this level-->
-            <!--Optional:-->
-            <application/>
-          </security>
+
           <!--Optional:-->
           <timeout>
             <!--Optional:-->

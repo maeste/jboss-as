@@ -150,13 +150,11 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
     static void registerTransformers110(ResourceTransformationDescriptionBuilder parentBuilder) {
         ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PATH_DATASOURCE)
                 .getAttributeBuilder()
-                //If these have an implied value in the old model we should discard depending on that rather than simply undefined
                 .setDiscard(DiscardAttributeChecker.UNDEFINED,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES, CONNECTION_LISTENER_CLASS,
                         CONNECTION_LISTENER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS,
-                        Constants.CONNECTION_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE
                         )
@@ -165,7 +163,6 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
                         CONNECTION_LISTENER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS,
-                        Constants.CONNECTION_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE
                         )
@@ -174,10 +171,6 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
                 .addRejectCheck(RejectAttributeChecker.UNDEFINED, Constants.EXCEPTION_SORTER_PROPERTIES, Constants.REAUTHPLUGIN_PROPERTIES, Constants.STALE_CONNECTION_CHECKER_PROPERTIES, Constants.VALID_CONNECTION_CHECKER_PROPERTIES)
                 //Reject expressions for enabled, since if they are used we don't know their value for the operation transformer override
                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.ENABLED)
-/* For this does the default value matter?
-Different 'default' for attribute 'allow-multiple-users'. Current: false; legacy: undefined
-*/
-
                 .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION)
                 .inheritResourceAttributeDefinitions()
@@ -193,13 +186,11 @@ Different 'default' for attribute 'allow-multiple-users'. Current: false; legacy
     static void registerTransformers111(ResourceTransformationDescriptionBuilder parentBuilder) {
         ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PATH_DATASOURCE);
                 builder.getAttributeBuilder()
-                //If these have an implied value in the old model we should discard depending on that rather than simply undefined
                 .setDiscard(DiscardAttributeChecker.UNDEFINED,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES, CONNECTION_LISTENER_CLASS,
                         CONNECTION_LISTENER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS,
-                        Constants.CONNECTION_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE
                         )
@@ -208,7 +199,6 @@ Different 'default' for attribute 'allow-multiple-users'. Current: false; legacy
                         CONNECTION_LISTENER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS,
-                        Constants.CONNECTION_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE
                         )
