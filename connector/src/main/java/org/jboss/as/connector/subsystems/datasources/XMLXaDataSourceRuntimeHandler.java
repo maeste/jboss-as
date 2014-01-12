@@ -32,7 +32,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.jca.common.api.metadata.common.CommonPool;
 import org.jboss.jca.common.api.metadata.common.CommonXaPool;
 import org.jboss.jca.common.api.metadata.ds.v12.DsPool;
-import org.jboss.jca.common.api.metadata.ds.v12.XaDataSource;
+import org.jboss.jca.common.api.metadata.ds.v13.XaDataSource;
 import org.jboss.jca.common.api.metadata.ds.v12.DsXaPool;
 
 /**
@@ -82,6 +82,8 @@ public class XMLXaDataSourceRuntimeHandler extends AbstractXMLDataSourceRuntimeH
             setBooleanIfNotNull(context, dataSource.isUseJavaContext());
         } else if (attributeName.equals(Constants.ENABLED.getName())) {
             setBooleanIfNotNull(context, dataSource.isEnabled());
+        } else if (attributeName.equals(Constants.CONNECTABLE.getName())) {
+            setBooleanIfNotNull(context, dataSource.isConnectable());
         } else if (attributeName.equals(org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_SIZE.getName())) {
             if (dataSource.getXaPool() == null) {
                 return;

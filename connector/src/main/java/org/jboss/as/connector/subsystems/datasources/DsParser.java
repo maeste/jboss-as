@@ -42,6 +42,7 @@ import static org.jboss.as.connector.subsystems.datasources.Constants.ALLOCATION
 import static org.jboss.as.connector.subsystems.datasources.Constants.ALLOCATION_RETRY_WAIT_MILLIS;
 import static org.jboss.as.connector.subsystems.datasources.Constants.ALLOW_MULTIPLE_USERS;
 import static org.jboss.as.connector.subsystems.datasources.Constants.CHECK_VALID_CONNECTION_SQL;
+import static org.jboss.as.connector.subsystems.datasources.Constants.CONNECTABLE;
 import static org.jboss.as.connector.subsystems.datasources.Constants.CONNECTION_LISTENER_CLASS;
 import static org.jboss.as.connector.subsystems.datasources.Constants.CONNECTION_LISTENER_PROPERTIES;
 import static org.jboss.as.connector.subsystems.datasources.Constants.CONNECTION_PROPERTIES;
@@ -129,10 +130,10 @@ import org.jboss.jca.common.api.metadata.ds.DsSecurity;
 import org.jboss.jca.common.api.metadata.ds.Statement;
 import org.jboss.jca.common.api.metadata.ds.TimeOut;
 import org.jboss.jca.common.api.metadata.ds.Validation;
-import org.jboss.jca.common.api.metadata.ds.v12.DataSource;
+import org.jboss.jca.common.api.metadata.ds.v13.DataSource;
 import org.jboss.jca.common.api.metadata.ds.v12.DsPool;
 import org.jboss.jca.common.api.metadata.ds.v12.DsXaPool;
-import org.jboss.jca.common.api.metadata.ds.v12.XaDataSource;
+import org.jboss.jca.common.api.metadata.ds.v13.XaDataSource;
 import org.jboss.jca.common.api.validator.ValidateException;
 import org.jboss.logging.Messages;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
@@ -325,7 +326,7 @@ public class DsParser extends AbstractParser {
         String poolName = null;
         final ModelNode operation = new ModelNode();
         operation.get(OP).set(ADD);
-        for (DataSource.Attribute attribute : DataSource.Attribute.values()) {
+        for (XaDataSource.Attribute attribute : XaDataSource.Attribute.values()) {
             switch (attribute) {
                 case ENABLED: {
                     String value = rawAttributeText(reader, ENABLED.getXmlName());
@@ -361,6 +362,13 @@ public class DsParser extends AbstractParser {
                     String value = rawAttributeText(reader, USE_CCM.getXmlName());
                     if (value != null) {
                         USE_CCM.parseAndSetParameter(value, operation, reader);
+                    }
+                    break;
+                }
+                case CONNECTABLE: {
+                    String value = rawAttributeText(reader, CONNECTABLE.getXmlName());
+                    if (value != null) {
+                        CONNECTABLE.parseAndSetParameter(value, operation, reader);
                     }
                     break;
                 }
@@ -583,6 +591,13 @@ public class DsParser extends AbstractParser {
                     String value = rawAttributeText(reader, JTA.getXmlName());
                     if (value != null) {
                         JTA.parseAndSetParameter(value, operation, reader);
+                    }
+                    break;
+                }
+                case CONNECTABLE: {
+                    String value = rawAttributeText(reader, CONNECTABLE.getXmlName());
+                    if (value != null) {
+                        CONNECTABLE.parseAndSetParameter(value, operation, reader);
                     }
                     break;
                 }

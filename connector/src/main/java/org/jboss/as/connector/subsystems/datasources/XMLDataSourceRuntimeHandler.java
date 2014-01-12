@@ -30,7 +30,7 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.jca.common.api.metadata.common.CommonPool;
-import org.jboss.jca.common.api.metadata.ds.v12.DataSource;
+import org.jboss.jca.common.api.metadata.ds.v13.DataSource;
 import org.jboss.jca.common.api.metadata.ds.v12.DsPool;
 
 /**
@@ -92,6 +92,8 @@ public class XMLDataSourceRuntimeHandler extends AbstractXMLDataSourceRuntimeHan
             setBooleanIfNotNull(context, dataSource.isJTA());
         } else if (attributeName.equals(Constants.ENABLED.getName())) {
             setBooleanIfNotNull(context, dataSource.isEnabled());
+        } else if (attributeName.equals(Constants.CONNECTABLE.getName())) {
+            setBooleanIfNotNull(context, dataSource.isConnectable());
         } else if (attributeName.equals(org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_SIZE.getName())) {
             if (dataSource.getPool() == null) {
                 return;
