@@ -48,6 +48,8 @@ enum Element {
     JDBC_STATE_STORE("state"),
     JDBC_COMMUNICATION_STORE("communication"),
     JDBC_ACTION_STORE("action"),
+    LLR_RESPOURCE("llr-resource"),
+    TABLE("table")
     ;
 
     private final String name;

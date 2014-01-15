@@ -48,6 +48,8 @@ enum Attribute {
     TABLE_PREFIX("table-prefix"),
     DROP_TABLE("drop-table"),
     ENABLE_ASYNC_IO("enable-async-io"),
+    JNDI_NAME("jndi-name"),
+    NAME("name")
     ;
     private final String name;
 
