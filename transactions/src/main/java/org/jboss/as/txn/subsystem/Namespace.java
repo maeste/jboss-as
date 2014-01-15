@@ -41,7 +41,6 @@ enum Namespace {
     TRANSACTIONS_1_4("urn:jboss:domain:transactions:1.4"),
     TRANSACTIONS_2_0("urn:jboss:domain:transactions:2.0"),
     TRANSACTIONS_3_0("urn:jboss:domain:transactions:3.0"),
-
     ;
 
     /**
