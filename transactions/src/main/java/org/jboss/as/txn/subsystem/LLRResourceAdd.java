@@ -40,8 +40,16 @@ class LLRResourceAdd extends AbstractAddStepHandler {
     static LLRResourceAdd INSTANCE = new LLRResourceAdd();
 
     @Override
+    protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+        LLRResourceResourceDefinition.JNDI_NAME.validateAndSet(operation, model);
+        LLRResourceResourceDefinition.TABLE_NAME.validateAndSet(operation, model);
+
+    }
+
+    @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model,
                                       final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
+
 
     }
 

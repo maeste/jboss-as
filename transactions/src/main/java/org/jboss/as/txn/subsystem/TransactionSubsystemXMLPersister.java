@@ -23,6 +23,7 @@ package org.jboss.as.txn.subsystem;
 
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
@@ -125,6 +126,21 @@ class TransactionSubsystemXMLPersister implements XMLElementWriter<SubsystemMars
                 writer.writeEmptyElement(Element.JDBC_STATE_STORE.getLocalName());
                 TransactionSubsystemRootResourceDefinition.JDBC_STATE_STORE_TABLE_PREFIX.marshallAsAttribute(node, writer);
                 TransactionSubsystemRootResourceDefinition.JDBC_STATE_STORE_DROP_TABLE.marshallAsAttribute(node, writer);
+            }
+            writer.writeEndElement();
+        }
+
+        if (node.hasDefined(LLRResourceResourceDefinition.LLR_RESOURCE) && node.get(LLRResourceResourceDefinition.LLR_RESOURCE).asList().size() > 0) {
+            writer.writeStartElement(Element.LLR_RESOURCES.getLocalName());
+            for (Property llr : node.get(LLRResourceResourceDefinition.LLR_RESOURCE).asPropertyList()) {
+                writer.writeStartElement(LLRResourceResourceDefinition.LLR_RESOURCE);
+                LLRResourceResourceDefinition.JNDI_NAME.marshallAsAttribute(llr.getValue(), writer);
+                if (llr.getValue().hasDefined(LLRResourceResourceDefinition.TABLE_NAME.getName())) {
+                    writer.writeStartElement(Element.TABLE.getLocalName());
+                    LLRResourceResourceDefinition.TABLE_NAME.marshallAsAttribute(llr.getValue(), writer);
+                    writer.writeEndElement();
+                }
+                writer.writeEndElement();
             }
             writer.writeEndElement();
         }

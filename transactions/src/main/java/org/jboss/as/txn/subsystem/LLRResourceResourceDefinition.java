@@ -24,11 +24,6 @@ package org.jboss.as.txn.subsystem;
 
 import static org.jboss.as.txn.TransactionMessages.MESSAGES;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.jboss.as.controller.AttributeDefinition;
-import org.jboss.as.controller.AttributeMarshaller;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
@@ -48,7 +43,7 @@ import org.jboss.dmr.ModelType;
  */
 public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
 
-    private static String LLR_RESOURCE = "llr-resource";
+    static String LLR_RESOURCE = "llr-resource";
 
     private static final PathElement PATH_LLR_RESOURCE = PathElement.pathElement(LLR_RESOURCE);
 
@@ -81,7 +76,7 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                 .setAllowExpression(true)
             .setAllowNull(false)
             .setXmlName("name")
-            .setAttributeMarshaller(new AttributeMarshaller() {
+            /*.setAttributeMarshaller(new AttributeMarshaller() {
                 public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
                     if (resourceModel.hasDefined(attribute.getName())) {
                         writer.writeStartElement(Element.TABLE.getLocalName());
@@ -90,7 +85,7 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                     }
 
                 }
-            })
+            })  */
             .build();
 
 

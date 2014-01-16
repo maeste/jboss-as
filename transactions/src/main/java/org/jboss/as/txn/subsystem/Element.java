@@ -49,6 +49,7 @@ enum Element {
     JDBC_COMMUNICATION_STORE("communication"),
     JDBC_ACTION_STORE("action"),
     LLR_RESPOURCE("llr-resource"),
+    LLR_RESOURCES("llr-resources"),
     TABLE("table")
     ;
 

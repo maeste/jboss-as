@@ -127,6 +127,12 @@ public class TransactionSubsystemTestCase extends AbstractSubsystemBaseTest {
     }
 
     @Test
+    public void testParser_3_0() throws Exception {
+        standardSubsystemTest("full-3.0.xml");
+    }
+
+
+    @Test
     public void testAsyncIOExpressions() throws Exception {
         standardSubsystemTest("async-io-expressions.xml");
     }

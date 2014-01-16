@@ -24,6 +24,7 @@ package org.jboss.as.txn.subsystem;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.controller.parsing.ParseUtils.missingRequired;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 
@@ -92,7 +94,9 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                 parseLLR(reader, operations);
                 break;
             }
-
+            case LLR_RESOURCES:
+                //just ignore and parse 1...n llr-resource inside
+                break;
             default: {
                 throw unexpectedElement(reader);
             }
@@ -100,19 +104,24 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
     }
 
     private void parseLLR(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
-        final ModelNode llrAddress = new ModelNode();
+        final ModelNode address = new ModelNode();
+        address.add(ModelDescriptionConstants.SUBSYSTEM, TransactionExtension.SUBSYSTEM_NAME);
+        address.protect();
+
+        final ModelNode llrAddress = address.clone();
+
         final ModelNode llrOperation = new ModelNode();
         llrOperation.get(OP).set(ADD);
-        llrAddress.add(LogStoreConstants.LOG_STORE, LogStoreConstants.LOG_STORE);
 
-        llrAddress.protect();
-
+        String jndiName = null;
         for (Attribute attribute : Attribute.values()) {
             switch (attribute) {
                 case JNDI_NAME: {
-                    String value = rawAttributeText(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName(), null);
-                    if (value != null) {
-                        LLRResourceResourceDefinition.JNDI_NAME.parseAndSetParameter(value, llrOperation, reader);
+                    jndiName = rawAttributeText(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName(), null);
+                    if (jndiName != null) {
+                        LLRResourceResourceDefinition.JNDI_NAME.parseAndSetParameter(jndiName, llrOperation, reader);
+                    } else {
+                      throw missingRequired(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName());
                     }
                     break;
                 }
@@ -122,11 +131,14 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
             }
         }
 
-        llrOperation.get(OP_ADDR).set(llrAddress);
         while (reader.hasNext()) {
             switch (reader.nextTag()) {
                 case END_ELEMENT: {
-                    if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.LLR_RESPOURCE) {
+                    if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.LLR_RESPOURCE && jndiName != null) {
+                        llrAddress.add(LLRResourceResourceDefinition.LLR_RESOURCE, jndiName);
+                        llrAddress.protect();
+                        llrOperation.get(OP_ADDR).set(llrAddress);
+
                         operations.add(llrOperation);
                         return;
                     } else {
