@@ -22,14 +22,21 @@
 
 package org.jboss.as.txn.subsystem;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+
 import java.util.List;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
+
+import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
+import com.arjuna.ats.jta.common.JTAEnvironmentBean;
+
 
 /**
  * TODO class javadoc.
@@ -48,11 +55,16 @@ class LLRResourceAdd extends AbstractAddStepHandler {
 
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model,
-                                      final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
+                                  final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
+        PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
 
+        final String jndiName = address.getLastElement().getValue();
 
+        // TODO Uncomment this code when the correct version of narayana is used in wildfly
+/*        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class);
+        List<String> jndiNames = jtaEnvironmentBean.getConnectableResourceJNDINames();
+
+        jndiNames.add(jndiName);
+        jtaEnvironmentBean.setConnectableResourceJNDINames(jndiNames);*/
     }
-
-
-
 }

@@ -90,15 +90,26 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                 subsystemOperation.get(CommonAttributes.USE_JDBC_STORE).set(true);
                 break;
             }
-            case LLR_RESPOURCE: {
-                parseLLR(reader, operations);
-                break;
-            }
             case LLR_RESOURCES:
-                //just ignore and parse 1...n llr-resource inside
+                parseLLRs(reader, operations);
                 break;
             default: {
                 throw unexpectedElement(reader);
+            }
+        }
+    }
+
+    private void parseLLRs(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
+
+        while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+            final Element element = Element.forName(reader.getLocalName());
+            switch (element) {
+                case LLR_RESPOURCE:
+                    parseLLR(reader, operations);
+                    break;
+                default: {
+                    throw unexpectedElement(reader);
+                }
             }
         }
     }
@@ -114,6 +125,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         llrOperation.get(OP).set(ADD);
 
         String jndiName = null;
+//        String tableName = "xids";
         for (Attribute attribute : Attribute.values()) {
             switch (attribute) {
                 case JNDI_NAME: {

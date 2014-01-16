@@ -300,7 +300,7 @@
                    ]]>
             </xs:documentation>
         </xs:annotation>
-        <xs:attribute name="name" type="xs:token" use="required"/>
+        <xs:attribute name="name" type="xs:token" use="optional"/>
     </xs:complexType>
 
 </xs:schema>
