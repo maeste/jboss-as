@@ -83,6 +83,8 @@ public class Constants {
 
     private static final String ENABLED_NAME = "enabled";
 
+    private static final String CONNECTABLE_NAME = "connectable";
+
     private static final String JNDINAME_NAME = "jndi-name";
 
     private static final String ALLOCATION_RETRY_NAME = "allocation-retry";
@@ -311,6 +313,13 @@ public class Constants {
     static SimpleAttributeDefinition USE_JAVA_CONTEXT = new SimpleAttributeDefinition(USE_JAVA_CONTEXT_NAME, DataSource.Attribute.USE_JAVA_CONTEXT.getLocalName(), new ModelNode().set(Defaults.USE_JAVA_CONTEXT), ModelType.BOOLEAN, true, true, MeasurementUnit.NONE);
 
     static SimpleAttributeDefinition ENABLED = new SimpleAttributeDefinition(ENABLED_NAME, DataSource.Attribute.ENABLED.getLocalName(), new ModelNode().set(Defaults.ENABLED), ModelType.BOOLEAN, true, true, MeasurementUnit.NONE);
+
+    static SimpleAttributeDefinition CONNECTABLE = new SimpleAttributeDefinitionBuilder(CONNECTABLE_NAME, ModelType.BOOLEAN)
+                    .setXmlName(org.jboss.jca.common.api.metadata.ds.v13.DataSource.Attribute.CONNECTABLE.getLocalName())
+                    .setAllowExpression(false)
+                    .setDefaultValue(new ModelNode(Defaults.CONNECTABLE))
+                    .setAllowNull(true)
+                    .build();
 
     static SimpleAttributeDefinition SECURITY_DOMAIN = new SimpleAttributeDefinitionBuilder(SECURITY_DOMAIN_NAME, ModelType.STRING)
             .setXmlName(CommonSecurity.Tag.SECURITY_DOMAIN.getLocalName())

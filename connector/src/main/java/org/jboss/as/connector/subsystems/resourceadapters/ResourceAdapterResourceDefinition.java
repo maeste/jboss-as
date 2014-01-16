@@ -111,6 +111,10 @@ public class ResourceAdapterResourceDefinition extends SimpleResourceDefinition 
     }
 
 
+    static void registerTransformers200(ResourceTransformationDescriptionBuilder parentBuilder) {
+        ConnectionDefinitionResourceDefinition.registerTransformer200(parentBuilder);
+    }
+
     static void registerTransformers120(ResourceTransformationDescriptionBuilder parentBuilder) {
         ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PathElement.pathElement(RESOURCEADAPTER_NAME))
                 .getAttributeBuilder()

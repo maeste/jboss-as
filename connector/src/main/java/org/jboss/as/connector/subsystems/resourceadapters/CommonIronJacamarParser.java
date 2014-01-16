@@ -73,6 +73,7 @@ import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ALLOC
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.APPLICATION;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CLASS_NAME;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONFIG_PROPERTY_VALUE;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONNECTABLE;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ENABLED;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ENLISTMENT;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.INTERLEAVING;
@@ -146,11 +147,16 @@ public abstract class CommonIronJacamarParser extends AbstractParser {
         boolean poolDefined = Boolean.FALSE;
 
         for (int i = 0; i < attributeSize; i++) {
-            org.jboss.jca.common.api.metadata.common.v11.CommonConnDef.Attribute attribute = org.jboss.jca.common.api.metadata.common.v11.CommonConnDef.Attribute.forName(reader.getAttributeLocalName(i));
+            org.jboss.jca.common.api.metadata.common.v12.CommonConnDef.Attribute attribute = org.jboss.jca.common.api.metadata.common.v12.CommonConnDef.Attribute.forName(reader.getAttributeLocalName(i));
             String value = reader.getAttributeValue(i);
             switch (attribute) {
                 case ENABLED: {
                     ENABLED.parseAndSetParameter(value, connectionDefinitionNode, reader);
+
+                    break;
+                }
+                case CONNECTABLE: {
+                    CONNECTABLE.parseAndSetParameter(value, connectionDefinitionNode, reader);
 
                     break;
                 }

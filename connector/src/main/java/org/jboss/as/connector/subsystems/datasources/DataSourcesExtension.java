@@ -620,7 +620,8 @@ public class DataSourcesExtension implements Extension {
                         break;
                     }
                     case DATASOURCES_1_1:
-                    case DATASOURCES_2_0:{
+                    case DATASOURCES_2_0:
+                    case DATASOURCES_3_0:{
                         localName = reader.getLocalName();
                         Element element = Element.forName(reader.getLocalName());
                         SUBSYSTEM_DATASOURCES_LOGGER.tracef("%s -> %s", localName, element);
