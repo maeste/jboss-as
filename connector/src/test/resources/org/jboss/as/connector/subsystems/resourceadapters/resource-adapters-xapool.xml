@@ -78,8 +78,6 @@
               <user-name>userName</user-name>
               <!--Optional:-->
               <password>pwd</password>
-              <!--Optional:-->
-              <security-domain>token</security-domain>
             </recover-credential>
             <!--Optional:-->
             <recover-plugin class-name="aClass">

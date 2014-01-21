@@ -155,7 +155,7 @@ public class ResourceAdapterResourceDefinition extends SimpleResourceDefinition 
                                         CAPACITY_DECREMENTER_CLASS, CAPACITY_INCREMENTER_CLASS,
                                         INITIAL_POOL_SIZE, CAPACITY_DECREMENTER_PROPERTIES, CAPACITY_INCREMENTER_PROPERTIES)
                                 .addRejectCheck(RejectAttributeChecker.UNDEFINED, ENLISTMENT, SHARABLE)
-                                .addRejectCheck(new RejectAttributeChecker.SimpleAcceptAttributeChecker(new ModelNode(false)), ENLISTMENT, SHARABLE)
+                                .addRejectCheck(new RejectAttributeChecker.SimpleAcceptAttributeChecker(new ModelNode(true)), ENLISTMENT, SHARABLE)
                                         //Did not use to be nillable
                                 .addRejectCheck(RejectAttributeChecker.UNDEFINED, Constants.RECOVERLUGIN_PROPERTIES)
                                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.RECOVERLUGIN_PROPERTIES)
