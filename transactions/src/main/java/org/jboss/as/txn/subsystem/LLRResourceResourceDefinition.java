@@ -24,6 +24,11 @@ package org.jboss.as.txn.subsystem;
 
 import static org.jboss.as.txn.TransactionMessages.MESSAGES;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.AttributeMarshaller;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
@@ -37,15 +42,15 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
 /**
- * TODO class javadoc.
+ * Implementation of {@link org.jboss.as.controller.ResourceDefinition} for llr-resource.
  *
- * @author Brian Stansberry (c) 2011 Red Hat Inc.
+ * @author Stefano Maestri (c) 2011 Red Hat Inc.
  */
 public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
 
     static String LLR_RESOURCE = "llr-resource";
 
-    private static final PathElement PATH_LLR_RESOURCE = PathElement.pathElement(LLR_RESOURCE);
+    static final PathElement PATH_LLR_RESOURCE = PathElement.pathElement(LLR_RESOURCE);
 
     static SimpleAttributeDefinition JNDI_NAME =  new SimpleAttributeDefinitionBuilder("jndi-name", ModelType.STRING)
             .setAllowExpression(true)
@@ -74,9 +79,11 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
 
     static SimpleAttributeDefinition TABLE_NAME =  new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
                 .setAllowExpression(true)
-            .setAllowNull(false)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode("xids"))
             .setXmlName("name")
-            /*.setAttributeMarshaller(new AttributeMarshaller() {
+            .setAttributeMarshaller(new AttributeMarshaller() {
+                @Override
                 public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
                     if (resourceModel.hasDefined(attribute.getName())) {
                         writer.writeStartElement(Element.TABLE.getLocalName());
@@ -85,10 +92,15 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                     }
 
                 }
-            })  */
+            })
             .build();
 
 
+    /**
+     * Default constructure.
+     * It set {@link org.jboss.as.txn.subsystem.LLRResourceAdd} as add handler
+     * and {@link org.jboss.as.controller.ReloadRequiredRemoveStepHandler} as remove handler
+     */
     public LLRResourceResourceDefinition() {
         super(PATH_LLR_RESOURCE,
                 TransactionExtension.getResourceDescriptionResolver(LLR_RESOURCE),
@@ -96,6 +108,9 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                 ReloadRequiredRemoveStepHandler.INSTANCE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerReadWriteAttribute(JNDI_NAME, null, new ReloadRequiredWriteAttributeHandler());

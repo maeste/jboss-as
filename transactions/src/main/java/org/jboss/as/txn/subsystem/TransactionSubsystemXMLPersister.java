@@ -135,11 +135,7 @@ class TransactionSubsystemXMLPersister implements XMLElementWriter<SubsystemMars
             for (Property llr : node.get(LLRResourceResourceDefinition.LLR_RESOURCE).asPropertyList()) {
                 writer.writeStartElement(LLRResourceResourceDefinition.LLR_RESOURCE);
                 LLRResourceResourceDefinition.JNDI_NAME.marshallAsAttribute(llr.getValue(), writer);
-                if (llr.getValue().hasDefined(LLRResourceResourceDefinition.TABLE_NAME.getName())) {
-                    writer.writeStartElement(Element.TABLE.getLocalName());
-                    LLRResourceResourceDefinition.TABLE_NAME.marshallAsAttribute(llr.getValue(), writer);
-                    writer.writeEndElement();
-                }
+                LLRResourceResourceDefinition.TABLE_NAME.marshallAsElement(llr.getValue(), writer);
                 writer.writeEndElement();
             }
             writer.writeEndElement();

@@ -37,7 +37,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 
 /**
- * The {@link XMLElementReader} that handles the Transaction subsystem.
+ * The {@link XMLElementReader} that handles the version 3.0 of Transaction subsystem xml.
  */
 class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
 
@@ -46,6 +46,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
     private TransactionSubsystem30Parser() {
         super(Namespace.TRANSACTIONS_3_0);
     }
+
 
     @Override
     protected void readElement(final XMLExtendedStreamReader reader, final Element element, final List<ModelNode> operations, final ModelNode subsystemOperation, final ModelNode logStoreOperation) throws XMLStreamException {
@@ -196,7 +197,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
      * @param defaultValue  value to return if there is no value for the attribute
      * @return the string representing raw attribute text or {@code defaultValue} if there is none
      */
-    public String rawAttributeText(XMLStreamReader reader, String attributeName, String defaultValue) {
+    private String rawAttributeText(XMLStreamReader reader, String attributeName, String defaultValue) {
         return reader.getAttributeValue("", attributeName) == null
                 ? defaultValue :
                 reader.getAttributeValue("", attributeName).trim();

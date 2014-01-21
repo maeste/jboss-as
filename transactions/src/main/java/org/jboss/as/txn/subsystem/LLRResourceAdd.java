@@ -29,23 +29,23 @@ import java.util.List;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 
-import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
-import com.arjuna.ats.jta.common.JTAEnvironmentBean;
-
 
 /**
- * TODO class javadoc.
+ * the {@link AbstractAddStepHandler} implementations that add LLR managed resource.
  *
- * @author Brian Stansberry (c) 2011 Red Hat Inc.
+ * @author Stefano Maestri (c) 2011 Red Hat Inc.
  */
 class LLRResourceAdd extends AbstractAddStepHandler {
     static LLRResourceAdd INSTANCE = new LLRResourceAdd();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
         LLRResourceResourceDefinition.JNDI_NAME.validateAndSet(operation, model);
@@ -53,6 +53,9 @@ class LLRResourceAdd extends AbstractAddStepHandler {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model,
                                   final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
