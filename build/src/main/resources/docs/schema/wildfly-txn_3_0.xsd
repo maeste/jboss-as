@@ -272,9 +272,8 @@
                             ]]>
             </xs:documentation>
         </xs:annotation>
-        <xs:attribute name="default-table-name" type="xs:token" use="optional" default="xids"/>
         <xs:all>
-            <xs:element name="llr-resource" type="llr-resource-Type" minOccurs="1" />
+            <xs:element name="llr-resource" type="llr-resource-Type" minOccurs="1"/>
         </xs:all>
     </xs:complexType>
 
@@ -287,13 +286,12 @@
             </xs:documentation>
         </xs:annotation>
         <xs:all>
-            <xs:element name="table" type="table-Type" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="llr-table" type="llr-table-Type" minOccurs="0" maxOccurs="1"/>
         </xs:all>
         <xs:attribute name="jndi-name" type="xs:token" use="required"/>
-        <xs:attribute name="table-name" type="xs:string" use="optional" default="xids"/>
     </xs:complexType>
 
-    <xs:complexType name="table-Type">
+    <xs:complexType name="llr-table-Type">
         <xs:annotation>
             <xs:documentation>
                 <![CDATA[
@@ -301,7 +299,7 @@
                    ]]>
             </xs:documentation>
         </xs:annotation>
-        <xs:attribute name="name" type="xs:token" use="optional"/>
+        <xs:attribute name="name" type="xs:token" use="optional" default="xids"/>
         <xs:attribute name="batch-size" type="xs:integer" use="optional" default="100"/>
         <xs:attribute name="immediate-cleanup" type="xs:boolean" use="optional" default="true"/>
     </xs:complexType>

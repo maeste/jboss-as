@@ -13,7 +13,7 @@
     <use-hornetq-store/>
     <llr-resources>
         <llr-resource jndi-name="java:/foo">
-            <table name="fooTable"/>
+            <llr-table name="fooTable" batch-size="10" immediate-cleanup="false"/>
         </llr-resource>
     </llr-resources>
 </subsystem>

@@ -23,10 +23,10 @@
 package org.jboss.as.txn.subsystem;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.txn.TransactionLogger.ROOT_LOGGER;
 
 import java.util.List;
 
-import com.arjuna.ats.jta.common.JTAEnvironmentBean;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -50,8 +50,9 @@ class LLRResourceAdd extends AbstractAddStepHandler {
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
         LLRResourceResourceDefinition.JNDI_NAME.validateAndSet(operation, model);
-        LLRResourceResourceDefinition.TABLE_NAME.validateAndSet(operation, model);
         LLRResourceResourceDefinition.LLR_TABLE_NAME.validateAndSet(operation, model);
+        LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE.validateAndSet(operation, model);
+        LLRResourceResourceDefinition.LLR_TABLE_IMMEDIATE_CLEANUP.validateAndSet(operation, model);
 
     }
 
@@ -63,13 +64,15 @@ class LLRResourceAdd extends AbstractAddStepHandler {
                                   final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
         PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
         final String jndiName = address.getLastElement().getValue();
-        final ModelNode tableName = LLRResourceResourceDefinition.LLR_TABLE_NAME.resolveModelAttribute(context, model);
-
+        final String tableName = LLRResourceResourceDefinition.LLR_TABLE_NAME.resolveModelAttribute(context, model).asString();
+        final int batchSize =  LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE.resolveModelAttribute(context, model).asInt();
+        final boolean immediate_cleanup = LLRResourceResourceDefinition.LLR_TABLE_IMMEDIATE_CLEANUP.resolveModelAttribute(context, model).asBoolean();
+        ROOT_LOGGER.infof("adding llr-resource: jndi-name=%s, table-name=%s, batch-size=%d, immediate-cleanup=%b", jndiName, tableName, batchSize, immediate_cleanup);
         // TODO Uncomment this code when the correct version of narayana is used in wildfly
-        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulatorgetDefaultInstance(JTAEnvironmentBean.class);
+/*        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulatorgetDefaultInstance(JTAEnvironmentBean.class);
         List<String> jndiNames = jtaEnvironmentBean.getConnectableResourceJNDINames();
 
         jndiNames.add(jndiName);
-        jtaEnvironmentBean.setConnectableResourceJNDINames(jndiNames);
+        jtaEnvironmentBean.setConnectableResourceJNDINames(jndiNames);   */
     }
 }

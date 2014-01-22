@@ -24,11 +24,6 @@ package org.jboss.as.txn.subsystem;
 
 import static org.jboss.as.txn.TransactionMessages.MESSAGES;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.jboss.as.controller.AttributeDefinition;
-import org.jboss.as.controller.AttributeMarshaller;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
@@ -77,42 +72,25 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                 })
             .build();
 
-    static SimpleAttributeDefinition LLR_TABLE_NAME =  new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
-            .setAllowExpression(true)
-            .setAllowNull(false)
-            .build();
-
-    static SimpleAttributeDefinition LLR_DEFAULT_TABLE_NAME =  new SimpleAttributeDefinitionBuilder("default-table-name", ModelType.STRING)
-            .setAllowExpression(true)
-            .setAllowNull(false)
-            .build();
-
     static SimpleAttributeDefinition LLR_TABLE_BATCH_SIZE =  new SimpleAttributeDefinitionBuilder("batch-size", ModelType.INT)
             .setAllowExpression(true)
             .setAllowNull(true)
+            .setDefaultValue(new ModelNode(100))
+            .setXmlName("batch-size")
             .build();
 
     static SimpleAttributeDefinition LLR_TABLE_IMMEDIATE_CLEANUP =  new SimpleAttributeDefinitionBuilder("immediate-cleanup", ModelType.BOOLEAN)
             .setAllowExpression(true)
             .setAllowNull(true)
+            .setDefaultValue(new ModelNode(true))
+            .setXmlName("immediate-cleanup")
             .build();
 
-    static SimpleAttributeDefinition TABLE_NAME =  new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
-                .setAllowExpression(true)
+    static SimpleAttributeDefinition LLR_TABLE_NAME = new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
+            .setAllowExpression(true)
             .setAllowNull(true)
             .setDefaultValue(new ModelNode("xids"))
             .setXmlName("name")
-            .setAttributeMarshaller(new AttributeMarshaller() {
-                @Override
-                public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
-                    if (resourceModel.hasDefined(attribute.getName())) {
-                        writer.writeStartElement(Element.TABLE.getLocalName());
-                        writer.writeAttribute(attribute.getXmlName(), resourceModel.get(attribute.getName()).asString());
-                        writer.writeEndElement();
-                    }
-
-                }
-            })
             .build();
 
 
@@ -135,6 +113,8 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerReadWriteAttribute(JNDI_NAME, null, new ReloadRequiredWriteAttributeHandler());
         resourceRegistration.registerReadWriteAttribute(LLR_TABLE_NAME, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(LLR_TABLE_BATCH_SIZE, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(LLR_TABLE_IMMEDIATE_CLEANUP, null, new ReloadRequiredWriteAttributeHandler());
     }
 }
 

@@ -49,8 +49,6 @@ enum Attribute {
     DROP_TABLE("drop-table"),
     ENABLE_ASYNC_IO("enable-async-io"),
     JNDI_NAME("jndi-name"),
-    LLR_TABLE_NAME("table-name"),
-    LLR_DEFAULT_TABLE_NAME("default-table-name"),
     LLR_TABLE_IMMEDIATE_CLEANUP("immediate-cleanup"),
     LLR_TABLE_BATCH_SIZE("batch-size"),
     NAME("name")

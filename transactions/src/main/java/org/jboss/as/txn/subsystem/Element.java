@@ -50,7 +50,7 @@ enum Element {
     JDBC_ACTION_STORE("action"),
     LLR_RESPOURCE("llr-resource"),
     LLR_RESOURCES("llr-resources"),
-    TABLE("table")
+    LLR_TABLE("llr-table")
     ;
 
     private final String name;

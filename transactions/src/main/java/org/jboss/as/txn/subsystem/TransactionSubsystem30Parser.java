@@ -103,41 +103,12 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
     }
 
     private void parseLLRs(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
-        String defaultTableName = "xids";
-
-        /* start code to add default table name attribute */
-/*        final ModelNode address = new ModelNode();
-        address.add(ModelDescriptionConstants.SUBSYSTEM, TransactionExtension.SUBSYSTEM_NAME);
-        address.protect();
-
-        final ModelNode llrsAddress = address.clone();
-
-        final ModelNode llrsOperation = new ModelNode();
-        llrsOperation.get(OP).set(ADD);*/
-
-        for (Attribute attribute : Attribute.values()) {
-            switch (attribute) {
-                case LLR_DEFAULT_TABLE_NAME: {
-                    defaultTableName = rawAttributeText(reader, LLRResourceResourceDefinition.LLR_DEFAULT_TABLE_NAME.getXmlName(), defaultTableName);
-
-/*                    if (defaultTableName != null) {
-                        LLRResourceResourceDefinition.LLR_DEFAULT_TABLE_NAME.parseAndSetParameter(defaultTableName, llrsOperation, reader);
-                    } else {
-                        throw missingRequired(reader, LLRResourceResourceDefinition.LLR_DEFAULT_TABLE_NAME.getXmlName());
-                    }*/
-
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
 
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             final Element element = Element.forName(reader.getLocalName());
             switch (element) {
                 case LLR_RESPOURCE:
-                    parseLLR(reader, operations, defaultTableName);
+                    parseLLR(reader, operations);
                     break;
                 default: {
                     throw unexpectedElement(reader);
@@ -146,50 +117,35 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         }
     }
 
-    private void parseLLR(XMLExtendedStreamReader reader, List<ModelNode> operations, String defaultTableName) throws XMLStreamException {
+    private void parseLLR(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
         final ModelNode address = new ModelNode();
         address.add(ModelDescriptionConstants.SUBSYSTEM, TransactionExtension.SUBSYSTEM_NAME);
         address.protect();
 
         final ModelNode llrAddress = address.clone();
-
         final ModelNode llrOperation = new ModelNode();
         llrOperation.get(OP).set(ADD);
 
         String jndiName = null;
-        String tableName = defaultTableName;
         for (Attribute attribute : Attribute.values()) {
             switch (attribute) {
                 case JNDI_NAME: {
                     jndiName = rawAttributeText(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName(), null);
-                    if (jndiName != null) {
                         LLRResourceResourceDefinition.JNDI_NAME.parseAndSetParameter(jndiName, llrOperation, reader);
-                    } else {
-                      throw missingRequired(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName());
-                    }
-                    break;
-                }
-                case LLR_TABLE_NAME: {
-                    tableName = rawAttributeText(reader, LLRResourceResourceDefinition.LLR_TABLE_NAME.getXmlName(), null);
-                    if (tableName != null) {
-                        LLRResourceResourceDefinition.LLR_TABLE_NAME.parseAndSetParameter(tableName, llrOperation, reader);
-                    } else {
-                        throw missingRequired(reader, LLRResourceResourceDefinition.LLR_TABLE_NAME.getXmlName());
-                    }
-
                     break;
                 }
                 default:
                     break;
             }
         }
-
+        if (jndiName == null) {
+            throw missingRequired(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName());
+        }
+        llrAddress.add(LLRResourceResourceDefinition.LLR_RESOURCE, jndiName);
         while (reader.hasNext()) {
             switch (reader.nextTag()) {
                 case END_ELEMENT: {
-                    if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.LLR_RESPOURCE && jndiName != null) {
-                        llrAddress.add(LLRResourceResourceDefinition.LLR_RESOURCE, jndiName);
-                        llrOperation.get(LLRResourceResourceDefinition.LLR_TABLE_NAME.getName()).set(tableName);
+                    if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.LLR_RESPOURCE) {
                         llrAddress.protect();
                         llrOperation.get(OP_ADDR).set(llrAddress);
 
@@ -204,18 +160,13 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                 }
                 case START_ELEMENT: {
                     switch (Element.forName(reader.getLocalName())) {
-                        case TABLE: {
+                        case LLR_TABLE: {
                             for (Attribute attribute : Attribute.values()) {
                                 switch (attribute) {
                                     case NAME: {
-                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.TABLE_NAME);
-/*                                        String value = rawAttributeText(reader, LLRResourceResourceDefinition.TABLE_NAME.getXmlName(), null);
-                                        if (value != null) {
-                                            LLRResourceResourceDefinition.TABLE_NAME.parseAndSetParameter(value, llrOperation, reader);
-                                        }*/
+                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_NAME);
                                         break;
                                     }
-
                                     case LLR_TABLE_BATCH_SIZE: // TODO make sure batch size and immediate-cleanup are consistent
                                         addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE);
                                         break;
