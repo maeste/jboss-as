@@ -26,6 +26,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_
 
 import java.util.List;
 
+import com.arjuna.ats.jta.common.JTAEnvironmentBean;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -50,6 +51,7 @@ class LLRResourceAdd extends AbstractAddStepHandler {
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
         LLRResourceResourceDefinition.JNDI_NAME.validateAndSet(operation, model);
         LLRResourceResourceDefinition.TABLE_NAME.validateAndSet(operation, model);
+        LLRResourceResourceDefinition.LLR_TABLE_NAME.validateAndSet(operation, model);
 
     }
 
@@ -60,14 +62,14 @@ class LLRResourceAdd extends AbstractAddStepHandler {
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model,
                                   final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
         PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
-
         final String jndiName = address.getLastElement().getValue();
+        final ModelNode tableName = LLRResourceResourceDefinition.LLR_TABLE_NAME.resolveModelAttribute(context, model);
 
         // TODO Uncomment this code when the correct version of narayana is used in wildfly
-/*        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class);
+        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulatorgetDefaultInstance(JTAEnvironmentBean.class);
         List<String> jndiNames = jtaEnvironmentBean.getConnectableResourceJNDINames();
 
         jndiNames.add(jndiName);
-        jtaEnvironmentBean.setConnectableResourceJNDINames(jndiNames);*/
+        jtaEnvironmentBean.setConnectableResourceJNDINames(jndiNames);
     }
 }

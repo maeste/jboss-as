@@ -27,6 +27,8 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_
 import static org.jboss.as.controller.parsing.ParseUtils.missingRequired;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
+import org.jboss.as.controller.SimpleAttributeDefinition;
+
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -101,12 +103,41 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
     }
 
     private void parseLLRs(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
+        String defaultTableName = "xids";
+
+        /* start code to add default table name attribute */
+/*        final ModelNode address = new ModelNode();
+        address.add(ModelDescriptionConstants.SUBSYSTEM, TransactionExtension.SUBSYSTEM_NAME);
+        address.protect();
+
+        final ModelNode llrsAddress = address.clone();
+
+        final ModelNode llrsOperation = new ModelNode();
+        llrsOperation.get(OP).set(ADD);*/
+
+        for (Attribute attribute : Attribute.values()) {
+            switch (attribute) {
+                case LLR_DEFAULT_TABLE_NAME: {
+                    defaultTableName = rawAttributeText(reader, LLRResourceResourceDefinition.LLR_DEFAULT_TABLE_NAME.getXmlName(), defaultTableName);
+
+/*                    if (defaultTableName != null) {
+                        LLRResourceResourceDefinition.LLR_DEFAULT_TABLE_NAME.parseAndSetParameter(defaultTableName, llrsOperation, reader);
+                    } else {
+                        throw missingRequired(reader, LLRResourceResourceDefinition.LLR_DEFAULT_TABLE_NAME.getXmlName());
+                    }*/
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
 
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             final Element element = Element.forName(reader.getLocalName());
             switch (element) {
                 case LLR_RESPOURCE:
-                    parseLLR(reader, operations);
+                    parseLLR(reader, operations, defaultTableName);
                     break;
                 default: {
                     throw unexpectedElement(reader);
@@ -115,7 +146,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         }
     }
 
-    private void parseLLR(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
+    private void parseLLR(XMLExtendedStreamReader reader, List<ModelNode> operations, String defaultTableName) throws XMLStreamException {
         final ModelNode address = new ModelNode();
         address.add(ModelDescriptionConstants.SUBSYSTEM, TransactionExtension.SUBSYSTEM_NAME);
         address.protect();
@@ -126,7 +157,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         llrOperation.get(OP).set(ADD);
 
         String jndiName = null;
-//        String tableName = "xids";
+        String tableName = defaultTableName;
         for (Attribute attribute : Attribute.values()) {
             switch (attribute) {
                 case JNDI_NAME: {
@@ -138,7 +169,16 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                     }
                     break;
                 }
+                case LLR_TABLE_NAME: {
+                    tableName = rawAttributeText(reader, LLRResourceResourceDefinition.LLR_TABLE_NAME.getXmlName(), null);
+                    if (tableName != null) {
+                        LLRResourceResourceDefinition.LLR_TABLE_NAME.parseAndSetParameter(tableName, llrOperation, reader);
+                    } else {
+                        throw missingRequired(reader, LLRResourceResourceDefinition.LLR_TABLE_NAME.getXmlName());
+                    }
 
+                    break;
+                }
                 default:
                     break;
             }
@@ -149,6 +189,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                 case END_ELEMENT: {
                     if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.LLR_RESPOURCE && jndiName != null) {
                         llrAddress.add(LLRResourceResourceDefinition.LLR_RESOURCE, jndiName);
+                        llrOperation.get(LLRResourceResourceDefinition.LLR_TABLE_NAME.getName()).set(tableName);
                         llrAddress.protect();
                         llrOperation.get(OP_ADDR).set(llrAddress);
 
@@ -167,13 +208,20 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                             for (Attribute attribute : Attribute.values()) {
                                 switch (attribute) {
                                     case NAME: {
-                                        String value = rawAttributeText(reader, LLRResourceResourceDefinition.TABLE_NAME.getXmlName(), null);
+                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.TABLE_NAME);
+/*                                        String value = rawAttributeText(reader, LLRResourceResourceDefinition.TABLE_NAME.getXmlName(), null);
                                         if (value != null) {
                                             LLRResourceResourceDefinition.TABLE_NAME.parseAndSetParameter(value, llrOperation, reader);
-                                        }
+                                        }*/
                                         break;
                                     }
 
+                                    case LLR_TABLE_BATCH_SIZE: // TODO make sure batch size and immediate-cleanup are consistent
+                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE);
+                                        break;
+                                    case LLR_TABLE_IMMEDIATE_CLEANUP:
+                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_IMMEDIATE_CLEANUP);
+                                        break;
                                     default:
                                         break;
                                 }
@@ -187,6 +235,15 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         }
     }
 
+    private void addAttribute(XMLExtendedStreamReader reader, ModelNode operation, SimpleAttributeDefinition attributeDefinition) throws XMLStreamException {
+        String value = rawAttributeText(reader, attributeDefinition.getXmlName(), null);
+
+        if (value != null) {
+            attributeDefinition.parseAndSetParameter(value, operation, reader);
+        } else {
+            throw missingRequired(reader, attributeDefinition.getXmlName());
+        }
+    }
 
     /**
      * Reads and trims the text for the given attribute and returns it or {@code defaultValue} if there is no

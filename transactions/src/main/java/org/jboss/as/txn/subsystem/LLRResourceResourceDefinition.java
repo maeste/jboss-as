@@ -77,6 +77,26 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                 })
             .build();
 
+    static SimpleAttributeDefinition LLR_TABLE_NAME =  new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(false)
+            .build();
+
+    static SimpleAttributeDefinition LLR_DEFAULT_TABLE_NAME =  new SimpleAttributeDefinitionBuilder("default-table-name", ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(false)
+            .build();
+
+    static SimpleAttributeDefinition LLR_TABLE_BATCH_SIZE =  new SimpleAttributeDefinitionBuilder("batch-size", ModelType.INT)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
+    static SimpleAttributeDefinition LLR_TABLE_IMMEDIATE_CLEANUP =  new SimpleAttributeDefinitionBuilder("immediate-cleanup", ModelType.BOOLEAN)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .build();
+
     static SimpleAttributeDefinition TABLE_NAME =  new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
                 .setAllowExpression(true)
             .setAllowNull(true)
@@ -114,7 +134,7 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerReadWriteAttribute(JNDI_NAME, null, new ReloadRequiredWriteAttributeHandler());
-        resourceRegistration.registerReadWriteAttribute(TABLE_NAME, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(LLR_TABLE_NAME, null, new ReloadRequiredWriteAttributeHandler());
     }
 }
 
