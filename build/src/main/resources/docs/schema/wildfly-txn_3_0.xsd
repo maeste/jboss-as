@@ -50,7 +50,7 @@
                 <xs:element name="use-hornetq-store" type="use-hornetq-store-Type" minOccurs="0" maxOccurs="1"/>
                 <xs:element name="jdbc-store" type="jdbc-store-Type" minOccurs="0" maxOccurs="1"/>
             </xs:choice>
-            <xs:element name="llr-resources" type="llr-resources-Type" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="commit-markable-resources" type="cmr-resources-Type" minOccurs="0" maxOccurs="1"></xs:element>
         </xs:sequence>
 
 
@@ -253,55 +253,86 @@
     </xs:complexType>
 
     <xs:complexType name="jdbc-store-settings-Type">
-            <xs:annotation>
-                <xs:documentation>
-                    <![CDATA[
-                            Settings for jdbc store
-                        ]]>
-                </xs:documentation>
-            </xs:annotation>
-            <xs:attribute name="table-prefix" type="xs:string" use="optional" />
-            <xs:attribute name="drop-table" type="xs:boolean" use="optional" default="false"/>
-        </xs:complexType>
-
-    <xs:complexType name="llr-resources-Type">
         <xs:annotation>
             <xs:documentation>
                 <![CDATA[
-                     Settings for LLR resources
-                            ]]>
+                    Settings for jdbc store
+                    ]]>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="table-prefix" type="xs:string" use="optional" />
+        <xs:attribute name="drop-table" type="xs:boolean" use="optional" default="false"/>
+    </xs:complexType>
+
+    <xs:complexType name="cmr-resources-Type">
+        <xs:annotation>
+            <xs:documentation>
+                <![CDATA[
+                    A list of non XA aware datasources that can reliably participate in an XA transaction.
+                    ]]>
             </xs:documentation>
         </xs:annotation>
         <xs:all>
-            <xs:element name="llr-resource" type="llr-resource-Type" minOccurs="1"/>
+            <xs:element name="commit-markable-resource" type="cmr-resource-Type" minOccurs="1"/>
         </xs:all>
     </xs:complexType>
 
-    <xs:complexType name="llr-resource-Type">
+    <xs:complexType name="cmr-resource-Type">
         <xs:annotation>
             <xs:documentation>
                 <![CDATA[
-                         Settings for a single LLR resource
-                ]]>
+                    Settings for a single commit markable resource.
+					Each datasource must be defined in the datasources subsystem configuration and
+					each one must be marked with the connectable="true" attribute.
+                    ]]>
             </xs:documentation>
         </xs:annotation>
         <xs:all>
-            <xs:element name="llr-table" type="llr-table-Type" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="xid-location" type="cmr-table-Type" minOccurs="0" maxOccurs="1"/>
         </xs:all>
         <xs:attribute name="jndi-name" type="xs:token" use="required"/>
     </xs:complexType>
 
-    <xs:complexType name="llr-table-Type">
+    <xs:complexType name="cmr-table-Type">
         <xs:annotation>
             <xs:documentation>
                 <![CDATA[
-                            Settings for a single LLR resource
-                   ]]>
+                    Storage settings for a single commit markable resource. For datasource resources
+					this will specifiy the table name where the xid of the commit-markable-resource
+					is stored
+                    ]]>
             </xs:documentation>
         </xs:annotation>
-        <xs:attribute name="name" type="xs:token" use="optional" default="xids"/>
-        <xs:attribute name="batch-size" type="xs:integer" use="optional" default="100"/>
-        <xs:attribute name="immediate-cleanup" type="xs:boolean" use="optional" default="true"/>
+        <xs:attribute name="name" type="xs:token" use="optional" default="xids">
+		    <xs:annotation>
+			    <xs:documentation>
+				    <![CDATA[
+					A name for the storage location
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="immediate-cleanup" type="xs:boolean" use="optional" default="true">
+		    <xs:annotation>
+			    <xs:documentation>
+				    <![CDATA[
+					Indicates whether the entry should be removed as soon as the transaction has
+					completed
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="batch-size" type="xs:integer" use="optional" default="100">
+		    <xs:annotation>
+			    <xs:documentation>
+				    <![CDATA[
+					If deletion of entries are deferred to the recovery module (ie immediate-cleanup
+					is set to false) then the batch size specifies how many xids to remove per DML
+					statement. Tuning the batch size is resource manager specific.
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
     </xs:complexType>
 
 </xs:schema>

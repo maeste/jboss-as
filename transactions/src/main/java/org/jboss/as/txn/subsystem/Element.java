@@ -48,9 +48,9 @@ enum Element {
     JDBC_STATE_STORE("state"),
     JDBC_COMMUNICATION_STORE("communication"),
     JDBC_ACTION_STORE("action"),
-    LLR_RESPOURCE("llr-resource"),
-    LLR_RESOURCES("llr-resources"),
-    LLR_TABLE("llr-table")
+    CM_RESPOURCE("commit-markable-resource"),
+    CM_RESOURCES("commit-markable-resources"),
+    CM_TABLE("xid-location")
     ;
 
     private final String name;

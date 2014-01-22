@@ -411,7 +411,7 @@
       <xs:annotation>
         <xs:documentation>
             <![CDATA[[
-                  Enable llr functionality on this datsource's connections
+                  Enable cmr functionality on this datsource's connections
                  ]]>
         </xs:documentation>
       </xs:annotation>

@@ -37,15 +37,15 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
 /**
- * Implementation of {@link org.jboss.as.controller.ResourceDefinition} for llr-resource.
+ * Implementation of {@link org.jboss.as.controller.ResourceDefinition} for commit-markable-resource.
  *
  * @author Stefano Maestri (c) 2011 Red Hat Inc.
  */
-public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
+public class CMResourceResourceDefinition extends SimpleResourceDefinition {
 
-    static String LLR_RESOURCE = "llr-resource";
+    static String CM_RESOURCE = "commit-markable-resource";
 
-    static final PathElement PATH_LLR_RESOURCE = PathElement.pathElement(LLR_RESOURCE);
+    static final PathElement PATH_CM_RESOURCE = PathElement.pathElement(CM_RESOURCE);
 
     static SimpleAttributeDefinition JNDI_NAME =  new SimpleAttributeDefinitionBuilder("jndi-name", ModelType.STRING)
             .setAllowExpression(true)
@@ -72,21 +72,21 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
                 })
             .build();
 
-    static SimpleAttributeDefinition LLR_TABLE_BATCH_SIZE =  new SimpleAttributeDefinitionBuilder("batch-size", ModelType.INT)
+    static SimpleAttributeDefinition CM_TABLE_BATCH_SIZE =  new SimpleAttributeDefinitionBuilder("batch-size", ModelType.INT)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setDefaultValue(new ModelNode(100))
             .setXmlName("batch-size")
             .build();
 
-    static SimpleAttributeDefinition LLR_TABLE_IMMEDIATE_CLEANUP =  new SimpleAttributeDefinitionBuilder("immediate-cleanup", ModelType.BOOLEAN)
+    static SimpleAttributeDefinition CM_TABLE_IMMEDIATE_CLEANUP =  new SimpleAttributeDefinitionBuilder("immediate-cleanup", ModelType.BOOLEAN)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setDefaultValue(new ModelNode(true))
             .setXmlName("immediate-cleanup")
             .build();
 
-    static SimpleAttributeDefinition LLR_TABLE_NAME = new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
+    static SimpleAttributeDefinition CM_TABLE_NAME = new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
             .setAllowExpression(true)
             .setAllowNull(true)
             .setDefaultValue(new ModelNode("xids"))
@@ -96,13 +96,13 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
 
     /**
      * Default constructure.
-     * It set {@link org.jboss.as.txn.subsystem.LLRResourceAdd} as add handler
+     * It set {@link org.jboss.as.txn.subsystem.CMResourceAdd} as add handler
      * and {@link org.jboss.as.controller.ReloadRequiredRemoveStepHandler} as remove handler
      */
-    public LLRResourceResourceDefinition() {
-        super(PATH_LLR_RESOURCE,
-                TransactionExtension.getResourceDescriptionResolver(LLR_RESOURCE),
-                LLRResourceAdd.INSTANCE,
+    public CMResourceResourceDefinition() {
+        super(PATH_CM_RESOURCE,
+                TransactionExtension.getResourceDescriptionResolver(CM_RESOURCE),
+                CMResourceAdd.INSTANCE,
                 ReloadRequiredRemoveStepHandler.INSTANCE);
     }
 
@@ -112,9 +112,9 @@ public class LLRResourceResourceDefinition extends SimpleResourceDefinition {
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerReadWriteAttribute(JNDI_NAME, null, new ReloadRequiredWriteAttributeHandler());
-        resourceRegistration.registerReadWriteAttribute(LLR_TABLE_NAME, null, new ReloadRequiredWriteAttributeHandler());
-        resourceRegistration.registerReadWriteAttribute(LLR_TABLE_BATCH_SIZE, null, new ReloadRequiredWriteAttributeHandler());
-        resourceRegistration.registerReadWriteAttribute(LLR_TABLE_IMMEDIATE_CLEANUP, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(CM_TABLE_NAME, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(CM_TABLE_BATCH_SIZE, null, new ReloadRequiredWriteAttributeHandler());
+        resourceRegistration.registerReadWriteAttribute(CM_TABLE_IMMEDIATE_CLEANUP, null, new ReloadRequiredWriteAttributeHandler());
     }
 }
 

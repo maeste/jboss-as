@@ -170,8 +170,8 @@ public class TransactionExtension implements Extension {
 
         final ResourceTransformationDescriptionBuilder subsystemRoot200 = TransformationDescriptionBuilder.Factory.createSubsystemInstance();
 
-        //Versions < 3.0.0 is not able to handle llr-resource
-        subsystemRoot200.rejectChildResource(LLRResourceResourceDefinition.PATH_LLR_RESOURCE);
+        //Versions < 3.0.0 is not able to handle commit-markable-resource
+        subsystemRoot200.rejectChildResource(CMResourceResourceDefinition.PATH_CM_RESOURCE);
 
         final ModelVersion version200 = ModelVersion.create(2, 0, 0);
         final TransformationDescription description200 = subsystemRoot200.build();
@@ -193,7 +193,7 @@ public class TransactionExtension implements Extension {
                         // Legacy name for enabling/disabling statistics
                 .addRename(TransactionSubsystemRootResourceDefinition.STATISTICS_ENABLED, CommonAttributes.ENABLE_STATISTICS);
 
-        subsystemRoot120.rejectChildResource(LLRResourceResourceDefinition.PATH_LLR_RESOURCE);
+        subsystemRoot120.rejectChildResource(CMResourceResourceDefinition.PATH_CM_RESOURCE);
 
         final ModelVersion version120 = ModelVersion.create(1, 2, 0);
         final TransformationDescription description120 = subsystemRoot120.build();
@@ -229,7 +229,7 @@ public class TransactionExtension implements Extension {
         subsystemRoot.getAttributeBuilder()
                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, TransactionSubsystemRootResourceDefinition.ATTRIBUTES_WITH_EXPRESSIONS_AFTER_1_1_1);
 
-        subsystemRoot.rejectChildResource(LLRResourceResourceDefinition.PATH_LLR_RESOURCE);
+        subsystemRoot.rejectChildResource(CMResourceResourceDefinition.PATH_CM_RESOURCE);
         final ModelVersion version111 = ModelVersion.create(1, 1, 1);
         final TransformationDescription description111 = subsystemRoot.build();
         TransformationDescription.Tools.register(description111, subsystem, version111);
