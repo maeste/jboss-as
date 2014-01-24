@@ -44,7 +44,6 @@ final class ResourceAdapterService implements Service<ResourceAdapter> {
 
     private final ResourceAdapter value;
     private final String name;
-    private final InjectedValue<ResourceAdaptersService.ModifiableResourceAdaptors> resourceAdapters = new InjectedValue<ResourceAdaptersService.ModifiableResourceAdaptors>();
     private final InjectedValue<CopyOnWriteArrayListMultiMap> resourceAdaptersMap = new InjectedValue<CopyOnWriteArrayListMultiMap>();
 
 
@@ -61,20 +60,14 @@ final class ResourceAdapterService implements Service<ResourceAdapter> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        resourceAdapters.getValue().addResourceAdapter(value);
         resourceAdaptersMap.getValue().putIfAbsent(value.getArchive(), ServiceName.of(ConnectorServices.RA_SERVICE, name));
         SUBSYSTEM_RA_LOGGER.debugf("Starting ResourceAdapter Service");
     }
 
     @Override
     public void stop(StopContext context) {
-        resourceAdapters.getValue().removeResourceAdapter(value);
         resourceAdaptersMap.getValue().remove(value.getArchive(), ServiceName.of(ConnectorServices.RA_SERVICE, name));
         SUBSYSTEM_RA_LOGGER.debugf("Stopping ResourceAdapter Service");
-    }
-
-    public Injector<ResourceAdaptersService.ModifiableResourceAdaptors> getResourceAdaptersInjector() {
-        return resourceAdapters;
     }
 
     public Injector<CopyOnWriteArrayListMultiMap> getResourceAdaptersMapInjector() {

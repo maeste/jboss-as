@@ -59,8 +59,7 @@ public class RaXmlDependencyProcessor implements DeploymentUnitProcessor {
         if (resourceAdaptersMap != null && resourceAdaptersMap.get(deploymentUnitName) != null) {
             for (ServiceName serviceName : resourceAdaptersMap.get(deploymentUnitName)) {
 
-                phaseContext.addDeploymentDependency(serviceName, AttachmentKey
-                        .create(ModifiableResourceAdapter.class));
+                phaseContext.addDeploymentDependency(serviceName, AttachmentKey.create(ModifiableResourceAdapter.class));
             }
         }
     }

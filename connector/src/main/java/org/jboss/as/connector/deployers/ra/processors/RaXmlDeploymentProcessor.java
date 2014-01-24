@@ -24,8 +24,10 @@ package org.jboss.as.connector.deployers.ra.processors;
 
 import org.jboss.as.connector.metadata.xmldescriptors.ConnectorXmlDescriptor;
 import org.jboss.as.connector.services.resourceadapters.deployment.InactiveResourceAdapterDeploymentService;
-import org.jboss.as.connector.subsystems.resourceadapters.ResourceAdaptersService;
+import org.jboss.as.connector.subsystems.resourceadapters.ModifiableResourceAdapter;
+import org.jboss.as.connector.subsystems.resourceadapters.ResourceAdaptersSubsystemService;
 import org.jboss.as.connector.util.ConnectorServices;
+import org.jboss.as.connector.util.CopyOnWriteArrayListMultiMap;
 import org.jboss.as.connector.util.RaServicesFactory;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
@@ -37,7 +39,6 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
-import org.jboss.jca.common.api.metadata.resourceadapter.ResourceAdapter;
 import org.jboss.jca.core.spi.mdr.MetadataRepository;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
@@ -90,11 +91,6 @@ public class RaXmlDeploymentProcessor implements DeploymentUnitProcessor {
         } else {
             registration = baseRegistration;
         }
-        ResourceAdaptersService.ModifiableResourceAdaptors raxmls = null;
-        final ServiceController<?> raService = phaseContext.getServiceRegistry().getService(
-                ConnectorServices.RESOURCEADAPTERS_SERVICE);
-        if (raService != null)
-            raxmls = ((ResourceAdaptersService.ModifiableResourceAdaptors) raService.getValue());
 
 
         ROOT_LOGGER.tracef("processing Raxml");
@@ -112,21 +108,19 @@ public class RaXmlDeploymentProcessor implements DeploymentUnitProcessor {
             }
 
             final String deploymentUnitName = deploymentUnitPrefix + deploymentUnit.getName();
+            CopyOnWriteArrayListMultiMap<String, ServiceName> resourceAdaptersMap = phaseContext.getDeploymentUnit().getAttachment(ResourceAdaptersSubsystemService.ATTACHMENT_KEY);
+            if (resourceAdaptersMap != null && resourceAdaptersMap.get(deploymentUnitName) != null) {
+                for (ServiceName raServiceName : resourceAdaptersMap.get(deploymentUnitName)) {
+                    final ServiceController<?> raService = phaseContext.getServiceRegistry().getService(raServiceName);
+                    if (raService != null) {
+                        ModifiableResourceAdapter raxml = ((ModifiableResourceAdapter) raService.getValue());
 
-            final String deployment;
-            if (deploymentUnitName.lastIndexOf('.') == -1) {
-                deployment = deploymentUnitName;
-            } else {
-                deployment = deploymentUnitName.substring(0, deploymentUnitName.lastIndexOf('.'));
-            }
-            if (raxmls != null) {
-                for (ResourceAdapter raxml : raxmls.getResourceAdapters()) {
+                        String rarName = raxml.getArchive();
 
-                    String rarName = raxml.getArchive();
+                        if (deploymentUnitName.equals(rarName)) {
+                            RaServicesFactory.createDeploymentService(registration, connectorXmlDescriptor, module, serviceTarget, deploymentUnitName, deploymentUnit.getServiceName(), deploymentUnitName, (org.jboss.jca.common.api.metadata.resourceadapter.v11.ResourceAdapter) raxml, deploymentResource, null);
 
-                    if (deploymentUnitName.equals(rarName)) {
-                        RaServicesFactory.createDeploymentService(registration, connectorXmlDescriptor, module, serviceTarget, deploymentUnitName, deploymentUnit.getServiceName(), deploymentUnitName, (org.jboss.jca.common.api.metadata.resourceadapter.v11.ResourceAdapter) raxml, deploymentResource, null);
-
+                        }
                     }
                 }
             }
