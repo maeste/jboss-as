@@ -140,7 +140,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         if (jndiName == null) {
             throw missingRequired(reader, CMResourceResourceDefinition.JNDI_NAME.getXmlName());
         }
-        cmrAddress.add(CMResourceResourceDefinition.CM_RESOURCE, jndiName);
+        cmrAddress.add(CommonAttributes.CM_RESOURCE, jndiName);
         while (reader.hasNext()) {
             switch (reader.nextTag()) {
                 case END_ELEMENT: {
@@ -166,7 +166,7 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                                         addAttribute(reader, cmrOperation, CMResourceResourceDefinition.CM_TABLE_NAME);
                                         break;
                                     }
-                                    case CM_TABLE_BATCH_SIZE: // TODO make sure batch size and immediate-cleanup are consistent
+                                    case CM_TABLE_BATCH_SIZE:
                                         addAttribute(reader, cmrOperation, CMResourceResourceDefinition.CM_TABLE_BATCH_SIZE);
                                         break;
                                     case CM_TABLE_IMMEDIATE_CLEANUP:

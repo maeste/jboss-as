@@ -43,11 +43,9 @@ import org.jboss.dmr.ModelType;
  */
 public class CMResourceResourceDefinition extends SimpleResourceDefinition {
 
-    static String CM_RESOURCE = "commit-markable-resource";
+    static final PathElement PATH_CM_RESOURCE = PathElement.pathElement(CommonAttributes.CM_RESOURCE);
 
-    static final PathElement PATH_CM_RESOURCE = PathElement.pathElement(CM_RESOURCE);
-
-    static SimpleAttributeDefinition JNDI_NAME =  new SimpleAttributeDefinitionBuilder("jndi-name", ModelType.STRING)
+    static SimpleAttributeDefinition JNDI_NAME =  new SimpleAttributeDefinitionBuilder(CommonAttributes.CM_JNDI_NAME, ModelType.STRING)
             .setAllowExpression(true)
             .setAllowNull(false)
             .setValidator(new ParameterValidator() {
@@ -72,25 +70,25 @@ public class CMResourceResourceDefinition extends SimpleResourceDefinition {
                 })
             .build();
 
-    static SimpleAttributeDefinition CM_TABLE_BATCH_SIZE =  new SimpleAttributeDefinitionBuilder("batch-size", ModelType.INT)
+    static SimpleAttributeDefinition CM_TABLE_BATCH_SIZE =  new SimpleAttributeDefinitionBuilder(CommonAttributes.CM_BATCH_SIZE, ModelType.INT)
             .setAllowExpression(true)
             .setAllowNull(true)
-            .setDefaultValue(new ModelNode(100))
-            .setXmlName("batch-size")
+            .setDefaultValue(new ModelNode(CommonAttributes.CM_BATCH_SIZE_DEF_VAL))
+            .setXmlName(CommonAttributes.CM_BATCH_SIZE)
             .build();
 
-    static SimpleAttributeDefinition CM_TABLE_IMMEDIATE_CLEANUP =  new SimpleAttributeDefinitionBuilder("immediate-cleanup", ModelType.BOOLEAN)
+    static SimpleAttributeDefinition CM_TABLE_IMMEDIATE_CLEANUP =  new SimpleAttributeDefinitionBuilder(CommonAttributes.CM_IMMEDIATE_CLEANUP, ModelType.BOOLEAN)
             .setAllowExpression(true)
             .setAllowNull(true)
-            .setDefaultValue(new ModelNode(true))
-            .setXmlName("immediate-cleanup")
+            .setDefaultValue(new ModelNode(CommonAttributes.CM_IMMEDIATE_CLEANUP_DEF_VAL))
+            .setXmlName(CommonAttributes.CM_IMMEDIATE_CLEANUP)
             .build();
 
-    static SimpleAttributeDefinition CM_TABLE_NAME = new SimpleAttributeDefinitionBuilder("table-name", ModelType.STRING)
+    static SimpleAttributeDefinition CM_TABLE_NAME = new SimpleAttributeDefinitionBuilder(CommonAttributes.CM_LOCATION_NAME, ModelType.STRING)
             .setAllowExpression(true)
             .setAllowNull(true)
-            .setDefaultValue(new ModelNode("xids"))
-            .setXmlName("name")
+            .setDefaultValue(new ModelNode(CommonAttributes.CM_LOCATION_NAME_DEF_VAL))
+            .setXmlName(CommonAttributes.CM_LOCATION_NAME)
             .build();
 
 
@@ -101,7 +99,7 @@ public class CMResourceResourceDefinition extends SimpleResourceDefinition {
      */
     public CMResourceResourceDefinition() {
         super(PATH_CM_RESOURCE,
-                TransactionExtension.getResourceDescriptionResolver(CM_RESOURCE),
+                TransactionExtension.getResourceDescriptionResolver(CommonAttributes.CM_RESOURCE),
                 CMResourceAdd.INSTANCE,
                 ReloadRequiredRemoveStepHandler.INSTANCE);
     }

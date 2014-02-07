@@ -130,10 +130,10 @@ class TransactionSubsystemXMLPersister implements XMLElementWriter<SubsystemMars
             writer.writeEndElement();
         }
 
-        if (node.hasDefined(CMResourceResourceDefinition.CM_RESOURCE) && node.get(CMResourceResourceDefinition.CM_RESOURCE).asList().size() > 0) {
+        if (node.hasDefined(CommonAttributes.CM_RESOURCE) && node.get(CommonAttributes.CM_RESOURCE).asList().size() > 0) {
             writer.writeStartElement(Element.CM_RESOURCES.getLocalName());
-            for (Property cmr : node.get(CMResourceResourceDefinition.CM_RESOURCE).asPropertyList()) {
-                writer.writeStartElement(CMResourceResourceDefinition.CM_RESOURCE);
+            for (Property cmr : node.get(CommonAttributes.CM_RESOURCE).asPropertyList()) {
+                writer.writeStartElement(CommonAttributes.CM_RESOURCE);
                 CMResourceResourceDefinition.JNDI_NAME.marshallAsAttribute(cmr.getValue(), writer);
                 if (cmr.getValue().hasDefined(CMResourceResourceDefinition.CM_TABLE_NAME.getName()) ||
                         cmr.getValue().hasDefined(CMResourceResourceDefinition.CM_TABLE_BATCH_SIZE.getName()) ||
