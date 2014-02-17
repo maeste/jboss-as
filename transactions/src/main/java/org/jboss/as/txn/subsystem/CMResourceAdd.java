@@ -74,19 +74,19 @@ class CMResourceAdd extends AbstractAddStepHandler {
 
         JTAEnvironmentBean jTAEnvironmentBean = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class);
 
-        List<String> connectableResourceJNDINames = jTAEnvironmentBean.getConnectableResourceJNDINames();
-        Map<String, String> connectableResourceTableNameMap = jTAEnvironmentBean.getConnectableResourceTableNameMap();
-        Map<String, Boolean> performImmediateCleanupOfConnectableResourceBranchesMap = jTAEnvironmentBean.getPerformImmediateCleanupOfConnectableResourceBranchesMap();
-        Map<String, Integer> connectableResourceRecordDeleteBatchSizeMap = jTAEnvironmentBean.getConnectableResourceRecordDeleteBatchSizeMap();
+        List<String> connectableResourceJNDINames = jTAEnvironmentBean.getCommitMarkableResourceJNDINames();
+        Map<String, String> connectableResourceTableNameMap = jTAEnvironmentBean.getCommitMarkableResourceTableNameMap();
+        Map<String, Boolean> performImmediateCleanupOfConnectableResourceBranchesMap = jTAEnvironmentBean.getPerformImmediateCleanupOfCommitMarkableResourceBranchesMap();
+        Map<String, Integer> connectableResourceRecordDeleteBatchSizeMap = jTAEnvironmentBean.getCommitMarkableResourceRecordDeleteBatchSizeMap();
 
         connectableResourceJNDINames.add(jndiName);
         connectableResourceTableNameMap.put(jndiName, tableName);
         performImmediateCleanupOfConnectableResourceBranchesMap.put(jndiName, immediateCleanup);
         connectableResourceRecordDeleteBatchSizeMap.put(jndiName, batchSize);
 
-        jTAEnvironmentBean.setConnectableResourceJNDINames(connectableResourceJNDINames);
-        jTAEnvironmentBean.setConnectableResourceTableNameMap(connectableResourceTableNameMap);
-        jTAEnvironmentBean.setPerformImmediateCleanupOfConnectableResourceBranchesMap(performImmediateCleanupOfConnectableResourceBranchesMap);
-        jTAEnvironmentBean.setConnectableResourceRecordDeleteBatchSizeMap(connectableResourceRecordDeleteBatchSizeMap);
+        jTAEnvironmentBean.setCommitMarkableResourceJNDINames(connectableResourceJNDINames);
+        jTAEnvironmentBean.setCommitMarkableResourceTableNameMap(connectableResourceTableNameMap);
+        jTAEnvironmentBean.setPerformImmediateCleanupOfCommitMarkableResourceBranchesMap(performImmediateCleanupOfConnectableResourceBranchesMap);
+        jTAEnvironmentBean.setCommitMarkableResourceRecordDeleteBatchSizeMap(connectableResourceRecordDeleteBatchSizeMap);
     }
 }

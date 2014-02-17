@@ -41,8 +41,8 @@ import org.omg.CORBA.ORB;
 import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule;
-import com.arjuna.ats.internal.jta.recovery.arjunacore.ConnectableResourceRecordRecoveryModule;
 import com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.CommitMarkableResourceRecordRecoveryModule;
 import com.arjuna.ats.internal.jts.recovery.contact.ExpiredContactScanner;
 import com.arjuna.ats.internal.jts.recovery.transactions.ExpiredServerScanner;
 import com.arjuna.ats.internal.jts.recovery.transactions.ExpiredToplevelScanner;
@@ -96,7 +96,7 @@ public class ArjunaRecoveryManagerService implements Service<RecoveryManagerServ
         }
 
         final List<String> recoveryExtensions = new ArrayList<String>();
-        recoveryExtensions.add(ConnectableResourceRecordRecoveryModule.class.getName()); // must be first
+        recoveryExtensions.add(CommitMarkableResourceRecordRecoveryModule.class.getName()); // must be first
         recoveryExtensions.add(AtomicActionRecoveryModule.class.getName());
         recoveryExtensions.add(TORecoveryModule.class.getName());
 
