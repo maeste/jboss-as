@@ -130,18 +130,18 @@ class TransactionSubsystemXMLPersister implements XMLElementWriter<SubsystemMars
             writer.writeEndElement();
         }
 
-        if (node.hasDefined(LLRResourceResourceDefinition.LLR_RESOURCE) && node.get(LLRResourceResourceDefinition.LLR_RESOURCE).asList().size() > 0) {
-            writer.writeStartElement(Element.LLR_RESOURCES.getLocalName());
-            for (Property llr : node.get(LLRResourceResourceDefinition.LLR_RESOURCE).asPropertyList()) {
-                writer.writeStartElement(LLRResourceResourceDefinition.LLR_RESOURCE);
-                LLRResourceResourceDefinition.JNDI_NAME.marshallAsAttribute(llr.getValue(), writer);
-                if (llr.getValue().hasDefined(LLRResourceResourceDefinition.LLR_TABLE_NAME.getName()) ||
-                        llr.getValue().hasDefined(LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE.getName()) ||
-                        llr.getValue().hasDefined(LLRResourceResourceDefinition.LLR_TABLE_IMMEDIATE_CLEANUP.getName())) {
-                    writer.writeStartElement(Element.LLR_TABLE.getLocalName());
-                    LLRResourceResourceDefinition.LLR_TABLE_NAME.marshallAsAttribute(llr.getValue(), writer);
-                    LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE.marshallAsAttribute(llr.getValue(), writer);
-                    LLRResourceResourceDefinition.LLR_TABLE_IMMEDIATE_CLEANUP.marshallAsAttribute(llr.getValue(), writer);
+        if (node.hasDefined(CommonAttributes.CM_RESOURCE) && node.get(CommonAttributes.CM_RESOURCE).asList().size() > 0) {
+            writer.writeStartElement(Element.CM_RESOURCES.getLocalName());
+            for (Property cmr : node.get(CommonAttributes.CM_RESOURCE).asPropertyList()) {
+                writer.writeStartElement(CommonAttributes.CM_RESOURCE);
+                CMResourceResourceDefinition.JNDI_NAME.marshallAsAttribute(cmr.getValue(), writer);
+                if (cmr.getValue().hasDefined(CMResourceResourceDefinition.CM_TABLE_NAME.getName()) ||
+                        cmr.getValue().hasDefined(CMResourceResourceDefinition.CM_TABLE_BATCH_SIZE.getName()) ||
+                        cmr.getValue().hasDefined(CMResourceResourceDefinition.CM_TABLE_IMMEDIATE_CLEANUP.getName())) {
+                    writer.writeStartElement(Element.CM_TABLE.getLocalName());
+                    CMResourceResourceDefinition.CM_TABLE_NAME.marshallAsAttribute(cmr.getValue(), writer);
+                    CMResourceResourceDefinition.CM_TABLE_BATCH_SIZE.marshallAsAttribute(cmr.getValue(), writer);
+                    CMResourceResourceDefinition.CM_TABLE_IMMEDIATE_CLEANUP.marshallAsAttribute(cmr.getValue(), writer);
                     writer.writeEndElement();
                 }
                 writer.writeEndElement();

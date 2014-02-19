@@ -93,8 +93,8 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                 subsystemOperation.get(CommonAttributes.USE_JDBC_STORE).set(true);
                 break;
             }
-            case LLR_RESOURCES:
-                parseLLRs(reader, operations);
+            case CM_RESOURCES:
+                parseCMs(reader, operations);
                 break;
             default: {
                 throw unexpectedElement(reader);
@@ -102,13 +102,12 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         }
     }
 
-    private void parseLLRs(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
-
+    private void parseCMs(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             final Element element = Element.forName(reader.getLocalName());
             switch (element) {
-                case LLR_RESPOURCE:
-                    parseLLR(reader, operations);
+                case CM_RESPOURCE:
+                    parseCM(reader, operations);
                     break;
                 default: {
                     throw unexpectedElement(reader);
@@ -117,21 +116,21 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
         }
     }
 
-    private void parseLLR(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
+    private void parseCM(XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
         final ModelNode address = new ModelNode();
         address.add(ModelDescriptionConstants.SUBSYSTEM, TransactionExtension.SUBSYSTEM_NAME);
         address.protect();
 
-        final ModelNode llrAddress = address.clone();
-        final ModelNode llrOperation = new ModelNode();
-        llrOperation.get(OP).set(ADD);
+        final ModelNode cmrAddress = address.clone();
+        final ModelNode cmrOperation = new ModelNode();
+        cmrOperation.get(OP).set(ADD);
 
         String jndiName = null;
         for (Attribute attribute : Attribute.values()) {
             switch (attribute) {
                 case JNDI_NAME: {
-                    jndiName = rawAttributeText(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName(), null);
-                        LLRResourceResourceDefinition.JNDI_NAME.parseAndSetParameter(jndiName, llrOperation, reader);
+                    jndiName = rawAttributeText(reader, CMResourceResourceDefinition.JNDI_NAME.getXmlName(), null);
+                        CMResourceResourceDefinition.JNDI_NAME.parseAndSetParameter(jndiName, cmrOperation, reader);
                     break;
                 }
                 default:
@@ -139,20 +138,20 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
             }
         }
         if (jndiName == null) {
-            throw missingRequired(reader, LLRResourceResourceDefinition.JNDI_NAME.getXmlName());
+            throw missingRequired(reader, CMResourceResourceDefinition.JNDI_NAME.getXmlName());
         }
-        llrAddress.add(LLRResourceResourceDefinition.LLR_RESOURCE, jndiName);
+        cmrAddress.add(CommonAttributes.CM_RESOURCE, jndiName);
         while (reader.hasNext()) {
             switch (reader.nextTag()) {
                 case END_ELEMENT: {
-                    if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.LLR_RESPOURCE) {
-                        llrAddress.protect();
-                        llrOperation.get(OP_ADDR).set(llrAddress);
+                    if (Element.CM_RESPOURCE.forName(reader.getLocalName()) == Element.CM_RESPOURCE) {
+                        cmrAddress.protect();
+                        cmrOperation.get(OP_ADDR).set(cmrAddress);
 
-                        operations.add(llrOperation);
+                        operations.add(cmrOperation);
                         return;
                     } else {
-                        if (Element.LLR_RESPOURCE.forName(reader.getLocalName()) == Element.UNKNOWN) {
+                        if (Element.CM_RESPOURCE.forName(reader.getLocalName()) == Element.UNKNOWN) {
                             throw unexpectedElement(reader);
                         }
                     }
@@ -160,18 +159,18 @@ class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
                 }
                 case START_ELEMENT: {
                     switch (Element.forName(reader.getLocalName())) {
-                        case LLR_TABLE: {
+                        case CM_TABLE: {
                             for (Attribute attribute : Attribute.values()) {
                                 switch (attribute) {
                                     case NAME: {
-                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_NAME);
+                                        addAttribute(reader, cmrOperation, CMResourceResourceDefinition.CM_TABLE_NAME);
                                         break;
                                     }
-                                    case LLR_TABLE_BATCH_SIZE: // TODO make sure batch size and immediate-cleanup are consistent
-                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_BATCH_SIZE);
+                                    case CM_TABLE_BATCH_SIZE:
+                                        addAttribute(reader, cmrOperation, CMResourceResourceDefinition.CM_TABLE_BATCH_SIZE);
                                         break;
-                                    case LLR_TABLE_IMMEDIATE_CLEANUP:
-                                        addAttribute(reader, llrOperation, LLRResourceResourceDefinition.LLR_TABLE_IMMEDIATE_CLEANUP);
+                                    case CM_TABLE_IMMEDIATE_CLEANUP:
+                                        addAttribute(reader, cmrOperation, CMResourceResourceDefinition.CM_TABLE_IMMEDIATE_CLEANUP);
                                         break;
                                     default:
                                         break;
