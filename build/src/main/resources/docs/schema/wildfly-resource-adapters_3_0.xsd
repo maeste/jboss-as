@@ -454,7 +454,7 @@
       <xs:annotation>
         <xs:documentation>
             <![CDATA[[
-                 Enable llr functionality on this connection
+                 Enable CMR functionality on this connection
                 ]]>
         </xs:documentation>
       </xs:annotation>

@@ -124,7 +124,7 @@ public interface TransactionMessages {
      *
      * @return the message.
      */
-    @Message(id = 10110, value = "Jndi name have to start with java:/ or java:jboss/")
+    @Message(id = 10110, value = "Jndi names have to start with java:/ or java:jboss/")
     OperationFailedException jndiNameInvalidFormat();
 
 }
