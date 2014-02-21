@@ -11,9 +11,9 @@
     <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
     <jts/>
     <use-hornetq-store/>
-    <llr-resources>
-        <llr-resource jndi-name="java:/foo">
-            <llr-table name="fooTable" batch-size="10" immediate-cleanup="false"/>
-        </llr-resource>
-    </llr-resources>
+    <commit-markable-resources>
+        <commit-markable-resource jndi-name="java:/foo">
+            <xid-location name="fooTable" batch-size="10" immediate-cleanup="false"/>
+        </commit-markable-resource>
+    </commit-markable-resources>
 </subsystem>

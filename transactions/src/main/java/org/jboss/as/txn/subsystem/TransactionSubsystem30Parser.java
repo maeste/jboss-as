@@ -41,14 +41,13 @@ import org.jboss.staxmapper.XMLExtendedStreamReader;
 /**
  * The {@link XMLElementReader} that handles the version 3.0 of Transaction subsystem xml.
  */
-class TransactionSubsystem30Parser extends TransactionSubsystem14Parser {
+class TransactionSubsystem30Parser extends TransactionSubsystem20Parser {
 
     public static final TransactionSubsystem30Parser INSTANCE = new TransactionSubsystem30Parser();
 
     private TransactionSubsystem30Parser() {
         super(Namespace.TRANSACTIONS_3_0);
     }
-
 
     @Override
     protected void readElement(final XMLExtendedStreamReader reader, final Element element, final List<ModelNode> operations, final ModelNode subsystemOperation, final ModelNode logStoreOperation) throws XMLStreamException {
