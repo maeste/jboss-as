@@ -21,6 +21,9 @@
  */
 package org.jboss.as.connector.subsystems.resourceadapters;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.AttributeMarshaller;
 import org.jboss.as.controller.ModelVersion;
@@ -48,9 +51,6 @@ import org.jboss.jca.common.api.metadata.common.v11.WorkManagerSecurity;
 import org.jboss.jca.common.api.metadata.ds.TimeOut;
 import org.jboss.jca.common.api.metadata.ds.v11.DataSource;
 import org.jboss.jca.common.api.metadata.resourceadapter.v10.ResourceAdapter;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 
 
@@ -316,7 +316,7 @@ public class Constants {
 
     static SimpleAttributeDefinition CONNECTABLE = new SimpleAttributeDefinitionBuilder(CONNECTABLE_NAME, ModelType.BOOLEAN)
                     .setXmlName(org.jboss.jca.common.api.metadata.ds.v13.DataSource.Attribute.CONNECTABLE.getLocalName())
-                    .setAllowExpression(false)
+                    .setAllowExpression(true)
                     .setDefaultValue(new ModelNode(Defaults.CONNECTABLE))
                     .setAllowNull(true)
                     .build();

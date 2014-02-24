@@ -232,8 +232,23 @@ public class ResourceAdaptersSubsystemTestCase extends AbstractSubsystemBaseTest
 
 
                         })
+                        .addFailedAttribute(subsystemAddress.append(PathElement.pathElement(RESOURCEADAPTER_NAME), ConnectionDefinitionResourceDefinition.PATH),
+                                new FailedOperationTransformationConfig.RejectExpressionsConfig(Constants.CONNECTABLE) {
 
-        );
+                                    @Override
+                                    protected boolean checkValue(String attrName, ModelNode attribute, boolean isWriteAttribute) {
+                                        if (super.checkValue(attrName, attribute, isWriteAttribute)) {
+                                            return true;
+                                        }
+                                        return attribute.asBoolean();
+                                    }
+
+                                    @Override
+                                    protected ModelNode correctValue(ModelNode toResolve, boolean isWriteAttribute) {
+                                        return new ModelNode(false);
+                                    }
+
+                        }));
  }
 
     protected AdditionalInitialization createAdditionalInitialization() {
