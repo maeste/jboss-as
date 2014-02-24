@@ -21,7 +21,14 @@
 */
 package org.jboss.as.connector.subsystems.resourceadapters;
 
+import static org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.resourceadapters.Constants.CONNECTIONDEFINITIONS_NAME;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ENLISTMENT;
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.SHARABLE;
 
 import org.jboss.as.connector.subsystems.common.pool.PoolOperations;
 import org.jboss.as.controller.AttributeDefinition;
@@ -117,12 +124,21 @@ public class ConnectionDefinitionResourceDefinition extends SimpleResourceDefini
     }
 
     static void registerTransformer110(ResourceTransformationDescriptionBuilder parentBuilder) {
-        parentBuilder.addChildResource(PATH)
-                .getAttributeBuilder().setDiscard(DiscardAttributeChecker.UNDEFINED, Constants.SECURITY_DOMAIN, Constants.SECURITY_DOMAIN_AND_APPLICATION, Constants.APPLICATION)
-                .setDiscard(DiscardAttributeChecker.ALWAYS, Constants.ENLISTMENT, Constants.SHARABLE, org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS, org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES, org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES)
-                .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), Constants.CONNECTABLE)
-                .addRejectCheck(RejectAttributeChecker.DEFINED, Constants.CONNECTABLE);
+        parentBuilder.addChildResource(PATH).getAttributeBuilder()
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, Constants.SECURITY_DOMAIN, Constants.SECURITY_DOMAIN_AND_APPLICATION, Constants.APPLICATION,
+                        CAPACITY_DECREMENTER_CLASS, CAPACITY_INCREMENTER_CLASS,
+                        INITIAL_POOL_SIZE, CAPACITY_DECREMENTER_PROPERTIES, CAPACITY_INCREMENTER_PROPERTIES)
+                .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), ENLISTMENT, SHARABLE)
+                        .addRejectCheck(RejectAttributeChecker.DEFINED, Constants.SECURITY_DOMAIN, Constants.SECURITY_DOMAIN_AND_APPLICATION, Constants.APPLICATION,
+                                CAPACITY_DECREMENTER_CLASS, CAPACITY_INCREMENTER_CLASS,
+                                INITIAL_POOL_SIZE, CAPACITY_DECREMENTER_PROPERTIES, CAPACITY_INCREMENTER_PROPERTIES)
+                        .addRejectCheck(RejectAttributeChecker.UNDEFINED, ENLISTMENT, SHARABLE)
+                        .addRejectCheck(new RejectAttributeChecker.SimpleAcceptAttributeChecker(new ModelNode(true)), ENLISTMENT, SHARABLE)
+                                //Did not use to be nillable
+                        .addRejectCheck(RejectAttributeChecker.UNDEFINED, Constants.RECOVERLUGIN_PROPERTIES)
+                        .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.RECOVERLUGIN_PROPERTIES)
+                        .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), Constants.CONNECTABLE)
+                        .addRejectCheck(RejectAttributeChecker.DEFINED, Constants.CONNECTABLE);
+
     }
 }
