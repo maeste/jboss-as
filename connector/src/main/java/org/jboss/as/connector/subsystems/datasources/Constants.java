@@ -61,9 +61,9 @@ import org.jboss.jca.common.api.metadata.ds.Driver;
 import org.jboss.jca.common.api.metadata.ds.Statement;
 import org.jboss.jca.common.api.metadata.ds.TimeOut;
 import org.jboss.jca.common.api.metadata.ds.Validation;
-import org.jboss.jca.common.api.metadata.ds.v13.DataSource;
 import org.jboss.jca.common.api.metadata.ds.v12.DsPool;
 import org.jboss.jca.common.api.metadata.ds.v12.XaDataSource;
+import org.jboss.jca.common.api.metadata.ds.v13.DataSource;
 
 /**
  * @author @author <a href="mailto:stefano.maestri@redhat.com">Stefano
@@ -293,7 +293,7 @@ public class Constants {
 
     static SimpleAttributeDefinition CONNECTABLE = new SimpleAttributeDefinitionBuilder(CONNECTABLE_NAME, ModelType.BOOLEAN)
                 .setXmlName(DataSource.Attribute.CONNECTABLE.getLocalName())
-                .setAllowExpression(false)
+                .setAllowExpression(true)
                 .setDefaultValue(new ModelNode(Defaults.CONNECTABLE))
                 .setAllowNull(true)
                 .build();
