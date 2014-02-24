@@ -43,7 +43,7 @@ import org.jboss.dmr.ModelType;
  */
 public class CMResourceResourceDefinition extends SimpleResourceDefinition {
 
-    static final PathElement PATH_CM_RESOURCE = PathElement.pathElement(CommonAttributes.CM_RESOURCE);
+    public static final PathElement PATH_CM_RESOURCE = PathElement.pathElement(CommonAttributes.CM_RESOURCE);
 
     static SimpleAttributeDefinition JNDI_NAME =  new SimpleAttributeDefinitionBuilder(CommonAttributes.CM_JNDI_NAME, ModelType.STRING)
             .setAllowExpression(true)
