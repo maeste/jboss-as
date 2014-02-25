@@ -139,6 +139,15 @@ public class TransactionSubsystemTestCase extends AbstractSubsystemBaseTest {
         standardSubsystemTest("async-io-expressions.xml");
     }
 
+    @Test
+    public void testCMRResources() throws Exception {
+        standardSubsystemTest("cmr-resources.xml");
+    }
+
+    //@Test
+    public void testCMRResourcesExpressions() throws Exception {
+        standardSubsystemTest("cmr-resources-expressions.xml");
+    }
 
     @Test
     public void testTransformersFullAS712() throws Exception {
