@@ -22,6 +22,18 @@
 
 package org.jboss.as.txn.subsystem;
 
+import static org.jboss.as.txn.TransactionLogger.ROOT_LOGGER;
+import static org.jboss.as.txn.subsystem.CommonAttributes.CM_RESOURCE;
+import static org.jboss.as.txn.subsystem.CommonAttributes.JTS;
+import static org.jboss.as.txn.subsystem.CommonAttributes.USEHORNETQSTORE;
+import static org.jboss.as.txn.subsystem.CommonAttributes.USE_JDBC_STORE;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.transaction.TransactionSynchronizationRegistry;
+import javax.transaction.UserTransaction;
+
 import com.arjuna.ats.internal.arjuna.utils.UuidProcessId;
 import com.arjuna.ats.jbossatx.jta.RecoveryManagerService;
 import com.arjuna.ats.jta.common.JTAEnvironmentBean;
@@ -30,7 +42,9 @@ import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.as.controller.services.path.PathManagerService;
 import org.jboss.as.jacorb.service.CorbaNamingService;
@@ -75,15 +89,6 @@ import org.jboss.msc.value.ImmediateValue;
 import org.jboss.tm.JBossXATerminator;
 import org.jboss.tm.usertx.UserTransactionRegistry;
 import org.omg.CORBA.ORB;
-
-import javax.transaction.TransactionSynchronizationRegistry;
-import javax.transaction.UserTransaction;
-import java.util.List;
-
-import static org.jboss.as.txn.TransactionLogger.ROOT_LOGGER;
-import static org.jboss.as.txn.subsystem.CommonAttributes.JTS;
-import static org.jboss.as.txn.subsystem.CommonAttributes.USEHORNETQSTORE;
-import static org.jboss.as.txn.subsystem.CommonAttributes.USE_JDBC_STORE;
 
 
 /**
@@ -195,8 +200,15 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         boolean jts = model.hasDefined(JTS) && model.get(JTS).asBoolean();
 
+        final Resource subsystemResource = context.readResourceFromRoot(PathAddress.pathAddress(TransactionExtension.SUBSYSTEM_PATH));
+        final List<ServiceName> deps = new LinkedList<>();
+
+        for (Resource.ResourceEntry re : subsystemResource.getChildren(CM_RESOURCE)) {
+            deps.add(TxnServices.JBOSS_TXN_CMR.append(re.getName()));
+        }
+
         //recovery environment
-        performRecoveryEnvBoottime(context, model, verificationHandler, controllers, jts);
+        performRecoveryEnvBoottime(context, model, verificationHandler, controllers, jts, deps);
 
         //core environment
         performCoreEnvironmentBootTime(context, model, verificationHandler, controllers);
@@ -380,7 +392,7 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
     private void performRecoveryEnvBoottime(OperationContext context, ModelNode model,
                                             ServiceVerificationHandler verificationHandler,
                                             List<ServiceController<?>> controllers,
-                                            final boolean jts) throws OperationFailedException {
+                                            final boolean jts, List<ServiceName> deps) throws OperationFailedException {
         //recovery environment
         final String recoveryBindingName = TransactionSubsystemRootResourceDefinition.BINDING.resolveModelAttribute(context, model).asString();
         final String recoveryStatusBindingName = TransactionSubsystemRootResourceDefinition.STATUS_BINDING.resolveModelAttribute(context, model).asString();
@@ -394,7 +406,7 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ArjunaRecoveryManagerService recoveryManagerService = new ArjunaRecoveryManagerService(recoveryListener, jts);
         final ServiceBuilder<RecoveryManagerService> recoveryManagerServiceServiceBuilder = context.getServiceTarget().addService(TxnServices.JBOSS_TXN_ARJUNA_RECOVERY_MANAGER, recoveryManagerService);
         // add dependency on JTA environment bean
-        recoveryManagerServiceServiceBuilder.addDependency(TxnServices.JBOSS_TXN_JTA_ENVIRONMENT);
+        recoveryManagerServiceServiceBuilder.addDependencies(deps);
 
         if (jts) {
             recoveryManagerServiceServiceBuilder.addDependency(ServiceName.JBOSS.append("jacorb", "orb-service"), ORB.class, recoveryManagerService.getOrbInjector());
