@@ -23,7 +23,10 @@
 package org.jboss.as.xts;
 
 import static org.jboss.as.xts.XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION;
-import static org.jboss.as.xts.XTSSubsystemDefinition.ENVIRONMENT_URL;
+import static org.jboss.as.xts.XTSSubsystemDefinition.ENVIRONMENT_HOST;
+import static org.jboss.as.xts.XTSSubsystemDefinition.ENVIRONMENT_PATH;
+import static org.jboss.as.xts.XTSSubsystemDefinition.ENVIRONMENT_PORT;
+import static org.jboss.as.xts.XTSSubsystemDefinition.ENVIRONMENT_PROTOCOL;
 import static org.jboss.as.xts.XTSSubsystemDefinition.HOST_NAME;
 
 import java.util.ArrayList;
@@ -144,17 +147,39 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
         HOST_NAME.validateAndSet(operation, model);
-        ENVIRONMENT_URL.validateAndSet(operation, model);
         DEFAULT_CONTEXT_PROPAGATION.validateAndSet(operation, model);
+        ENVIRONMENT_PROTOCOL.validateAndSet(operation, model);
+        ENVIRONMENT_HOST.validateAndSet(operation, model);
+        ENVIRONMENT_PORT.validateAndSet(operation, model);
+        ENVIRONMENT_PATH.validateAndSet(operation, model);
+
+
     }
 
 
     @Override
     protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
         final String hostName = HOST_NAME.resolveModelAttribute(context, model).asString();
+        final String coordinatorURL;
+        if (model.hasDefined(ENVIRONMENT_PROTOCOL.getName()) ||
+                model.hasDefined(ENVIRONMENT_HOST.getName()) ||
+                model.hasDefined(ENVIRONMENT_PORT.getName()) ||
+                model.hasDefined(ENVIRONMENT_PATH.getName()) ) {
+            if ( ENVIRONMENT_HOST.resolveModelAttribute(context, model).asString().startsWith("::")) {
+                coordinatorURL = ENVIRONMENT_PROTOCOL.resolveModelAttribute(context, model).asString() + "://[" +
+                                        ENVIRONMENT_HOST.resolveModelAttribute(context, model).asString() + "]:" +
+                                        ENVIRONMENT_PORT.resolveModelAttribute(context, model).asString() + "/" +
+                                        ENVIRONMENT_PATH.resolveModelAttribute(context, model).asString();
+            } else {
+                coordinatorURL = ENVIRONMENT_PROTOCOL.resolveModelAttribute(context, model).asString() + "://" +
+                        ENVIRONMENT_HOST.resolveModelAttribute(context, model).asString() + ":" +
+                        ENVIRONMENT_PORT.resolveModelAttribute(context, model).asString() + "/" +
+                        ENVIRONMENT_PATH.resolveModelAttribute(context, model).asString();
+            }
+        } else {
+            coordinatorURL = null;
+        }
 
-        final ModelNode coordinatorURLAttribute = ENVIRONMENT_URL.resolveModelAttribute(context, model);
-        final String coordinatorURL = coordinatorURLAttribute.isDefined() ? coordinatorURLAttribute.asString() : null;
         if (coordinatorURL != null && XtsAsLogger.ROOT_LOGGER.isDebugEnabled()) {
             XtsAsLogger.ROOT_LOGGER.debugf("nodeIdentifier=%s\n", coordinatorURL);
         }

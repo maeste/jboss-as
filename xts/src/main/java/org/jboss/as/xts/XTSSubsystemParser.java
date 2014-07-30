@@ -108,11 +108,8 @@ class XTSSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             writer.writeEndElement();
         }
 
-        if (node.hasDefined(ENVIRONMENT_URL.getName())) {
-            writer.writeStartElement(Element.XTS_ENVIRONMENT.getLocalName());
-            ENVIRONMENT_URL.marshallAsAttribute(node, writer);
-            writer.writeEndElement();
-        }
+
+        writeXtsEnvironment(writer, node);
 
         if (node.hasDefined(DEFAULT_CONTEXT_PROPAGATION.getName())) {
             writer.writeStartElement(Element.DEFAULT_CONTEXT_PROPAGATION.getLocalName());
@@ -121,6 +118,14 @@ class XTSSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         }
 
         writer.writeEndElement();
+    }
+
+    protected void writeXtsEnvironment(XMLExtendedStreamWriter writer, ModelNode node) throws XMLStreamException {
+        if (node.hasDefined(ENVIRONMENT_URL.getName())) {
+            writer.writeStartElement(Element.XTS_ENVIRONMENT.getLocalName());
+            ENVIRONMENT_URL.marshallAsAttribute(node, writer);
+            writer.writeEndElement();
+        }
     }
 
     private void parseHostElement(XMLExtendedStreamReader reader, ModelNode subsystem) throws XMLStreamException {
@@ -157,7 +162,7 @@ class XTSSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
      * @throws javax.xml.stream.XMLStreamException
      *
      */
-    private void parseXTSEnvironmentElement(XMLExtendedStreamReader reader, ModelNode subsystem) throws XMLStreamException {
+    protected void parseXTSEnvironmentElement(XMLExtendedStreamReader reader, ModelNode subsystem) throws XMLStreamException {
 
         final int count = reader.getAttributeCount();
         for (int i = 0; i < count; i++) {

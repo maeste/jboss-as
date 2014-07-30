@@ -29,5 +29,11 @@ interface CommonAttributes {
     String HOST = "host";
     String XTS_ENVIRONMENT= "xts-environment";
     String DEFAULT_CONTEXT_PROPAGATION = "default-context-propagation";
+
+    String ENVIRONMENT_PROTOCOL = "environment-protocol";
+    String ENVIRONMENT_HOST = "environment-host";
+    String ENVIRONMENT_PORT = "environment-port";
+    String ENVIRONMENT_PATH = "environment-path";
+
     // TODO, many more!
 }

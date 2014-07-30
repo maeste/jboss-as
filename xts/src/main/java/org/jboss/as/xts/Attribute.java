@@ -35,6 +35,11 @@ enum Attribute {
     URL("url"),
     ENABLED("enabled"),
     NAME("name"),
+    PROTOCOL("protocol"),
+    HOST("host"),
+    PORT("port"),
+    PATH("path")
+
     ;
     private final String name;
 

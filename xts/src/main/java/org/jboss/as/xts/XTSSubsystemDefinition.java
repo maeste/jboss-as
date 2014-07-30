@@ -53,13 +53,43 @@ public class XTSSubsystemDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .build();
 
-    protected static final SimpleAttributeDefinition ENVIRONMENT_URL =
-            new SimpleAttributeDefinitionBuilder(ModelDescriptionConstants.URL, ModelType.STRING, true)
+    protected static final SimpleAttributeDefinition ENVIRONMENT_PROTOCOL =
+            new SimpleAttributeDefinitionBuilder(CommonAttributes.ENVIRONMENT_PROTOCOL, ModelType.STRING, true)
                     .setAllowExpression(true)
-                    .setXmlName(Attribute.URL.getLocalName())
+                    .setXmlName(Attribute.PROTOCOL.getLocalName())
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-                            //.setDefaultValue(new ModelNode().setExpression("http://${jboss.bind.address:127.0.0.1}:8080/ws-c11/ActivationService"))
+                    .setRequires(CommonAttributes.ENVIRONMENT_HOST, CommonAttributes.ENVIRONMENT_PORT, CommonAttributes.ENVIRONMENT_PATH)
                     .build();
+
+    protected static final SimpleAttributeDefinition ENVIRONMENT_HOST =
+            new SimpleAttributeDefinitionBuilder(CommonAttributes.ENVIRONMENT_HOST, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Attribute.HOST.getLocalName())
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setRequires(CommonAttributes.ENVIRONMENT_PROTOCOL, CommonAttributes.ENVIRONMENT_PORT, CommonAttributes.ENVIRONMENT_PATH)
+                    .build();
+    protected static final SimpleAttributeDefinition ENVIRONMENT_PORT =
+            new SimpleAttributeDefinitionBuilder(CommonAttributes.ENVIRONMENT_PORT, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Attribute.PORT.getLocalName())
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setRequires(CommonAttributes.ENVIRONMENT_HOST, CommonAttributes.ENVIRONMENT_PROTOCOL, CommonAttributes.ENVIRONMENT_PATH)
+                    .build();
+    protected static final SimpleAttributeDefinition ENVIRONMENT_PATH =
+            new SimpleAttributeDefinitionBuilder(CommonAttributes.ENVIRONMENT_PATH, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Attribute.PATH.getLocalName())
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setRequires(CommonAttributes.ENVIRONMENT_HOST, CommonAttributes.ENVIRONMENT_PORT, CommonAttributes.ENVIRONMENT_PROTOCOL)
+                    .build();
+
+    @Deprecated //just legacy support
+    protected static final SimpleAttributeDefinition ENVIRONMENT_URL =
+                new SimpleAttributeDefinitionBuilder(ModelDescriptionConstants.URL, ModelType.STRING, true)
+                        .setAllowExpression(true)
+                        .setXmlName(Attribute.URL.getLocalName())
+                        .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                        .build();
 
     protected static final SimpleAttributeDefinition DEFAULT_CONTEXT_PROPAGATION =
             new SimpleAttributeDefinitionBuilder(CommonAttributes.DEFAULT_CONTEXT_PROPAGATION, ModelType.BOOLEAN, true)
@@ -95,9 +125,14 @@ public class XTSSubsystemDefinition extends SimpleResourceDefinition {
 
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
-        resourceRegistration.registerReadWriteAttribute(HOST_NAME, null, new ReloadRequiredWriteAttributeHandler(HOST_NAME));
-        resourceRegistration.registerReadWriteAttribute(ENVIRONMENT_URL, null, new ReloadRequiredWriteAttributeHandler(ENVIRONMENT_URL));
-        resourceRegistration.registerReadWriteAttribute(DEFAULT_CONTEXT_PROPAGATION, null, new ReloadRequiredWriteAttributeHandler(DEFAULT_CONTEXT_PROPAGATION));
+        ReloadRequiredWriteAttributeHandler reloadReqHandler = new ReloadRequiredWriteAttributeHandler(HOST_NAME, ENVIRONMENT_PROTOCOL, ENVIRONMENT_HOST,
+                ENVIRONMENT_PORT, ENVIRONMENT_PATH, DEFAULT_CONTEXT_PROPAGATION);
+        resourceRegistration.registerReadWriteAttribute(HOST_NAME, null, reloadReqHandler);
+        resourceRegistration.registerReadWriteAttribute(ENVIRONMENT_PROTOCOL, null, reloadReqHandler);
+        resourceRegistration.registerReadWriteAttribute(ENVIRONMENT_HOST, null, reloadReqHandler);
+        resourceRegistration.registerReadWriteAttribute(ENVIRONMENT_PORT, null, reloadReqHandler);
+        resourceRegistration.registerReadWriteAttribute(ENVIRONMENT_PATH, null, reloadReqHandler);
+        resourceRegistration.registerReadWriteAttribute(DEFAULT_CONTEXT_PROPAGATION, null, reloadReqHandler);
         //this here just for legacy support!
         resourceRegistration.registerReadOnlyAttribute(ENVIRONMENT, new OperationStepHandler() {
             @Override
