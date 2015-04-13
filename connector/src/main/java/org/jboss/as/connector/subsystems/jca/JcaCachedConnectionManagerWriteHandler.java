@@ -41,9 +41,9 @@ public class JcaCachedConnectionManagerWriteHandler extends AbstractWriteAttribu
 
     private JcaCachedConnectionManagerWriteHandler() {
         super(
-                JcaCachedConnectionManagerDefinition.CcmParameters.DEBUG.getAttribute(),
-                JcaCachedConnectionManagerDefinition.CcmParameters.ERROR.getAttribute(),
-                JcaCachedConnectionManagerDefinition.CcmParameters.IGNORE_UNKNOWN_CONNECTIONS.getAttribute()
+                JcaCachedConnectionManagerDefinition.DEBUG,
+                JcaCachedConnectionManagerDefinition.ERROR,
+                JcaCachedConnectionManagerDefinition.IGNORE_UNKNOWN_CONNECTIONS
         );
     }
 
@@ -52,11 +52,11 @@ public class JcaCachedConnectionManagerWriteHandler extends AbstractWriteAttribu
 
         CachedConnectionManager ccm = (CachedConnectionManager) context.getServiceRegistry(true).getService(ConnectorServices.CCM_SERVICE).getValue();
 
-        if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.DEBUG.getAttribute().getName())) {
+        if (attributeName.equals(JcaCachedConnectionManagerDefinition.DEBUG.getName())) {
             ccm.setDebug(resolvedValue.asBoolean());
-        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.ERROR.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.ERROR.getName())) {
             ccm.setError(resolvedValue.asBoolean());
-        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.IGNORE_UNKNOWN_CONNECTIONS.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.IGNORE_UNKNOWN_CONNECTIONS.getName())) {
             ccm.setIgnoreUnknownConnections(resolvedValue.asBoolean());
         }
 
@@ -70,11 +70,11 @@ public class JcaCachedConnectionManagerWriteHandler extends AbstractWriteAttribu
 
         CachedConnectionManager ccm = (CachedConnectionManager) context.getServiceRegistry(true).getService(ConnectorServices.CCM_SERVICE).getValue();
 
-        if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.DEBUG.getAttribute().getName())) {
+        if (attributeName.equals(JcaCachedConnectionManagerDefinition.DEBUG.getName())) {
             ccm.setDebug(valueToRestore.asBoolean());
-        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.ERROR.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.ERROR.getName())) {
             ccm.setError(valueToRestore.asBoolean());
-        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.IGNORE_UNKNOWN_CONNECTIONS.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.IGNORE_UNKNOWN_CONNECTIONS.getName())) {
             ccm.setIgnoreUnknownConnections(valueToRestore.asBoolean());
         }
 

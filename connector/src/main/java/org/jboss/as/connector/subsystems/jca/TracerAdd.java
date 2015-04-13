@@ -23,6 +23,7 @@ package org.jboss.as.connector.subsystems.jca;
 
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
@@ -40,15 +41,15 @@ public class TracerAdd extends AbstractAddStepHandler {
 
     @Override
     protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
-        for (TracerDefinition.TracerParameters parameter : TracerDefinition.TracerParameters.values()) {
-            parameter.getAttribute().validateAndSet(operation, model);
+        for (AttributeDefinition parameter : TracerDefinition.ATTRIBUTES) {
+            parameter.validateAndSet(operation, model);
         }
     }
 
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 
-        final boolean enabled = TracerDefinition.TracerParameters.TRACER_ENABLED.getAttribute().resolveModelAttribute(context, model).asBoolean();
+        final boolean enabled = TracerDefinition.TRACER_ENABLED.resolveModelAttribute(context, model).asBoolean();
 
         ServiceName serviceName = ConnectorServices.TRACER_CONFIG_SERVICE;
         ServiceName jcaConfigServiceName = ConnectorServices.CONNECTOR_CONFIG_SERVICE;

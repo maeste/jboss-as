@@ -1,76 +1,55 @@
-<subsystem xmlns="urn:jboss:domain:jca:3.0">
+<subsystem xmlns="urn:jboss:domain:jca:4.0">
   <!--Optional:-->
   <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
   <!--Optional:-->
   <bean-validation enabled="false"/>
   <tracer enabled="true" />
-  <default-workmanager>
-    <short-running-threads allow-core-timeout="true">
-      <!--Optional:-->
-      <core-threads count="3"/>
-      <queue-length count="3"/>
-      <max-threads count="3"/>
-      <!--Optional:-->
-      <keepalive-time time="10" unit="minutes"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </short-running-threads>
-    <!--Optional:-->
-    <long-running-threads allow-core-timeout="true">
-      <!--Optional:-->
-      <core-threads count="3"/>
-      <queue-length count="3"/>
-      <max-threads count="3"/>
-      <!--Optional:-->
-      <keepalive-time time="10" unit="milliseconds"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </long-running-threads>
-  </default-workmanager>
+  <workmanager name="default">
+    <short-running-threads name="default" allow-core-timeout="true"
+                           core-threads="3"
+                           queue-length="3"
+                           max-threads="3"
+                           keep-alive-time="10" keep-alive-unit="minutes" thread-factory="string"/>
+    <long-running-threads name="default" allow-core-timeout="true"
+                          core-threads="3"
+                          queue-length="3"
+                          max-threads="3"
+                          keep-alive-time="10" keep-alive-unit="milliseconds"
+                          thread-factory="string"/>
+  </workmanager>
   <!--Zero or more repetitions:-->
   <workmanager name="anotherWm">
-    <short-running-threads allow-core-timeout="true">
-      <!--Optional:-->
-      <core-threads count="3"/>
-      <queue-length count="3"/>
-      <max-threads count="3"/>
-      <!--Optional:-->
-      <keepalive-time time="10" unit="milliseconds"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </short-running-threads>
-    <!--Optional:-->
-    <long-running-threads allow-core-timeout="false">
-      <!--Optional:-->
-      <core-threads count="3"/>
-      <queue-length count="3"/>
-      <max-threads count="3"/>
-      <!--Optional:-->
-      <keepalive-time time="10" unit="hours"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </long-running-threads>
+    <short-running-threads name="anotherWm" allow-core-timeout="true"
+                               core-threads="3"
+                               queue-length="3"
+                               max-threads="3"
+                               keep-alive-time="10" keep-alive-unit="minutes" thread-factory="string"/>
+        <long-running-threads name="anotherWm" allow-core-timeout="true"
+                              core-threads="3"
+                              queue-length="3"
+                              max-threads="3"
+                              keep-alive-time="10" keep-alive-unit="minutes"
+                              thread-factory="string"/>
   </workmanager>
   <!--Optional:-->
-  <distributed-workmanager name="MyDWM">
-    <selector name="PING_TIME">
-      <option name="myOption">ignored</option>
-    </selector>
-    <policy name="WATERMARK">
-      <option name="watermark">0</option>
-    </policy>
-    <short-running-threads>
-      <core-threads count="50"/>
-      <queue-length count="50"/>
-      <max-threads count="50"/>
-      <keepalive-time time="10" unit="seconds"/>
-    </short-running-threads>
-    <transport jgroups-stack="udp" jgroups-cluster="myChannel" request-timeout="100000"/>
+  <distributed-workmanager name="MyDWM"
+                           jgroups-stack="udp" jgroups-cluster="myChannel" request-timeout="100000">
+      <policy-option name="watermark" value="0" />
+      <selector-option name="myOption" value="ignored" />
+      <short-running-threads name="MyDWM" allow-core-timeout="true"
+                             core-threads="3"
+                             queue-length="3"
+                             max-threads="3"
+                             keep-alive-time="10" keep-alive-unit="minutes" thread-factory="string"/>
+
   </distributed-workmanager>
-  <bootstrap-contexts>
-    <!--1 or more repetitions:-->
-    <bootstrap-context name="bootStrapContext" workmanager="anotherWm"/>
-  </bootstrap-contexts>
+    <bootstrap-contexts>
+        <!--1 or more repetitions:-->
+
+        <bootstrap-context name="default" workmanager="default"/>
+
+        <bootstrap-context name="bootStrapContext" workmanager="anotherWm"/>
+    </bootstrap-contexts>
   <!--Optional:-->
   <cached-connection-manager debug="false" error="true"/>
 </subsystem>

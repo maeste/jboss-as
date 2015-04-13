@@ -22,30 +22,42 @@
 
 package org.jboss.as.connector.subsystems.jca;
 
-import org.jboss.as.controller.AttributeDefinition;
-import org.jboss.as.controller.PathElement;
-import org.jboss.as.controller.ReadResourceNameOperationStepHandler;
-import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
-import org.jboss.as.controller.SimpleAttributeDefinition;
-import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
-import org.jboss.as.controller.client.helpers.MeasurementUnit;
-import org.jboss.as.controller.registry.ManagementResourceRegistration;
-import org.jboss.as.controller.transform.description.ResourceTransformationDescriptionBuilder;
-import org.jboss.as.threads.BoundedQueueThreadPoolResourceDefinition;
-import org.jboss.as.threads.ThreadsServices;
-import org.jboss.dmr.ModelType;
-
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER;
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_LONG_RUNNING;
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_SHORT_RUNNING;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
+import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
+import org.jboss.as.controller.SimpleAttributeDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.as.controller.client.helpers.MeasurementUnit;
+import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.as.threads.BoundedQueueThreadPoolResourceDefinition;
+import org.jboss.as.threads.ThreadsServices;
+import org.jboss.dmr.ModelType;
+
 /**
- * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2012 Red Hat Inc.
+ * @author Stefano Maestri
  */
-public class JcaWorkManagerDefinition extends SimpleResourceDefinition {
+public class JcaWorkManagerDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_WORK_MANAGER = PathElement.pathElement(WORKMANAGER);
     private final boolean registerRuntimeOnly;
+
+
+    public static SimpleAttributeDefinition NAME = SimpleAttributeDefinitionBuilder.create("name", ModelType.STRING)
+            .setAllowExpression(false)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName("name")
+            .build();
+    static final AttributeDefinition[] ATTRIBUTES = {NAME};
+
 
     private JcaWorkManagerDefinition(final boolean registerRuntimeOnly) {
         super(PATH_WORK_MANAGER,
@@ -59,52 +71,19 @@ public class JcaWorkManagerDefinition extends SimpleResourceDefinition {
         return new JcaWorkManagerDefinition(registerRuntimeOnly);
     }
 
-    @Override
-    public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
-        super.registerAttributes(resourceRegistration);
-
-        for (final WmParameters parameter : WmParameters.values()) {
-            AttributeDefinition ad = parameter.getAttribute();
-            resourceRegistration.registerReadOnlyAttribute(ad, ReadResourceNameOperationStepHandler.INSTANCE);
-        }
-
-    }
 
     @Override
-        public void registerChildren(ManagementResourceRegistration resourceRegistration) {
+    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerSubModel(BoundedQueueThreadPoolResourceDefinition.create(WORKMANAGER_SHORT_RUNNING, ThreadsServices.STANDARD_THREAD_FACTORY_RESOLVER, ThreadsServices.STANDARD_HANDOFF_EXECUTOR_RESOLVER,
                 ThreadsServices.EXECUTOR.append(WORKMANAGER_SHORT_RUNNING), registerRuntimeOnly));
         resourceRegistration.registerSubModel(BoundedQueueThreadPoolResourceDefinition.create(WORKMANAGER_LONG_RUNNING, ThreadsServices.STANDARD_THREAD_FACTORY_RESOLVER, ThreadsServices.STANDARD_HANDOFF_EXECUTOR_RESOLVER,
-                        ThreadsServices.EXECUTOR.append(WORKMANAGER_LONG_RUNNING), registerRuntimeOnly));
+                ThreadsServices.EXECUTOR.append(WORKMANAGER_LONG_RUNNING), registerRuntimeOnly));
 
     }
 
-    static void registerTransformers110(ResourceTransformationDescriptionBuilder parentBuilder) {
-
-        ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PATH_WORK_MANAGER);
-        BoundedQueueThreadPoolResourceDefinition.registerTransformers1_0(builder, WORKMANAGER_SHORT_RUNNING);
-        BoundedQueueThreadPoolResourceDefinition.registerTransformers1_0(builder, WORKMANAGER_LONG_RUNNING);
-    }
-
-    public static enum WmParameters {
-        NAME(SimpleAttributeDefinitionBuilder.create("name", ModelType.STRING)
-                .setAllowExpression(false)
-                .setAllowNull(false)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName("name")
-                .build());
-
-
-        private WmParameters(SimpleAttributeDefinition attribute) {
-            this.attribute = attribute;
-        }
-
-        public SimpleAttributeDefinition getAttribute() {
-            return attribute;
-        }
-
-        private SimpleAttributeDefinition attribute;
+    @Override
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
     }
 
 }

@@ -22,15 +22,20 @@
 
 package org.jboss.as.connector.subsystems.jca;
 
+import static org.jboss.as.connector.subsystems.jca.Constants.CACHED_CONNECTION_MANAGER;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleOperationDefinition;
 import org.jboss.as.controller.SimpleOperationDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.transform.description.DiscardAttributeChecker;
@@ -38,14 +43,54 @@ import org.jboss.as.controller.transform.description.ResourceTransformationDescr
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
-import static org.jboss.as.connector.subsystems.jca.Constants.CACHED_CONNECTION_MANAGER;
-
 /**
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2012 Red Hat Inc.
  */
-public class JcaCachedConnectionManagerDefinition extends SimpleResourceDefinition {
+public class JcaCachedConnectionManagerDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_CACHED_CONNECTION_MANAGER = PathElement.pathElement(CACHED_CONNECTION_MANAGER, CACHED_CONNECTION_MANAGER);
     static final JcaCachedConnectionManagerDefinition INSTANCE = new JcaCachedConnectionManagerDefinition();
+
+    public static SimpleAttributeDefinition DEBUG = SimpleAttributeDefinitionBuilder.create("debug", ModelType.BOOLEAN)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode().set(false))
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName("debug")
+            .build();
+    public static SimpleAttributeDefinition ERROR = SimpleAttributeDefinitionBuilder.create("error", ModelType.BOOLEAN)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode().set(false))
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName("error")
+            .build();
+    public static SimpleAttributeDefinition IGNORE_UNKNOWN_CONNECTIONS = SimpleAttributeDefinitionBuilder.create("ignore-unknown-connections", ModelType.BOOLEAN)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode().set(false))
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName("ignore-unknown-connections")
+            .build();
+    public static SimpleAttributeDefinition INSTALL = SimpleAttributeDefinitionBuilder.create("install", ModelType.BOOLEAN)
+            .setAllowExpression(false)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode().set(false))
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .build();
+
+    static final AttributeDefinition[] ATTRIBUTES = {DEBUG, ERROR, IGNORE_UNKNOWN_CONNECTIONS, INSTALL};
+
+    SimpleOperationDefinition GET_NUMBER_OF_CONNECTIONS = new SimpleOperationDefinitionBuilder("get-number-of-connections", JcaExtension.getResourceDescriptionResolver(PATH_CACHED_CONNECTION_MANAGER.getKey()))
+            .setRuntimeOnly()
+            .build();
+    SimpleOperationDefinition LIST_CONNECTIONS = new SimpleOperationDefinitionBuilder("list-connections", JcaExtension.getResourceDescriptionResolver(PATH_CACHED_CONNECTION_MANAGER.getKey()))
+            .setRuntimeOnly()
+            .build();
+
 
     private JcaCachedConnectionManagerDefinition() {
         super(PATH_CACHED_CONNECTION_MANAGER,
@@ -56,100 +101,39 @@ public class JcaCachedConnectionManagerDefinition extends SimpleResourceDefiniti
 
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
-        super.registerAttributes(resourceRegistration);
+        ReloadRequiredWriteAttributeHandler handler = new ReloadRequiredWriteAttributeHandler(getAttributes());
 
-        for (final CcmParameters parameter : CcmParameters.values()) {
-            if (parameter != CcmParameters.INSTALL) {
-                resourceRegistration.registerReadWriteAttribute(parameter.getAttribute(), null, JcaCachedConnectionManagerWriteHandler.INSTANCE);
+        for (AttributeDefinition attr : getAttributes()) {
+
+            if (!attr.equals(INSTALL)) {
+                resourceRegistration.registerReadWriteAttribute(attr, null, JcaCachedConnectionManagerWriteHandler.INSTANCE);
             } else {
-                AttributeDefinition ad = parameter.getAttribute();
-                resourceRegistration.registerReadWriteAttribute(ad, null, new ReloadRequiredWriteAttributeHandler(ad));
+                resourceRegistration.registerReadWriteAttribute(attr, null, handler);
             }
         }
 
     }
 
     @Override
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
+    }
+
+
+    @Override
     public void registerOperations(ManagementResourceRegistration resourceRegistration) {
         super.registerOperations(resourceRegistration);
-        resourceRegistration.registerOperationHandler(CcmOperations.GET_NUMBER_OF_CONNECTIONS.getOperation(), GetNumberOfConnectionsHandler.INSTANCE);
-        resourceRegistration.registerOperationHandler(CcmOperations.LIST_CONNECTIONS.getOperation(), ListOfConnectionsHandler.INSTANCE);
+        resourceRegistration.registerOperationHandler(GET_NUMBER_OF_CONNECTIONS, GetNumberOfConnectionsHandler.INSTANCE);
+        resourceRegistration.registerOperationHandler(LIST_CONNECTIONS, ListOfConnectionsHandler.INSTANCE);
 
     }
 
     static void registerTransformers110(ResourceTransformationDescriptionBuilder parentBuilder) {
 
-            ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PATH_CACHED_CONNECTION_MANAGER);
-            builder.getAttributeBuilder().setDiscard(DiscardAttributeChecker.ALWAYS, CcmParameters.IGNORE_UNKNOWN_CONNECTIONS.getAttribute());
+        ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PATH_CACHED_CONNECTION_MANAGER);
+        builder.getAttributeBuilder().setDiscard(DiscardAttributeChecker.ALWAYS, IGNORE_UNKNOWN_CONNECTIONS);
 
-        }
-
-    public static enum CcmParameters {
-        DEBUG(SimpleAttributeDefinitionBuilder.create("debug", ModelType.BOOLEAN)
-                .setAllowExpression(true)
-                .setAllowNull(true)
-                .setDefaultValue(new ModelNode().set(false))
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName("debug")
-                .build()),
-        ERROR(SimpleAttributeDefinitionBuilder.create("error", ModelType.BOOLEAN)
-                .setAllowExpression(true)
-                .setAllowNull(true)
-                .setDefaultValue(new ModelNode().set(false))
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName("error")
-                .build()),
-        IGNORE_UNKNOWN_CONNECTIONS(SimpleAttributeDefinitionBuilder.create("ignore-unknown-connections", ModelType.BOOLEAN)
-                .setAllowExpression(true)
-                .setAllowNull(true)
-                .setDefaultValue(new ModelNode().set(false))
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName("ignore-unknown-connections")
-                .build()),
-        INSTALL(SimpleAttributeDefinitionBuilder.create("install", ModelType.BOOLEAN)
-                .setAllowExpression(false)
-                .setAllowNull(true)
-                .setDefaultValue(new ModelNode().set(false))
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .build());
-
-
-        private CcmParameters(SimpleAttributeDefinition attribute) {
-            this.attribute = attribute;
-        }
-
-        public SimpleAttributeDefinition getAttribute() {
-            return attribute;
-        }
-
-        private SimpleAttributeDefinition attribute;
     }
-
-
-    public static enum CcmOperations {
-        GET_NUMBER_OF_CONNECTIONS(new SimpleOperationDefinitionBuilder("get-number-of-connections", JcaExtension.getResourceDescriptionResolver(PATH_CACHED_CONNECTION_MANAGER.getKey()))
-                .setRuntimeOnly()
-                .build()),
-        LIST_CONNECTIONS(new SimpleOperationDefinitionBuilder("list-connections", JcaExtension.getResourceDescriptionResolver(PATH_CACHED_CONNECTION_MANAGER.getKey()))
-                .setRuntimeOnly()
-                .build());
-
-
-        private CcmOperations(SimpleOperationDefinition operation) {
-            this.operation = operation;
-        }
-
-        public SimpleOperationDefinition getOperation() {
-            return operation;
-        }
-
-        private SimpleOperationDefinition operation;
-    }
-
 
 
 }

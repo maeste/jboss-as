@@ -39,14 +39,14 @@ public class JcaBeanValidationWriteHandler extends AbstractWriteAttributeHandler
     static JcaBeanValidationWriteHandler INSTANCE = new JcaBeanValidationWriteHandler();
 
     private JcaBeanValidationWriteHandler() {
-        super(JcaBeanValidationDefinition.BeanValidationParameters.BEAN_VALIDATION_ENABLED.getAttribute());
+        super(JcaBeanValidationDefinition.BEAN_VALIDATION_ENABLED);
     }
 
     @Override
     protected boolean applyUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode resolvedValue, ModelNode currentValue, HandbackHolder<JcaSubsystemConfiguration> jcaSubsystemConfigurationHandbackHolder) throws OperationFailedException {
         JcaSubsystemConfiguration config = (JcaSubsystemConfiguration) context.getServiceRegistry(true).getService(ConnectorServices.CONNECTOR_CONFIG_SERVICE).getValue();
 
-        if (attributeName.equals(JcaBeanValidationDefinition.BeanValidationParameters.BEAN_VALIDATION_ENABLED.getAttribute().getName())) {
+        if (attributeName.equals(JcaBeanValidationDefinition.BEAN_VALIDATION_ENABLED.getName())) {
             config.setBeanValidation(resolvedValue.asBoolean());
         }
 
@@ -58,7 +58,7 @@ public class JcaBeanValidationWriteHandler extends AbstractWriteAttributeHandler
     protected void revertUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode valueToRestore, ModelNode valueToRevert, JcaSubsystemConfiguration handback) throws OperationFailedException {
         JcaSubsystemConfiguration config = (JcaSubsystemConfiguration) context.getServiceRegistry(true).getService(ConnectorServices.CONNECTOR_CONFIG_SERVICE).getValue();
 
-        if (attributeName.equals(JcaBeanValidationDefinition.BeanValidationParameters.BEAN_VALIDATION_ENABLED.getAttribute().getName())) {
+        if (attributeName.equals(JcaBeanValidationDefinition.BEAN_VALIDATION_ENABLED.getName())) {
             config.setBeanValidation(valueToRestore.asBoolean());
         }
     }

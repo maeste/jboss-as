@@ -51,7 +51,7 @@ public class JcaDistributedWorkManagerWriteHandler extends AbstractWriteAttribut
     static JcaDistributedWorkManagerWriteHandler INSTANCE = new JcaDistributedWorkManagerWriteHandler();
 
     private JcaDistributedWorkManagerWriteHandler() {
-        super(JcaDistributedWorkManagerDefinition.DWmParameters.getAttributeDefinitions());
+        super(JcaDistributedWorkManagerDefinition.ATTRIBUTES);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class JcaDistributedWorkManagerWriteHandler extends AbstractWriteAttribut
 
         Injection injector = new Injection();
 
-        if (attributeName.equals(JcaDistributedWorkManagerDefinition.DWmParameters.POLICY.getAttribute().getName())) {
+        if (attributeName.equals(JcaDistributedWorkManagerDefinition.POLICY.getName())) {
             switch (JcaDistributedWorkManagerDefinition.PolicyValue.valueOf(resolvedValue.asString())) {
                 case NEVER: {
                     namedDistributedWorkManager.setPolicy(new Never());
@@ -88,7 +88,7 @@ public class JcaDistributedWorkManagerWriteHandler extends AbstractWriteAttribut
                     throw ROOT_LOGGER.unsupportedPolicy(resolvedValue.asString());
                 }
             }
-        } else if (attributeName.equals(JcaDistributedWorkManagerDefinition.DWmParameters.SELECTOR.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaDistributedWorkManagerDefinition.SELECTOR.getName())) {
             switch (JcaDistributedWorkManagerDefinition.SelectorValue.valueOf(resolvedValue.asString())) {
                 case FIRST_AVAILABLE: {
                     namedDistributedWorkManager.setSelector(new FirstAvailable());
@@ -106,8 +106,8 @@ public class JcaDistributedWorkManagerWriteHandler extends AbstractWriteAttribut
                     throw ROOT_LOGGER.unsupportedSelector(resolvedValue.asString());
                 }
             }
-        } else if (attributeName.equals(JcaDistributedWorkManagerDefinition.DWmParameters.POLICY_OPTIONS.getAttribute().getName()) && namedDistributedWorkManager.getPolicy() != null) {
-            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.DWmParameters.POLICY_OPTIONS.getAttribute()).unwrap(context, operation).entrySet()) {
+        } else if (attributeName.equals(JcaDistributedWorkManagerDefinition.POLICY_OPTIONS.getName()) && namedDistributedWorkManager.getPolicy() != null) {
+            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.POLICY_OPTIONS).unwrap(context, operation).entrySet()) {
                 try {
                     injector.inject(namedDistributedWorkManager.getPolicy(), entry.getKey(), entry.getValue());
                 } catch (Exception e) {
@@ -116,8 +116,8 @@ public class JcaDistributedWorkManagerWriteHandler extends AbstractWriteAttribut
                 }
 
             }
-        } else if (attributeName.equals(JcaDistributedWorkManagerDefinition.DWmParameters.SELECTOR_OPTIONS.getAttribute().getName())) {
-            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.DWmParameters.SELECTOR_OPTIONS.getAttribute()).unwrap(context, operation).entrySet()) {
+        } else if (attributeName.equals(JcaDistributedWorkManagerDefinition.SELECTOR_OPTIONS.getName())) {
+            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.SELECTOR_OPTIONS).unwrap(context, operation).entrySet()) {
                 try {
                     injector.inject(namedDistributedWorkManager.getSelector(), entry.getKey(), entry.getValue());
                 } catch (Exception e) {
@@ -137,11 +137,11 @@ public class JcaDistributedWorkManagerWriteHandler extends AbstractWriteAttribut
 
         CachedConnectionManager ccm = (CachedConnectionManager) context.getServiceRegistry(true).getService(ConnectorServices.CCM_SERVICE).getValue();
 
-        if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.DEBUG.getAttribute().getName())) {
+        if (attributeName.equals(JcaCachedConnectionManagerDefinition.DEBUG.getName())) {
             ccm.setDebug(valueToRestore.asBoolean());
-        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.ERROR.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.ERROR.getName())) {
             ccm.setError(valueToRestore.asBoolean());
-        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.CcmParameters.IGNORE_UNKNOWN_CONNECTIONS.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaCachedConnectionManagerDefinition.IGNORE_UNKNOWN_CONNECTIONS.getName())) {
             ccm.setIgnoreUnknownConnections(valueToRestore.asBoolean());
         }
 

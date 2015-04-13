@@ -24,13 +24,16 @@ package org.jboss.as.connector.subsystems.jca;
 
 import static org.jboss.as.connector.subsystems.jca.Constants.TRACER;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
-import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
@@ -38,9 +41,20 @@ import org.jboss.dmr.ModelType;
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2012 Red Hat Inc.
  * @author Stefano Maestri
  */
-public class TracerDefinition extends SimpleResourceDefinition {
+public class TracerDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_TRACER = PathElement.pathElement(TRACER, TRACER);
     static final TracerDefinition INSTANCE = new TracerDefinition();
+
+
+    public static SimpleAttributeDefinition TRACER_ENABLED = SimpleAttributeDefinitionBuilder.create("enabled", ModelType.BOOLEAN)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode().set(false))
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .build();
+
+    static final AttributeDefinition[] ATTRIBUTES = {TRACER_ENABLED};
 
     private TracerDefinition() {
         super(PATH_TRACER,
@@ -50,33 +64,10 @@ public class TracerDefinition extends SimpleResourceDefinition {
     }
 
     @Override
-    public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
-        super.registerAttributes(resourceRegistration);
-
-        for (final TracerParameters parameter : TracerParameters.values()) {
-            resourceRegistration.registerReadWriteAttribute(parameter.getAttribute(), null, TracerWriteHandler.INSTANCE);
-        }
-
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
     }
 
-    public static enum TracerParameters {
-        TRACER_ENABLED(SimpleAttributeDefinitionBuilder.create("enabled", ModelType.BOOLEAN)
-                .setAllowExpression(true)
-                .setAllowNull(true)
-                .setDefaultValue(new ModelNode().set(false))
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .build());
 
-        private TracerParameters(SimpleAttributeDefinition attribute) {
-            this.attribute = attribute;
-        }
-
-        public SimpleAttributeDefinition getAttribute() {
-            return attribute;
-        }
-
-        private SimpleAttributeDefinition attribute;
-    }
 
 }

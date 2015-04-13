@@ -24,20 +24,23 @@ package org.jboss.as.connector.subsystems.jca;
 import static org.jboss.as.connector.logging.ConnectorLogger.ROOT_LOGGER;
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_LONG_RUNNING;
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_SHORT_RUNNING;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import org.jboss.as.connector.services.workmanager.statistics.DistributedWorkManagerStatisticsService;
-import org.jboss.as.connector.services.workmanager.statistics.WorkManagerStatisticsService;
 import org.jboss.as.connector.services.workmanager.DistributedWorkManagerService;
 import org.jboss.as.connector.services.workmanager.NamedDistributedWorkManager;
+import org.jboss.as.connector.services.workmanager.statistics.DistributedWorkManagerStatisticsService;
+import org.jboss.as.connector.services.workmanager.statistics.WorkManagerStatisticsService;
 import org.jboss.as.connector.subsystems.resourceadapters.IronJacamarResource;
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.connector.util.Injection;
 import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.registry.Resource;
@@ -71,8 +74,8 @@ public class DistributedWorkManagerAdd extends AbstractAddStepHandler {
 
     @Override
     protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
-        for (JcaDistributedWorkManagerDefinition.DWmParameters parameter : JcaDistributedWorkManagerDefinition.DWmParameters.values()) {
-            parameter.getAttribute().validateAndSet(operation, model);
+        for (AttributeDefinition parameter : JcaDistributedWorkManagerDefinition.ATTRIBUTES) {
+            parameter.validateAndSet(operation, model);
         }
 
     }
@@ -80,10 +83,11 @@ public class DistributedWorkManagerAdd extends AbstractAddStepHandler {
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final Resource resource) throws OperationFailedException {
         ModelNode model = resource.getModel();
-        String name = JcaDistributedWorkManagerDefinition.DWmParameters.NAME.getAttribute().resolveModelAttribute(context, model).asString();
+        final ModelNode address = operation.require(OP_ADDR);
+        final String name = PathAddress.pathAddress(address).getLastElement().getValue();
 
-        String policy = JcaDistributedWorkManagerDefinition.DWmParameters.POLICY.getAttribute().resolveModelAttribute(context, model).asString();
-        String selector = JcaDistributedWorkManagerDefinition.DWmParameters.SELECTOR.getAttribute().resolveModelAttribute(context, model).asString();
+        String policy = JcaDistributedWorkManagerDefinition.POLICY.resolveModelAttribute(context, model).asString();
+        String selector = JcaDistributedWorkManagerDefinition.SELECTOR.resolveModelAttribute(context, model).asString();
 
         ServiceTarget serviceTarget = context.getServiceTarget();
         NamedDistributedWorkManager namedDistributedWorkManager = new NamedDistributedWorkManager(name);
@@ -107,7 +111,7 @@ public class DistributedWorkManagerAdd extends AbstractAddStepHandler {
 
             }
             Injection injector = new Injection();
-            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.DWmParameters.POLICY_OPTIONS.getAttribute()).unwrap(context, model).entrySet()) {
+            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.POLICY_OPTIONS).unwrap(context, model).entrySet()) {
                 try {
                     injector.inject(namedDistributedWorkManager.getPolicy(), entry.getKey(), entry.getValue());
                 } catch (Exception e) {
@@ -136,7 +140,7 @@ public class DistributedWorkManagerAdd extends AbstractAddStepHandler {
                     throw ROOT_LOGGER.unsupportedSelector(selector);
             }
             Injection injector = new Injection();
-            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.DWmParameters.SELECTOR_OPTIONS.getAttribute()).unwrap(context, model).entrySet()) {
+            for (Map.Entry<String, String> entry : ((PropertiesAttributeDefinition) JcaDistributedWorkManagerDefinition.SELECTOR_OPTIONS).unwrap(context, model).entrySet()) {
                 try {
                     injector.inject(namedDistributedWorkManager.getSelector(), entry.getKey(), entry.getValue());
                 } catch (Exception e) {
@@ -147,11 +151,11 @@ public class DistributedWorkManagerAdd extends AbstractAddStepHandler {
             namedDistributedWorkManager.setSelector(new PingTime());
         }
 
-        String jgroupsStack = model.hasDefined(JcaDistributedWorkManagerDefinition.DWmParameters.TRANSPORT_JGROPUS_STACK.getAttribute().getName()) ?
-                JcaDistributedWorkManagerDefinition.DWmParameters.TRANSPORT_JGROPUS_STACK.getAttribute().resolveModelAttribute(context, model).asString() :
+        String jgroupsStack = model.hasDefined(JcaDistributedWorkManagerDefinition.TRANSPORT_JGROPUS_STACK.getName()) ?
+                JcaDistributedWorkManagerDefinition.TRANSPORT_JGROPUS_STACK.resolveModelAttribute(context, model).asString() :
                 "udp";
-        String channelName = JcaDistributedWorkManagerDefinition.DWmParameters.TRANSPORT_JGROPUS_CLUSTER.getAttribute().resolveModelAttribute(context, model).asString();
-        Long requestTimeout = JcaDistributedWorkManagerDefinition.DWmParameters.TRANSPORT_REQUEST_TIMEOUT.getAttribute().resolveModelAttribute(context, model).asLong();
+        String channelName = JcaDistributedWorkManagerDefinition.TRANSPORT_JGROPUS_CLUSTER.resolveModelAttribute(context, model).asString();
+        Long requestTimeout = JcaDistributedWorkManagerDefinition.TRANSPORT_REQUEST_TIMEOUT.resolveModelAttribute(context, model).asLong();
 
         DistributedWorkManagerService wmService = new DistributedWorkManagerService(namedDistributedWorkManager, channelName, requestTimeout);
         ServiceBuilder<DistributedWorkManager> builder = serviceTarget

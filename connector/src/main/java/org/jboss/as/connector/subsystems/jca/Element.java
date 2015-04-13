@@ -67,7 +67,7 @@ public enum Element {
 
     POLICY("policy"),
 
-    SELECTOR("selector"),
+    SELECTOR("selector-name"),
 
     OPTION("option"),
 

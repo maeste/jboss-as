@@ -39,9 +39,9 @@ class JcaArchiveValidationWriteHandler extends AbstractWriteAttributeHandler<Jca
 
     private JcaArchiveValidationWriteHandler() {
         super(
-            JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_ENABLED.getAttribute(),
-            JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_ERROR.getAttribute(),
-            JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_WARN.getAttribute()
+            JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_ENABLED,
+            JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_ERROR,
+            JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_WARN
         );
     }
 
@@ -49,11 +49,11 @@ class JcaArchiveValidationWriteHandler extends AbstractWriteAttributeHandler<Jca
     protected boolean applyUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode resolvedValue, ModelNode currentValue, HandbackHolder<JcaSubsystemConfiguration> jcaSubsystemConfigurationHandbackHolder) throws OperationFailedException {
         JcaSubsystemConfiguration config = (JcaSubsystemConfiguration) context.getServiceRegistry(true).getService(ConnectorServices.CONNECTOR_CONFIG_SERVICE).getValue();
 
-        if (attributeName.equals(JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_ENABLED.getAttribute().getName())) {
+        if (attributeName.equals(JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_ENABLED.getName())) {
             config.setArchiveValidation(resolvedValue.asBoolean());
-        } else if (attributeName.equals(JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_ERROR.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_ERROR.getName())) {
             config.setArchiveValidationFailOnError(resolvedValue.asBoolean());
-        } else if (attributeName.equals(JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_WARN.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_WARN.getName())) {
             config.setArchiveValidationFailOnWarn(resolvedValue.asBoolean());
         }
 
@@ -65,11 +65,11 @@ class JcaArchiveValidationWriteHandler extends AbstractWriteAttributeHandler<Jca
     protected void revertUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode valueToRestore, ModelNode valueToRevert, JcaSubsystemConfiguration handback) throws OperationFailedException {
         JcaSubsystemConfiguration config = (JcaSubsystemConfiguration) context.getServiceRegistry(true).getService(ConnectorServices.CONNECTOR_CONFIG_SERVICE).getValue();
 
-        if (attributeName.equals(JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_ENABLED.getAttribute().getName())) {
+        if (attributeName.equals(JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_ENABLED.getName())) {
             config.setArchiveValidation(valueToRestore.asBoolean());
-        }else if (attributeName.equals(JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_ERROR.getAttribute().getName())) {
+        }else if (attributeName.equals(JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_ERROR.getName())) {
             config.setArchiveValidationFailOnError(valueToRestore.asBoolean());
-        } else if (attributeName.equals(JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_WARN.getAttribute().getName())) {
+        } else if (attributeName.equals(JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_WARN.getName())) {
             config.setArchiveValidationFailOnWarn(valueToRestore.asBoolean());
         }
 

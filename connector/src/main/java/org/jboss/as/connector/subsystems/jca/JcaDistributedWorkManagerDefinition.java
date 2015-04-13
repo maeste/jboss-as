@@ -22,14 +22,22 @@
 
 package org.jboss.as.connector.subsystems.jca;
 
+import static org.jboss.as.connector.subsystems.jca.Constants.DISTRIBUTED_WORKMANAGER;
+import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_LONG_RUNNING;
+import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_SHORT_RUNNING;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.ReadResourceNameOperationStepHandler;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
+import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
 import org.jboss.as.controller.operations.validation.EnumValidator;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
@@ -38,14 +46,10 @@ import org.jboss.as.threads.ThreadsServices;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
-import static org.jboss.as.connector.subsystems.jca.Constants.DISTRIBUTED_WORKMANAGER;
-import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_LONG_RUNNING;
-import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_SHORT_RUNNING;
-
 /**
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2012 Red Hat Inc.
  */
-public class JcaDistributedWorkManagerDefinition extends SimpleResourceDefinition {
+public class JcaDistributedWorkManagerDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_DISTRIBUTED_WORK_MANAGER = PathElement.pathElement(DISTRIBUTED_WORKMANAGER);
     private final boolean registerRuntimeOnly;
 
@@ -63,138 +67,130 @@ public class JcaDistributedWorkManagerDefinition extends SimpleResourceDefinitio
 
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
-        super.registerAttributes(resourceRegistration);
 
-        for (final AttributeDefinition ad : DWmParameters.getReadOnlyAttributeDefinitions()) {
+        for (final AttributeDefinition ad : READONLY_ATTRIBUTES) {
             resourceRegistration.registerReadOnlyAttribute(ad, ReadResourceNameOperationStepHandler.INSTANCE);
         }
 
-        for (final AttributeDefinition ad : DWmParameters.getReloadRequiredAttributeDefinitions()) {
+        for (final AttributeDefinition ad : RELOADREQUIRED_ATTRIBUTES) {
             resourceRegistration.registerReadWriteAttribute(ad, null, new ReloadRequiredWriteAttributeHandler(ad));
         }
 
-        for (final AttributeDefinition ad : DWmParameters.getRuntimeAttributeDefinitions()) {
+        for (final AttributeDefinition ad : RUNTIME_ATTRIBUTES) {
             resourceRegistration.registerReadWriteAttribute(ad, null, JcaDistributedWorkManagerWriteHandler.INSTANCE);
         }
 
     }
 
     @Override
-        public void registerChildren(ManagementResourceRegistration resourceRegistration) {
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
+    }
+
+    @Override
+    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
         resourceRegistration.registerSubModel(BoundedQueueThreadPoolResourceDefinition.create(WORKMANAGER_SHORT_RUNNING, ThreadsServices.STANDARD_THREAD_FACTORY_RESOLVER, ThreadsServices.STANDARD_HANDOFF_EXECUTOR_RESOLVER,
                 ThreadsServices.EXECUTOR.append(WORKMANAGER_SHORT_RUNNING), registerRuntimeOnly));
         resourceRegistration.registerSubModel(BoundedQueueThreadPoolResourceDefinition.create(WORKMANAGER_LONG_RUNNING, ThreadsServices.STANDARD_THREAD_FACTORY_RESOLVER, ThreadsServices.STANDARD_HANDOFF_EXECUTOR_RESOLVER,
-                        ThreadsServices.EXECUTOR.append(WORKMANAGER_LONG_RUNNING), registerRuntimeOnly));
+                ThreadsServices.EXECUTOR.append(WORKMANAGER_LONG_RUNNING), registerRuntimeOnly));
 
     }
 
-    public static enum DWmParameters {
-        NAME(SimpleAttributeDefinitionBuilder.create("name", ModelType.STRING)
-                .setAllowExpression(false)
-                .setAllowNull(false)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName("name")
-                .build()),
-        SELECTOR(SimpleAttributeDefinitionBuilder.create("selector", ModelType.STRING)
-                .setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Element.SELECTOR.getLocalName())
-                .setValidator(new EnumValidator<SelectorValue>(SelectorValue.class, true, true))
-                .setDefaultValue(new ModelNode(SelectorValue.PING_TIME.name()))
-                .build()),
-        POLICY(SimpleAttributeDefinitionBuilder.create("policy", ModelType.STRING)
-                .setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Element.POLICY.getLocalName())
-                .setValidator(new EnumValidator<PolicyValue>(PolicyValue.class, true, true))
-                .setDefaultValue(new ModelNode(PolicyValue.WATERMARK.name()))
-                .build()),
-        POLICY_OPTIONS(new PropertiesAttributeDefinition.Builder("policy-options", true)
-                .setAllowExpression(true)
-                .setXmlName(Element.OPTION.getLocalName())
-                .build()),
-        SELECTOR_OPTIONS(new PropertiesAttributeDefinition.Builder("selector-options", true)
-                .setAllowExpression(true)
-                .setXmlName(Element.OPTION.getLocalName())
-                .build()),
-        TRANSPORT_JGROPUS_STACK(SimpleAttributeDefinitionBuilder.create("transport-jgroups-stack", ModelType.STRING).setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Attribute.JGROUPS_STACK.getLocalName())
-                .build()),
-        TRANSPORT_JGROPUS_CLUSTER(SimpleAttributeDefinitionBuilder.create("transport-jgroups-cluster", ModelType.STRING).setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Attribute.JGROUPS_CLUSTER.getLocalName())
-                .setDefaultValue(new ModelNode("jca"))
-                .build()),
-        TRANSPORT_REQUEST_TIMEOUT(SimpleAttributeDefinitionBuilder.create("transport-request-timeout", ModelType.LONG).setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Attribute.REQUEST_TIMEOUT.getLocalName())
-                .setDefaultValue(new ModelNode("10000"))
-                .build());
+    static final SimpleAttributeDefinition NAME = SimpleAttributeDefinitionBuilder.create("name", ModelType.STRING)
+            .setAllowExpression(false)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName("name")
+            .build();
+    static final SimpleAttributeDefinition SELECTOR = SimpleAttributeDefinitionBuilder.create("selector", ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName(Attribute.SELECTOR.getLocalName())
+            .setValidator(new EnumValidator<SelectorValue>(SelectorValue.class, true, true))
+            .setDefaultValue(new ModelNode(SelectorValue.PING_TIME.name()))
+            .build();
+    static final SimpleAttributeDefinition POLICY = SimpleAttributeDefinitionBuilder.create("policy", ModelType.STRING)
+            .setAllowExpression(true)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName(Attribute.POLICY.getLocalName())
+            .setValidator(new EnumValidator<PolicyValue>(PolicyValue.class, true, true))
+            .setDefaultValue(new ModelNode(PolicyValue.WATERMARK.name()))
+            .build();
+    static final PropertiesAttributeDefinition POLICY_OPTIONS = new PropertiesAttributeDefinition.Builder("policy-options", true)
+            .setWrapXmlElement(false)
+            .setAllowExpression(true)
+            .setXmlName(Attribute.POLICY_OPTION.getLocalName())
+            .build();
+    static final PropertiesAttributeDefinition SELECTOR_OPTIONS = new PropertiesAttributeDefinition.Builder("selector-options", true)
+            .setWrapXmlElement(false)
+            .setAllowExpression(true)
+            .setXmlName(Attribute.SELECTOR_OPTION.getLocalName())
+            .build();
+    static final SimpleAttributeDefinition TRANSPORT_JGROPUS_STACK = SimpleAttributeDefinitionBuilder.create("transport-jgroups-stack", ModelType.STRING).setAllowExpression(true)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName(Attribute.JGROUPS_STACK.getLocalName())
+            .build();
+    static final SimpleAttributeDefinition TRANSPORT_JGROPUS_CLUSTER = SimpleAttributeDefinitionBuilder.create("transport-jgroups-cluster", ModelType.STRING).setAllowExpression(true)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName(Attribute.JGROUPS_CLUSTER.getLocalName())
+            .setDefaultValue(new ModelNode("jca"))
+            .build();
+    static final SimpleAttributeDefinition TRANSPORT_REQUEST_TIMEOUT = SimpleAttributeDefinitionBuilder.create("transport-request-timeout", ModelType.LONG).setAllowExpression(true)
+            .setAllowNull(true)
+            .setMeasurementUnit(MeasurementUnit.NONE)
+            .setRestartAllServices()
+            .setXmlName(Attribute.REQUEST_TIMEOUT.getLocalName())
+            .setDefaultValue(new ModelNode("10000"))
+            .build();
 
 
-        public static AttributeDefinition[] getAttributeDefinitions() {
-            final AttributeDefinition[] returnValue = new AttributeDefinition[DWmParameters.values().length];
-            int i = 0;
-            for  (DWmParameters entry : DWmParameters.values()) {
-                returnValue[i] = entry.getAttribute();
-                i++;
-            }
-            return returnValue;
-        }
+    public static AttributeDefinition[] RUNTIME_ATTRIBUTES = {
+            POLICY,
+            SELECTOR,
+            POLICY_OPTIONS,
+            SELECTOR_OPTIONS
 
-        public static AttributeDefinition[] getRuntimeAttributeDefinitions() {
-            return new AttributeDefinition[]{
-                    POLICY.getAttribute(),
-                    SELECTOR.getAttribute(),
-                    POLICY_OPTIONS.getAttribute(),
-                    SELECTOR_OPTIONS.getAttribute()
-            };
-        }
+    };
 
-        public static AttributeDefinition[] getReloadRequiredAttributeDefinitions() {
-            return new AttributeDefinition[]{
-                    TRANSPORT_JGROPUS_CLUSTER.getAttribute(),
-                    TRANSPORT_JGROPUS_STACK.getAttribute(),
-                    TRANSPORT_REQUEST_TIMEOUT.getAttribute()
-            };
-        }
+    public static AttributeDefinition[] RELOADREQUIRED_ATTRIBUTES = {
+            TRANSPORT_JGROPUS_CLUSTER,
+            TRANSPORT_JGROPUS_STACK,
+            TRANSPORT_REQUEST_TIMEOUT
+    };
 
-        public static AttributeDefinition[] getReadOnlyAttributeDefinitions() {
-                    return new AttributeDefinition[]{
-                            NAME.getAttribute()
-                    };
-                }
 
-        private DWmParameters(AttributeDefinition attribute) {
-            this.attribute = attribute;
-        }
+    public static AttributeDefinition[] READONLY_ATTRIBUTES = {
+            NAME
+    };
 
-        public AttributeDefinition getAttribute() {
-            return attribute;
-        }
+    public static AttributeDefinition[] ATTRIBUTES = {
+            POLICY,
+            SELECTOR,
+            POLICY_OPTIONS,
+            SELECTOR_OPTIONS,
+            TRANSPORT_JGROPUS_CLUSTER,
+            TRANSPORT_JGROPUS_STACK,
+            TRANSPORT_REQUEST_TIMEOUT,
+            NAME
+    };
 
-        private AttributeDefinition attribute;
-    }
 
-    public static enum PolicyValue {
+    public enum PolicyValue {
         NEVER,
         ALWAYS,
         WATERMARK;
     }
 
-    public static enum SelectorValue {
+    public enum SelectorValue {
         FIRST_AVAILABLE,
         PING_TIME,
         MAX_FREE_THREADS;

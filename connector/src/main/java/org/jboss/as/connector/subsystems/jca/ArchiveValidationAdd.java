@@ -23,6 +23,7 @@ package org.jboss.as.connector.subsystems.jca;
 
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
@@ -40,17 +41,17 @@ public class ArchiveValidationAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
-        for (JcaArchiveValidationDefinition.ArchiveValidationParameters parameter : JcaArchiveValidationDefinition.ArchiveValidationParameters.values() ) {
-            parameter.getAttribute().validateAndSet(operation,model);
+        for (AttributeDefinition parameter : JcaArchiveValidationDefinition.ATTRIBUTES ) {
+            parameter.validateAndSet(operation,model);
         }
     }
 
     @Override
     protected void performBoottime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 
-        final boolean enabled = JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_ENABLED.getAttribute().resolveModelAttribute(context, model).asBoolean();
-        final boolean failOnError = JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_ERROR.getAttribute().resolveModelAttribute(context, model).asBoolean();
-        final boolean failOnWarn = JcaArchiveValidationDefinition.ArchiveValidationParameters.ARCHIVE_VALIDATION_FAIL_ON_WARN.getAttribute().resolveModelAttribute(context, model).asBoolean();
+        final boolean enabled = JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_ENABLED.resolveModelAttribute(context, model).asBoolean();
+        final boolean failOnError = JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_ERROR.resolveModelAttribute(context, model).asBoolean();
+        final boolean failOnWarn = JcaArchiveValidationDefinition.ARCHIVE_VALIDATION_FAIL_ON_WARN.resolveModelAttribute(context, model).asBoolean();
 
         ServiceName serviceName = ConnectorServices.ARCHIVE_VALIDATION_CONFIG_SERVICE;
         ServiceName jcaConfigServiceName = ConnectorServices.CONNECTOR_CONFIG_SERVICE;

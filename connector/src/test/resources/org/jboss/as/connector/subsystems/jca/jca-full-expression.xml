@@ -1,75 +1,60 @@
-<subsystem xmlns="urn:jboss:domain:jca:3.0">
-  <!--Optional:-->
-  <archive-validation enabled="${test.expr:true}" fail-on-error="${test.expr:true}" fail-on-warn="${test.expr:false}"/>
-  <!--Optional:-->
-  <bean-validation enabled="${test.expr:false}"/>
-  <tracer enabled="true" />
-  <default-workmanager>
-    <short-running-threads allow-core-timeout="${test.expr:true}">
-      <!--Optional:-->
-      <core-threads count="${test.expr:3}"/>
-      <queue-length count="${test.expr:3}"/>
-      <max-threads count="${test.expr:3}"/>
-      <!--Optional:-->
-      <keepalive-time time="${test.expr:10}" unit="minutes"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </short-running-threads>
+<subsystem xmlns="urn:jboss:domain:jca:4.0">
     <!--Optional:-->
-    <long-running-threads allow-core-timeout="${test.expr:true}">
-      <!--Optional:-->
-      <core-threads count="${test.expr:3}"/>
-      <queue-length count="${test.expr:3}"/>
-      <max-threads count="${test.expr:3}"/>
-      <!--Optional:-->
-      <keepalive-time time="${test.expr:10}" unit="milliseconds"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </long-running-threads>
-  </default-workmanager>
+    <archive-validation enabled="${test.expr:true}" fail-on-error="${test.expr:true}"
+                        fail-on-warn="${test.expr:false}"/>
+    <!--Optional:-->
+    <bean-validation enabled="${test.expr:false}"/>
+    <tracer enabled="true"/>
+    <workmanager name="default">
+        <short-running-threads name="default" allow-core-timeout="${test.expr:true}"
+                               core-threads="${test.expr:3}"
+                               queue-length="${test.expr:3}"
+                               max-threads="${test.expr:3}"
+                               keep-alive-time="${test.expr:10}" keep-alive-unit="minutes"
+                               thread-factory="string"/>
+        <long-running-threads name="default" allow-core-timeout="${test.expr:true}"
+                              core-threads="${test.expr:3}"
+                              queue-length="${test.expr:3}"
+                              max-threads="${test.expr:3}"
+                              keep-alive-time="${test.expr:10}" keep-alive-unit="milliseconds"
+                              thread-factory="string"/>
+    </workmanager>
     <workmanager name="anotherWm">
-    <short-running-threads allow-core-timeout="${test.expr:true}">
-      <!--Optional:-->
-      <core-threads count="${test.expr:3}"/>
-      <queue-length count="${test.expr:3}"/>
-      <max-threads count="${test.expr:3}"/>
-      <!--Optional:-->
-      <keepalive-time time="${test.expr:10}" unit="milliseconds"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </short-running-threads>
-    <!--Optional:-->
-    <long-running-threads allow-core-timeout="${test.expr:false}">
-      <!--Optional:-->
-      <core-threads count="${test.expr:3}"/>
-      <queue-length count="${test.expr:3}"/>
-      <max-threads count="${test.expr:3}"/>
-      <!--Optional:-->
-      <keepalive-time time="${test.expr:10}" unit="hours"/>
-      <!--Optional:-->
-      <thread-factory name="string"/>
-    </long-running-threads>
-  </workmanager>
-  <distributed-workmanager name="MyDWM">
-      <selector name="${test.expr:PING_TIME}">
-        <option name="myOption">${test.expr:ignored}</option>
-      </selector>
-      <policy name="${test.expr:WATERMARK}">
-        <option name="watermark">${test.expr:0}</option>
-      </policy>
-      <short-running-threads>
-        <core-threads count="${test.expr:50}"/>
-        <queue-length count="${test.expr:50}"/>
-        <max-threads count="${test.expr:50}"/>
-        <keepalive-time time="${test.expr:10}" unit="seconds"/>
-      </short-running-threads>
-      <transport jgroups-stack="${test.expr:udp}" jgroups-cluster="${test.expr:myChannel}" request-timeout="${test.expr:100000}"/>
+        <short-running-threads name="anotherWm" allow-core-timeout="${test.expr:true}"
+                               core-threads="${test.expr:3}"
+                               queue-length="${test.expr:3}"
+                               max-threads="${test.expr:3}"
+                               keep-alive-time="${test.expr:10}" keep-alive-unit="minutes"
+                               thread-factory="string"/>
+        <!--Optional:-->
+        <long-running-threads name="anotherWm" allow-core-timeout="${test.expr:true}"
+                              core-threads="${test.expr:3}"
+                              queue-length="${test.expr:3}"
+                              max-threads="${test.expr:3}"
+                              keep-alive-time="${test.expr:10}" keep-alive-unit="minutes"
+                              thread-factory="string"/>
+
+    </workmanager>
+    <distributed-workmanager name="MyDWM"
+                             selector-name="${test.expr:PING_TIME}"
+                             policy-name="${test.expr:WATERMARK}"
+                             jgroups-stack="${test.expr:udp}" jgroups-cluster="${test.expr:myChannel}"
+                             request-timeout="${test.expr:100000}">
+        <policy-option name="watermark" value="${test.expr:0}" />
+        <selector-option name="myOption" value="${test.expr:ignored}" />
+        <short-running-threads name="MyDWM" allow-core-timeout="${test.expr:true}"
+                               core-threads="${test.expr:3}"
+                               queue-length="${test.expr:3}"
+                               max-threads="${test.expr:3}"
+                               keep-alive-time="${test.expr:10}" keep-alive-unit="minutes"
+                               thread-factory="string"/>
     </distributed-workmanager>
-  <!--Optional:-->
-  <bootstrap-contexts>
-    <!--1 or more repetitions:-->
-    <bootstrap-context name="bootStrapContext" workmanager="${test.expr:anotherWm}"/>
-  </bootstrap-contexts>
-  <!--Optional:-->
-  <cached-connection-manager debug="${test.expr:false}" error="${test.expr:true}"/>
+    <!--Optional:-->
+    <bootstrap-contexts>
+        <!--1 or more repetitions:-->
+        <bootstrap-context name="default" workmanager="default"/>
+        <bootstrap-context name="bootStrapContext" workmanager="${test.expr:anotherWm}"/>
+    </bootstrap-contexts>
+    <!--Optional:-->
+    <cached-connection-manager debug="${test.expr:false}" error="${test.expr:true}"/>
 </subsystem>

@@ -39,14 +39,14 @@ public class TracerWriteHandler extends AbstractWriteAttributeHandler<JcaSubsyst
     static TracerWriteHandler INSTANCE = new TracerWriteHandler();
 
     private TracerWriteHandler() {
-        super(TracerDefinition.TracerParameters.TRACER_ENABLED.getAttribute());
+        super(TracerDefinition.TRACER_ENABLED);
     }
 
     @Override
     protected boolean applyUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode resolvedValue, ModelNode currentValue, HandbackHolder<JcaSubsystemConfiguration> jcaSubsystemConfigurationHandbackHolder) throws OperationFailedException {
         JcaSubsystemConfiguration config = (JcaSubsystemConfiguration) context.getServiceRegistry(true).getService(ConnectorServices.CONNECTOR_CONFIG_SERVICE).getValue();
 
-        if (attributeName.equals(TracerDefinition.TracerParameters.TRACER_ENABLED.getAttribute().getName())) {
+        if (attributeName.equals(TracerDefinition.TRACER_ENABLED.getName())) {
             config.setTracer(resolvedValue.asBoolean());
         }
 
@@ -58,7 +58,7 @@ public class TracerWriteHandler extends AbstractWriteAttributeHandler<JcaSubsyst
     protected void revertUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode valueToRestore, ModelNode valueToRevert, JcaSubsystemConfiguration handback) throws OperationFailedException {
         JcaSubsystemConfiguration config = (JcaSubsystemConfiguration) context.getServiceRegistry(true).getService(ConnectorServices.CONNECTOR_CONFIG_SERVICE).getValue();
 
-        if (attributeName.equals(TracerDefinition.TracerParameters.TRACER_ENABLED.getAttribute().getName())) {
+        if (attributeName.equals(TracerDefinition.TRACER_ENABLED.getName())) {
             config.setTracer(valueToRestore.asBoolean());
         }
     }

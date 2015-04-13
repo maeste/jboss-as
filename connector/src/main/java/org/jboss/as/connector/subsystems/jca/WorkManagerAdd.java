@@ -27,8 +27,10 @@ import org.jboss.as.connector.services.workmanager.WorkManagerService;
 import org.jboss.as.connector.subsystems.resourceadapters.IronJacamarResource;
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.threads.ThreadsServices;
@@ -44,6 +46,7 @@ import java.util.concurrent.Executor;
 
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_LONG_RUNNING;
 import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_SHORT_RUNNING;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
 /**
  * @author <a href="jesper.pedersen@jboss.org">Jesper Pedersen</a>
@@ -56,16 +59,16 @@ public class WorkManagerAdd extends AbstractAddStepHandler {
 
     @Override
     protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
-        for (JcaWorkManagerDefinition.WmParameters parameter : JcaWorkManagerDefinition.WmParameters.values()) {
-            parameter.getAttribute().validateAndSet(operation, model);
+        for (AttributeDefinition parameter : JcaWorkManagerDefinition.ATTRIBUTES) {
+            parameter.validateAndSet(operation, model);
         }
     }
 
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final Resource resource) throws OperationFailedException {
 
-        String name = JcaWorkManagerDefinition.WmParameters.NAME.getAttribute().resolveModelAttribute(context, resource.getModel()).asString();
-
+        final ModelNode address = operation.require(OP_ADDR);
+        final String name = PathAddress.pathAddress(address).getLastElement().getValue();
 
         ServiceTarget serviceTarget = context.getServiceTarget();
 

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jboss.as.connector.logging.ConnectorLogger;
-
 import org.jboss.as.controller.ModelVersion;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
@@ -63,7 +62,7 @@ public class JcaSubsystemTestCase extends AbstractSubsystemBaseTest {
 
     @Override
     protected String getSubsystemXsdPath() throws Exception {
-        return "schema/wildfly-jca_3_0.xsd";
+        return "schema/wildfly-jca_4_0.xsd";
     }
 
     @Override
@@ -170,7 +169,7 @@ public class JcaSubsystemTestCase extends AbstractSubsystemBaseTest {
                 //These two are true in the original model but get removed by the transformers, so they default to false. Set them to true
                 //modelNode.get(Constants.TRACER, Constants.TRACER). add(new ModelNode(Constants.TRACER));
                 //.add(Constants.TRACER);
-                modelNode.get(Constants.TRACER, Constants.TRACER, TracerDefinition.TracerParameters.TRACER_ENABLED.getAttribute().getName()).set(true);
+                modelNode.get(Constants.TRACER, Constants.TRACER, TracerDefinition.TRACER_ENABLED.getName()).set(true);
                 return modelNode;
 
             }

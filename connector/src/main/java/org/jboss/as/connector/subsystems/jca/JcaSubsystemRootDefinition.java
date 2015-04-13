@@ -24,9 +24,14 @@ package org.jboss.as.connector.subsystems.jca;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.ModelVersion;
 import org.jboss.as.controller.PathElement;
-import org.jboss.as.controller.SimpleResourceDefinition;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
@@ -37,7 +42,7 @@ import org.jboss.as.controller.transform.description.TransformationDescriptionBu
 /**
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2012 Red Hat Inc.
  */
-public class JcaSubsystemRootDefinition extends SimpleResourceDefinition {
+public class JcaSubsystemRootDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_SUBSYSTEM = PathElement.pathElement(SUBSYSTEM, JcaExtension.SUBSYSTEM_NAME);
     private final boolean registerRuntimeOnly;
 
@@ -62,23 +67,28 @@ public class JcaSubsystemRootDefinition extends SimpleResourceDefinition {
 
     }
 
+    static final AttributeDefinition[] ATTRIBUTES = {};
+
+
     @Override
-    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
-        resourceRegistration.registerSubModel(JcaArchiveValidationDefinition.INSTANCE);
-
-        resourceRegistration.registerSubModel(JcaBeanValidationDefinition.INSTANCE);
-
-        resourceRegistration.registerSubModel(TracerDefinition.INSTANCE);
-
-        resourceRegistration.registerSubModel(JcaCachedConnectionManagerDefinition.INSTANCE);
-
-        resourceRegistration.registerSubModel(JcaWorkManagerDefinition.createInstance(registerRuntimeOnly));
-
-        resourceRegistration.registerSubModel(JcaDistributedWorkManagerDefinition.createInstance(registerRuntimeOnly));
-
-        resourceRegistration.registerSubModel(JcaBootstrapContextDefinition.INSTANCE);
-
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
     }
+
+    @Override
+    public List<? extends PersistentResourceDefinition> getChildren() {
+        final PersistentResourceDefinition[] CHILDREN = {
+                JcaArchiveValidationDefinition.INSTANCE,
+                JcaBeanValidationDefinition.INSTANCE,
+                TracerDefinition.INSTANCE,
+                JcaWorkManagerDefinition.createInstance(registerRuntimeOnly),
+                JcaDistributedWorkManagerDefinition.createInstance(registerRuntimeOnly),
+                JcaCachedConnectionManagerDefinition.INSTANCE,
+                JcaBootstrapContextDefinition.INSTANCE
+        };
+        return Arrays.asList(CHILDREN);
+    }
+
 
     static void registerTransformers(SubsystemRegistration subsystem) {
         ResourceTransformationDescriptionBuilder builder = TransformationDescriptionBuilder.Factory.createSubsystemInstance();

@@ -23,6 +23,7 @@ package org.jboss.as.connector.subsystems.jca;
 
 import org.jboss.as.connector.util.ConnectorServices;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
@@ -40,15 +41,15 @@ public class BeanValidationAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
-        for (JcaBeanValidationDefinition.BeanValidationParameters parameter : JcaBeanValidationDefinition.BeanValidationParameters.values() ) {
-            parameter.getAttribute().validateAndSet(operation,model);
+        for (AttributeDefinition parameter : JcaBeanValidationDefinition.ATTRIBUTES ) {
+            parameter.validateAndSet(operation,model);
         }
     }
 
     @Override
     protected void performBoottime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
 
-        final boolean enabled = JcaBeanValidationDefinition.BeanValidationParameters.BEAN_VALIDATION_ENABLED.getAttribute().resolveModelAttribute(context, model).asBoolean();
+        final boolean enabled = JcaBeanValidationDefinition.BEAN_VALIDATION_ENABLED.resolveModelAttribute(context, model).asBoolean();
 
         ServiceName serviceName = ConnectorServices.BEAN_VALIDATION_CONFIG_SERVICE;
         ServiceName jcaConfigServiceName = ConnectorServices.CONNECTOR_CONFIG_SERVICE;

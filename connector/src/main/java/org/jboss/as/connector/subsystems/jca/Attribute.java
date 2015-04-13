@@ -62,7 +62,17 @@ public enum Attribute {
 
     JGROUPS_CLUSTER("jgroups-cluster"),
 
-    REQUEST_TIMEOUT("request-timeout");
+    REQUEST_TIMEOUT("request-timeout"),
+
+    POLICY("policy-name"),
+
+    SELECTOR("selector-name"),
+
+    OPTION("option"),
+
+    POLICY_OPTION("policy-option"),
+
+    SELECTOR_OPTION("selector-option");
 
     private final String name;
 
