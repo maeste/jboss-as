@@ -44,19 +44,23 @@ import static org.jboss.as.connector.subsystems.datasources.Constants.STATISTICS
 import static org.jboss.as.connector.subsystems.datasources.Constants.TEST_CONNECTION;
 import static org.jboss.as.connector.subsystems.datasources.Constants.TRACKING;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.connector.logging.ConnectorLogger;
 import org.jboss.as.connector.subsystems.common.pool.PoolConfigurationRWHandler;
 import org.jboss.as.connector.subsystems.common.pool.PoolOperations;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.access.constraint.ApplicationTypeConfig;
 import org.jboss.as.controller.access.management.AccessConstraintDefinition;
 import org.jboss.as.controller.access.management.ApplicationTypeAccessConstraintDefinition;
@@ -70,15 +74,15 @@ import org.jboss.as.controller.transform.description.ResourceTransformationDescr
 import org.jboss.dmr.ModelNode;
 
 /**
- *
  * @author Stefano Maestri
  */
-public class DataSourceDefinition extends SimpleResourceDefinition {
+public class DataSourceDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_DATASOURCE = PathElement.pathElement(DATA_SOURCE);
     private final boolean registerRuntimeOnly;
     private final boolean deployed;
 
     private final List<AccessConstraintDefinition> accessConstraints;
+
 
     private DataSourceDefinition(final boolean registerRuntimeOnly, final boolean deployed) {
         super(PATH_DATASOURCE,
@@ -150,18 +154,24 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
             }
         }
 
-
-
     }
 
     @Override
-    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
+    public Collection<AttributeDefinition> getAttributes() {
+        List<AttributeDefinition> attributes = Arrays.asList(DATASOURCE_ATTRIBUTE);
+        attributes.addAll(Arrays.asList(DATASOURCE_PROPERTIES_ATTRIBUTES));
+        return attributes;
+    }
+
+    @Override
+    public List<? extends PersistentResourceDefinition> getChildren() {
         if (deployed) {
-            resourceRegistration.registerSubModel(ConnectionPropertyDefinition.DEPLOYED_INSTANCE);
+            return Collections.singletonList(ConnectionPropertyDefinition.DEPLOYED_INSTANCE);
         } else {
-            resourceRegistration.registerSubModel(ConnectionPropertyDefinition.INSTANCE);
+            return Collections.singletonList(ConnectionPropertyDefinition.INSTANCE);
         }
     }
+
 
     @Override
     public List<AccessConstraintDefinition> getAccessConstraints() {
@@ -209,23 +219,23 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
                   (leave the line commented out so no one else gets confused)
                   .addRejectCheck(RejectAttributeChecker.UNDEFINED, Constants.EXCEPTION_SORTER_PROPERTIES, Constants.REAUTHPLUGIN_PROPERTIES, Constants.STALE_CONNECTION_CHECKER_PROPERTIES, Constants.VALID_CONNECTION_CHECKER_PROPERTIES)*/
                         //Reject expressions for enabled, since if they are used we don't know their value for the operation transformer override
-                //Reject expressions for enabled, since if they are used we don't know their value for the operation transformer override
+                        //Reject expressions for enabled, since if they are used we don't know their value for the operation transformer override
                 .setDiscard(DiscardAttributeChecker.UNDEFINED, TRACKING)
                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.ENABLED)
                 .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.UNDEFINE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.ADD)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
-                    .end()
-                //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
+                .end()
+                        //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
                 .addOperationTransformationOverride(DATASOURCE_ENABLE.getName())
                 .end()
                 .addOperationTransformationOverride(DATASOURCE_DISABLE.getName())
@@ -236,7 +246,7 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
 
     static void registerTransformers111(ResourceTransformationDescriptionBuilder parentBuilder) {
         ResourceTransformationDescriptionBuilder builder = parentBuilder.addChildResource(PATH_DATASOURCE);
-                builder.getAttributeBuilder()
+        builder.getAttributeBuilder()
                 .setDiscard(DiscardAttributeChecker.UNDEFINED,
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES, CONNECTION_LISTENER_CLASS,
                         CONNECTION_LISTENER_PROPERTIES,
@@ -245,48 +255,48 @@ public class DataSourceDefinition extends SimpleResourceDefinition {
                         org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
                         org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE
                 )
-                        .setDiscard(DiscardAttributeChecker.UNDEFINED, TRACKING)
-                        .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), CONNECTABLE)
-                        .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(false, false, new ModelNode(true)), STATISTICS_ENABLED)
-                        .addRejectCheck(new RejectAttributeChecker.DefaultRejectAttributeChecker() {
+                .setDiscard(DiscardAttributeChecker.UNDEFINED, TRACKING)
+                .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), CONNECTABLE)
+                .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(false, false, new ModelNode(true)), STATISTICS_ENABLED)
+                .addRejectCheck(new RejectAttributeChecker.DefaultRejectAttributeChecker() {
 
-                            @Override
-                            public String getRejectionLogMessage(Map<String, ModelNode> attributes) {
-                                return ConnectorLogger.ROOT_LOGGER.rejectAttributesMustBeTrue(attributes.keySet());
-                            }
+                    @Override
+                    public String getRejectionLogMessage(Map<String, ModelNode> attributes) {
+                        return ConnectorLogger.ROOT_LOGGER.rejectAttributesMustBeTrue(attributes.keySet());
+                    }
 
-                            @Override
-                            protected boolean rejectAttribute(PathAddress address, String attributeName, ModelNode attributeValue,
-                                                              TransformationContext context) {
-                                //This will not get called if it was discarded, so reject if it is undefined (default==false) or if defined and != 'true'
-                                return !attributeValue.isDefined() || !attributeValue.asString().equals("true");
-                            }
-                        }, STATISTICS_ENABLED).addRejectCheck(RejectAttributeChecker.DEFINED,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES, CONNECTION_LISTENER_CLASS,
-                        CONNECTION_LISTENER_PROPERTIES,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
-                        org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE,
-                        CONNECTABLE, TRACKING
-                )
+                    @Override
+                    protected boolean rejectAttribute(PathAddress address, String attributeName, ModelNode attributeValue,
+                                                      TransformationContext context) {
+                        //This will not get called if it was discarded, so reject if it is undefined (default==false) or if defined and != 'true'
+                        return !attributeValue.isDefined() || !attributeValue.asString().equals("true");
+                    }
+                }, STATISTICS_ENABLED).addRejectCheck(RejectAttributeChecker.DEFINED,
+                org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES, CONNECTION_LISTENER_CLASS,
+                CONNECTION_LISTENER_PROPERTIES,
+                org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
+                org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS,
+                org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_PROPERTIES,
+                org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE,
+                CONNECTABLE, TRACKING
+        )
                 //Reject expressions for enabled, since if they are used we don't know their value for the operation transformer override
                 //Although 'enabled' appears in the legacy model and the 'add' handler, the add does not actually set its value in the model
                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.ENABLED)
                 .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.UNDEFINE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.ADD)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
-                    .end()
-                //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
+                .end()
+                        //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
                 .addOperationTransformationOverride(DATASOURCE_ENABLE.getName())
                 .end()
                 .addOperationTransformationOverride(DATASOURCE_DISABLE.getName())

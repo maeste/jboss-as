@@ -44,19 +44,23 @@ import static org.jboss.as.connector.subsystems.datasources.Constants.XA_DATASOU
 import static org.jboss.as.connector.subsystems.datasources.Constants.XA_DATASOURCE_ATTRIBUTE;
 import static org.jboss.as.connector.subsystems.datasources.Constants.XA_DATASOURCE_PROPERTIES_ATTRIBUTES;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.connector.logging.ConnectorLogger;
 import org.jboss.as.connector.subsystems.common.pool.PoolConfigurationRWHandler;
 import org.jboss.as.connector.subsystems.common.pool.PoolOperations;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.access.constraint.ApplicationTypeConfig;
 import org.jboss.as.controller.access.management.AccessConstraintDefinition;
 import org.jboss.as.controller.access.management.ApplicationTypeAccessConstraintDefinition;
@@ -72,12 +76,13 @@ import org.jboss.dmr.ModelNode;
 /**
  * @author Stefano Maestri
  */
-public class XaDataSourceDefinition extends SimpleResourceDefinition {
+public class XaDataSourceDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_XA_DATASOURCE = PathElement.pathElement(XA_DATASOURCE);
     private final boolean registerRuntimeOnly;
     private final boolean deployed;
 
     private final List<AccessConstraintDefinition> accessConstraints;
+
 
     private XaDataSourceDefinition(final boolean registerRuntimeOnly, final boolean deployed) {
         super(PATH_XA_DATASOURCE,
@@ -152,11 +157,18 @@ public class XaDataSourceDefinition extends SimpleResourceDefinition {
     }
 
     @Override
-    public void registerChildren(ManagementResourceRegistration resourceRegistration) {
+    public Collection<AttributeDefinition> getAttributes() {
+        List<AttributeDefinition> attributes = Arrays.asList(XA_DATASOURCE_ATTRIBUTE);
+        attributes.addAll(Arrays.asList(XA_DATASOURCE_PROPERTIES_ATTRIBUTES));
+        return attributes;
+    }
+
+    @Override
+    public List<? extends PersistentResourceDefinition> getChildren() {
         if (deployed) {
-            resourceRegistration.registerSubModel(XaDataSourcePropertyDefinition.DEPLOYED_INSTANCE);
+            return Collections.singletonList(XaDataSourcePropertyDefinition.DEPLOYED_INSTANCE);
         } else {
-            resourceRegistration.registerSubModel(XaDataSourcePropertyDefinition.INSTANCE);
+            return Collections.singletonList(XaDataSourcePropertyDefinition.INSTANCE);
         }
     }
 
@@ -210,18 +222,18 @@ public class XaDataSourceDefinition extends SimpleResourceDefinition {
                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.ENABLED)
                 .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.UNDEFINE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.ADD)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
-                    .end()
-                //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
+                .end()
+                        //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
                 .addOperationTransformationOverride(DATASOURCE_ENABLE.getName())
                 .end()
                 .addOperationTransformationOverride(DATASOURCE_DISABLE.getName())
@@ -273,18 +285,18 @@ public class XaDataSourceDefinition extends SimpleResourceDefinition {
                 .addRejectCheck(RejectAttributeChecker.SIMPLE_EXPRESSIONS, Constants.ENABLED)
                 .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.WRITE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.UNDEFINE_ATTRIBUTE_OPERATION)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_TRANSFORMER)
-                    .end()
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_TRANSFORMER)
+                .end()
                 .addOperationTransformationOverride(ModelDescriptionConstants.ADD)
-                    .inheritResourceAttributeDefinitions()
-                    .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
-                    .end()
-                //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
+                .inheritResourceAttributeDefinitions()
+                .setCustomOperationTransformer(ENABLE_ADD_TRANSFORMER)
+                .end()
+                        //We're rejecting operations when statistics-enabled=false, so let it through in the enable/disable ops which do not use that attribute
                 .addOperationTransformationOverride(DATASOURCE_ENABLE.getName())
                 .end()
                 .addOperationTransformationOverride(DATASOURCE_DISABLE.getName())

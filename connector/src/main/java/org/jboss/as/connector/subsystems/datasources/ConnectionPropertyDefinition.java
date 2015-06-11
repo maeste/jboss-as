@@ -26,10 +26,14 @@ package org.jboss.as.connector.subsystems.datasources;
 
 import static org.jboss.as.connector.subsystems.datasources.Constants.CONNECTION_PROPERTIES;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.transform.description.RejectAttributeChecker;
@@ -38,12 +42,14 @@ import org.jboss.as.controller.transform.description.ResourceTransformationDescr
 /**
  * @author Stefabo Maestri
  */
-public class ConnectionPropertyDefinition extends SimpleResourceDefinition {
+public class ConnectionPropertyDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_CONNECTION_PROPERTY = PathElement.pathElement(CONNECTION_PROPERTIES.getName());
     static final ConnectionPropertyDefinition INSTANCE = new ConnectionPropertyDefinition(false);
     static final ConnectionPropertyDefinition DEPLOYED_INSTANCE = new ConnectionPropertyDefinition(true);
 
     private final boolean deployed;
+
+    static final AttributeDefinition[] ATTRIBUTES = {Constants.CONNECTION_PROPERTY_VALUE};
 
     private ConnectionPropertyDefinition(final boolean deployed) {
         super(PATH_CONNECTION_PROPERTY,
@@ -65,12 +71,17 @@ public class ConnectionPropertyDefinition extends SimpleResourceDefinition {
 
     }
 
-    static void registerTransformers11x(ResourceTransformationDescriptionBuilder parentBuilder) {
-            parentBuilder.addChildResource(PATH_CONNECTION_PROPERTY)
-             .getAttributeBuilder()
-                    .addRejectCheck(RejectAttributeChecker.UNDEFINED, Constants.CONNECTION_PROPERTY_VALUE)
-                    .end();
+    @Override
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
+    }
 
-        }
+    static void registerTransformers11x(ResourceTransformationDescriptionBuilder parentBuilder) {
+        parentBuilder.addChildResource(PATH_CONNECTION_PROPERTY)
+                .getAttributeBuilder()
+                .addRejectCheck(RejectAttributeChecker.UNDEFINED, Constants.CONNECTION_PROPERTY_VALUE)
+                .end();
+
+    }
 
 }

@@ -26,22 +26,29 @@ package org.jboss.as.connector.subsystems.datasources;
 
 import static org.jboss.as.connector.subsystems.datasources.Constants.XADATASOURCE_PROPERTIES;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 
 /**
  * @author Stefano Maestri
  */
-public class XaDataSourcePropertyDefinition extends SimpleResourceDefinition {
+public class XaDataSourcePropertyDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_PROPERTIES = PathElement.pathElement(XADATASOURCE_PROPERTIES.getName());
     static final XaDataSourcePropertyDefinition INSTANCE = new XaDataSourcePropertyDefinition(false);
     static final XaDataSourcePropertyDefinition DEPLOYED_INSTANCE = new XaDataSourcePropertyDefinition(true);
 
     private final boolean deployed;
+
+    static final AttributeDefinition[] ATTRIBUTES = {Constants.XADATASOURCE_PROPERTY_VALUE};
+
 
     private XaDataSourcePropertyDefinition(final boolean deployed) {
         super(PATH_PROPERTIES,
@@ -60,6 +67,11 @@ public class XaDataSourcePropertyDefinition extends SimpleResourceDefinition {
         } else {
             resourceRegistration.registerReadOnlyAttribute(Constants.XADATASOURCE_PROPERTY_VALUE, null);
         }
+    }
+
+    @Override
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(ATTRIBUTES);
     }
 
 }

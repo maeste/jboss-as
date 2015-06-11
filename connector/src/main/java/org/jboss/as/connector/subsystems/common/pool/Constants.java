@@ -22,11 +22,7 @@
 
 package org.jboss.as.connector.subsystems.common.pool;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.jboss.as.controller.AttributeDefinition;
-import org.jboss.as.controller.AttributeMarshaller;
 import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
@@ -38,9 +34,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.jca.common.api.metadata.Defaults;
 import org.jboss.jca.common.api.metadata.common.FlushStrategy;
-import org.jboss.jca.common.api.metadata.common.Pool;
-import org.jboss.jca.common.api.metadata.ds.TimeOut;
-import org.jboss.jca.common.api.metadata.ds.Validation;
 
 /**
  * @author @author <a href="mailto:stefano.maestri@redhat.com">Stefano
@@ -82,125 +75,101 @@ public class Constants {
 
 
     public static final SimpleAttributeDefinition BLOCKING_TIMEOUT_WAIT_MILLIS = new SimpleAttributeDefinitionBuilder(BLOCKING_TIMEOUT_WAIT_MILLIS_NAME, ModelType.LONG, true)
-            .setXmlName(TimeOut.Tag.BLOCKING_TIMEOUT_MILLIS.getLocalName())
+            .setAttributeGroup("timeout")
+            .setXmlName("blocking-timeout-millis")
             .setMeasurementUnit(MeasurementUnit.MILLISECONDS)
             .setAllowExpression(true)
             .build();
 
 
     public static final SimpleAttributeDefinition IDLETIMEOUTMINUTES = new SimpleAttributeDefinitionBuilder(IDLETIMEOUTMINUTES_NAME, ModelType.LONG, true)
-            .setXmlName(TimeOut.Tag.IDLE_TIMEOUT_MINUTES.getLocalName())
+            .setAttributeGroup("timeout")
             .setMeasurementUnit(MeasurementUnit.MINUTES)
             .setAllowExpression(true)
             .build();
 
     public static final SimpleAttributeDefinition BACKGROUNDVALIDATIONMILLIS = new SimpleAttributeDefinitionBuilder(BACKGROUNDVALIDATIONMILLIS_NAME, ModelType.LONG, true)
-            .setXmlName(Validation.Tag.BACKGROUND_VALIDATION_MILLIS.getLocalName())
+            .setAttributeGroup("validation")
             .setMeasurementUnit(MeasurementUnit.MILLISECONDS)
             .setValidator(new IntRangeValidator(1, true, true))
             .setAllowExpression(true)
             .build();
 
     public static final SimpleAttributeDefinition BACKGROUNDVALIDATION = new SimpleAttributeDefinitionBuilder(BACKGROUNDVALIDATION_NAME, ModelType.BOOLEAN, true)
-            .setXmlName(Validation.Tag.BACKGROUND_VALIDATION.getLocalName())
+            .setAttributeGroup("validation")
             .setAllowExpression(true)
             //.setDefaultValue(new ModelNode(Defaults.BACKGROUND_VALIDATION))
             .build();
 
     public static final SimpleAttributeDefinition USE_FAST_FAIL = new SimpleAttributeDefinitionBuilder(USE_FAST_FAIL_NAME, ModelType.BOOLEAN, true)
-            .setXmlName(Validation.Tag.USE_FAST_FAIL.getLocalName())
+            .setAttributeGroup("validation")
             .setDefaultValue(new ModelNode(Defaults.USE_FAST_FAIL))
             .setAllowExpression(true)
             .build();
 
     public static SimpleAttributeDefinition VALIDATE_ON_MATCH = new SimpleAttributeDefinitionBuilder(VALIDATEONMATCH_NAME, ModelType.BOOLEAN, true)
-                .setXmlName(Validation.Tag.VALIDATE_ON_MATCH.getLocalName())
-                .setAllowExpression(true)
-                .build();
+            .setAttributeGroup("validation")
+            .setAllowExpression(true)
+            .build();
 
     public static final SimpleAttributeDefinition MAX_POOL_SIZE = new SimpleAttributeDefinitionBuilder(MAX_POOL_SIZE_NAME, ModelType.INT, true)
-            .setXmlName(Pool.Tag.MAX_POOL_SIZE.getLocalName())
+            .setAttributeGroup("pool")
             .setAllowExpression(true)
             .setDefaultValue(new ModelNode(Defaults.MAX_POOL_SIZE))
             .build();
 
     public static final SimpleAttributeDefinition MIN_POOL_SIZE = new SimpleAttributeDefinitionBuilder(MIN_POOL_SIZE_NAME, ModelType.INT, true)
-            .setXmlName(Pool.Tag.MIN_POOL_SIZE.getLocalName())
+            .setAttributeGroup("pool")
             .setAllowExpression(true)
             .setDefaultValue(new ModelNode(Defaults.MIN_POOL_SIZE))
             .build();
 
     public static final SimpleAttributeDefinition INITIAL_POOL_SIZE = new SimpleAttributeDefinitionBuilder(INITIAL_POOL_SIZE_NAME, ModelType.INT)
-            .setXmlName(Pool.Tag.INITIAL_POOL_SIZE.getLocalName())
+            .setAttributeGroup("pool")
             .setAllowExpression(true)
             .setAllowNull(true)
             .build();
 
     public static SimpleAttributeDefinition CAPACITY_INCREMENTER_CLASS = new SimpleAttributeDefinitionBuilder(CAPACITY_INCREMENTER_CLASS_NAME, ModelType.STRING, true)
-            .setXmlName(org.jboss.jca.common.api.metadata.common.Extension.Attribute.CLASS_NAME.getLocalName())
-
+            .setAttributeGroup("pool")
             .setAllowExpression(true)
             .build();
 
     public static PropertiesAttributeDefinition CAPACITY_INCREMENTER_PROPERTIES = new PropertiesAttributeDefinition.Builder(CAPACITY_INCREMENTER_PROPERTIES_NAME, true)
-            .setXmlName(org.jboss.jca.common.api.metadata.common.Extension.Tag.CONFIG_PROPERTY.getLocalName())
+            .setAttributeGroup("pool")
             .setAllowNull(true)
             .setAllowExpression(true)
-            .setAttributeMarshaller(new AttributeMarshaller() {
-                @Override
-                public void marshallAsElement(final AttributeDefinition attribute, final ModelNode resourceModel, final boolean marshallDefault, final XMLStreamWriter writer) throws XMLStreamException {
-                    for (ModelNode property : resourceModel.get(attribute.getName()).asList()) {
-                        writer.writeStartElement(attribute.getXmlName());
-                        writer.writeAttribute(org.jboss.as.controller.parsing.Attribute.NAME.getLocalName(), property.asProperty().getName());
-                        writer.writeCharacters(property.asProperty().getValue().asString());
-                        writer.writeEndElement();
-                    }
-
-                }
-
-            })
             .build();
 
     public static SimpleAttributeDefinition CAPACITY_DECREMENTER_CLASS = new SimpleAttributeDefinitionBuilder(CAPACITY_DECREMENTER_CLASS_NAME, ModelType.STRING, true)
-            .setXmlName(org.jboss.jca.common.api.metadata.common.Extension.Attribute.CLASS_NAME.getLocalName())
+            .setAttributeGroup("pool")
             .setAllowExpression(true)
             .build();
 
     public static PropertiesAttributeDefinition CAPACITY_DECREMENTER_PROPERTIES = new PropertiesAttributeDefinition.Builder(CAPACITY_DECREMENTER_PROPERTIES_NAME, true)
-            .setXmlName(org.jboss.jca.common.api.metadata.common.Extension.Tag.CONFIG_PROPERTY.getLocalName())
+            .setAttributeGroup("pool")
             .setAllowNull(true)
             .setAllowExpression(true)
-            .setAttributeMarshaller(new AttributeMarshaller() {
-                @Override
-                public void marshallAsElement(final AttributeDefinition attribute, final ModelNode resourceModel, final boolean marshallDefault, final XMLStreamWriter writer) throws XMLStreamException {
-                    for (ModelNode property : resourceModel.get(attribute.getName()).asList()) {
-                        writer.writeStartElement(attribute.getXmlName());
-                        writer.writeAttribute(org.jboss.as.controller.parsing.Attribute.NAME.getLocalName(), property.asProperty().getName());
-                        writer.writeCharacters(property.asProperty().getValue().asString());
-                        writer.writeEndElement();
-                    }
-
-                }
-
-            })
             .build();
 
 
     public static final SimpleAttributeDefinition POOL_PREFILL = new SimpleAttributeDefinitionBuilder(POOL_PREFILL_NAME, ModelType.BOOLEAN, true)
+            .setAttributeGroup("pool")
+            .setXmlName("prefill")
             .setDefaultValue(new ModelNode(Defaults.PREFILL))
             .setAllowExpression(true)
-            .setXmlName(Pool.Tag.PREFILL.getLocalName())
             .build();
 
     public static final SimpleAttributeDefinition POOL_USE_STRICT_MIN = new SimpleAttributeDefinitionBuilder(POOL_USE_STRICT_MIN_NAME, ModelType.BOOLEAN, true)
+            .setAttributeGroup("pool")
+            .setXmlName("use-strict-min")
             .setDefaultValue(new ModelNode(Defaults.USE_STRICT_MIN))
             .setAllowExpression(true)
-            .setXmlName(Pool.Tag.USE_STRICT_MIN.getLocalName())
             .build();
 
     public static final SimpleAttributeDefinition POOL_FLUSH_STRATEGY = new SimpleAttributeDefinitionBuilder(FLUSH_STRATEGY_NAME, ModelType.STRING)
+            .setAttributeGroup("pool")
             .setDefaultValue(new ModelNode(Defaults.FLUSH_STRATEGY.getName()))
-            .setXmlName(Pool.Tag.FLUSH_STRATEGY.getLocalName())
             .setAllowNull(true)
             .setAllowExpression(true)
             .setValidator(new EnumValidator<FlushStrategy>(FlushStrategy.class, true, true))

@@ -26,11 +26,13 @@ package org.jboss.as.connector.subsystems.datasources;
 
 import static org.jboss.as.connector.subsystems.datasources.Constants.JDBC_DRIVER_NAME;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
-import org.jboss.as.controller.SimpleResourceDefinition;
+import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.access.constraint.ApplicationTypeConfig;
 import org.jboss.as.controller.access.management.AccessConstraintDefinition;
 import org.jboss.as.controller.access.management.ApplicationTypeAccessConstraintDefinition;
@@ -42,7 +44,7 @@ import org.jboss.as.controller.transform.description.ResourceTransformationDescr
 /**
  * Stefano Maestri
  */
-public class JdbcDriverDefinition extends SimpleResourceDefinition {
+public class JdbcDriverDefinition extends PersistentResourceDefinition {
     protected static final PathElement PATH_DRIVER = PathElement.pathElement(JDBC_DRIVER_NAME);
     static final JdbcDriverDefinition INSTANCE = new JdbcDriverDefinition();
 
@@ -64,6 +66,12 @@ public class JdbcDriverDefinition extends SimpleResourceDefinition {
             resourceRegistration.registerReadOnlyAttribute(attribute, null);
         }
     }
+
+    @Override
+    public Collection<AttributeDefinition> getAttributes() {
+        return Arrays.asList(Constants.JDBC_DRIVER_ATTRIBUTES);
+    }
+
 
     @Override
     public List<AccessConstraintDefinition> getAccessConstraints() {
