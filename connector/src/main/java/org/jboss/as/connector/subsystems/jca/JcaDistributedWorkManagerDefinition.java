@@ -27,7 +27,6 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.ReadResourceNameOperationStepHandler;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
-import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.client.helpers.MeasurementUnit;
@@ -67,10 +66,6 @@ public class JcaDistributedWorkManagerDefinition extends SimpleResourceDefinitio
 
         for (final AttributeDefinition ad : DWmParameters.getReadOnlyAttributeDefinitions()) {
             resourceRegistration.registerReadOnlyAttribute(ad, ReadResourceNameOperationStepHandler.INSTANCE);
-        }
-
-        for (final AttributeDefinition ad : DWmParameters.getReloadRequiredAttributeDefinitions()) {
-            resourceRegistration.registerReadWriteAttribute(ad, null, new ReloadRequiredWriteAttributeHandler(ad));
         }
 
         for (final AttributeDefinition ad : DWmParameters.getRuntimeAttributeDefinitions()) {
@@ -121,28 +116,7 @@ public class JcaDistributedWorkManagerDefinition extends SimpleResourceDefinitio
         SELECTOR_OPTIONS(new PropertiesAttributeDefinition.Builder("selector-options", true)
                 .setAllowExpression(true)
                 .setXmlName(Element.OPTION.getLocalName())
-                .build()),
-        TRANSPORT_JGROPUS_STACK(SimpleAttributeDefinitionBuilder.create("transport-jgroups-stack", ModelType.STRING).setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Attribute.JGROUPS_STACK.getLocalName())
-                .build()),
-        TRANSPORT_JGROPUS_CLUSTER(SimpleAttributeDefinitionBuilder.create("transport-jgroups-cluster", ModelType.STRING).setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Attribute.JGROUPS_CLUSTER.getLocalName())
-                .setDefaultValue(new ModelNode("jca"))
-                .build()),
-        TRANSPORT_REQUEST_TIMEOUT(SimpleAttributeDefinitionBuilder.create("transport-request-timeout", ModelType.LONG).setAllowExpression(true)
-                .setAllowNull(true)
-                .setMeasurementUnit(MeasurementUnit.NONE)
-                .setRestartAllServices()
-                .setXmlName(Attribute.REQUEST_TIMEOUT.getLocalName())
-                .setDefaultValue(new ModelNode("10000"))
-                .build());
-
+                         .build());
 
         public static AttributeDefinition[] getAttributeDefinitions() {
             final AttributeDefinition[] returnValue = new AttributeDefinition[DWmParameters.values().length];
@@ -160,14 +134,6 @@ public class JcaDistributedWorkManagerDefinition extends SimpleResourceDefinitio
                     SELECTOR.getAttribute(),
                     POLICY_OPTIONS.getAttribute(),
                     SELECTOR_OPTIONS.getAttribute()
-            };
-        }
-
-        public static AttributeDefinition[] getReloadRequiredAttributeDefinitions() {
-            return new AttributeDefinition[]{
-                    TRANSPORT_JGROPUS_CLUSTER.getAttribute(),
-                    TRANSPORT_JGROPUS_STACK.getAttribute(),
-                    TRANSPORT_REQUEST_TIMEOUT.getAttribute()
             };
         }
 
