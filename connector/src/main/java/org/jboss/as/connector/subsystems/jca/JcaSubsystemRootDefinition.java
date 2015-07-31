@@ -25,20 +25,14 @@ package org.jboss.as.connector.subsystems.jca;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 
 import org.jboss.as.controller.ModelVersion;
-import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
-import org.jboss.as.controller.transform.OperationTransformer.TransformedOperation;
-import org.jboss.as.controller.transform.OperationTransformer;
-import org.jboss.as.controller.transform.TransformationContext;
 import org.jboss.as.controller.transform.description.ResourceTransformationDescriptionBuilder;
 import org.jboss.as.controller.transform.description.TransformationDescription;
 import org.jboss.as.controller.transform.description.TransformationDescriptionBuilder;
-import org.jboss.dmr.ModelNode;
 
 /**
  * @author <a href="mailto:tomaz.cerar@redhat.com">Tomaz Cerar</a> (c) 2012 Red Hat Inc.
@@ -95,17 +89,7 @@ public class JcaSubsystemRootDefinition extends SimpleResourceDefinition {
         builder20.discardChildResource(TracerDefinition.PATH_TRACER);
         TransformationDescription.Tools.register(builder20.build(), subsystem, ModelVersion.create(2, 0, 0));
         ResourceTransformationDescriptionBuilder builder30 = TransformationDescriptionBuilder.Factory.createSubsystemInstance();
-        builder30.addOperationTransformationOverride("transport-jgroups-cluster")
-            .inheritResourceAttributeDefinitions()
-            .setCustomOperationTransformer(new OperationTransformer() {
-                    @Override
-                    public TransformedOperation transformOperation(TransformationContext context, PathAddress address, ModelNode operation)
-                        throws OperationFailedException {
-                        ModelNode copy = operation.clone();
-                        copy.add("transport-jgroups-cluster").set(address.getLastElement().toString());
-                        return new TransformedOperation(copy, TransformedOperation.ORIGINAL_RESULT);
-                    }
-                });
+        JcaDistributedWorkManagerDefinition.registerTransformers300(builder30);
         TransformationDescription.Tools.register(builder30.build(), subsystem, ModelVersion.create(3, 0, 0));
     }
 }
