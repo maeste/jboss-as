@@ -344,7 +344,11 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
                                 moduleName, installedDriver.getDriverClassName(),
                                 installedDriver.getDataSourceClassName(), installedDriver.getXaDataSourceClassName());
                         drivers.put(driverName, driver);
+                        if (dataSourceConfig.getDataSourceClass() == null) {
+                            ((ModifiableDataSource)dataSourceConfig).forceDataSourceClass(driver.getDataSourceClass());
+                        }
                     }
+
                     dataSources = new DatasourcesImpl(Arrays.asList(dataSourceConfig), null, drivers);
                 } else if (xaDataSourceConfig != null) {
                     String driverName = xaDataSourceConfig.getDriver();
@@ -357,6 +361,9 @@ public abstract class AbstractDataSourceService implements Service<DataSource> {
                                 installedDriver.getDriverClassName(),
                                 installedDriver.getDataSourceClassName(), installedDriver.getXaDataSourceClassName());
                         drivers.put(driverName, driver);
+                        if (xaDataSourceConfig.getXaDataSourceClass() == null) {
+                            ((ModifiableXaDataSource)dataSourceConfig).forceXaDataSourceClass(driver.getXaDataSourceClass());
+                        }
                     }
                     dataSources = new DatasourcesImpl(null, Arrays.asList(xaDataSourceConfig), drivers);
                 }
