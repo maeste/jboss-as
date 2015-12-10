@@ -33,6 +33,7 @@ import static org.jboss.as.connector.subsystems.common.pool.Constants.IDLETIMEOU
 import static org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.MIN_POOL_SIZE;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_PREFILL;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_USE_STRICT_MIN;
@@ -194,6 +195,7 @@ public class DataSourcesExtension implements Extension {
         context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.DATASOURCES_2_0.getUriString(), DataSourceSubsystemParser.INSTANCE);
         context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.DATASOURCES_3_0.getUriString(), DataSourceSubsystemParser.INSTANCE);
         context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.DATASOURCES_4_0.getUriString(), DataSourceSubsystemParser.INSTANCE);
+        context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.DATASOURCES_4_1.getUriString(), DataSourceSubsystemParser.INSTANCE);
     }
 
     public static final class DataSourceSubsystemParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>,
@@ -310,6 +312,7 @@ public class DataSourcesExtension implements Extension {
                         MIN_POOL_SIZE.isMarshallable(dataSourceNode) ||
                         MAX_POOL_SIZE.isMarshallable(dataSourceNode) ||
                         POOL_PREFILL.isMarshallable(dataSourceNode) ||
+                        POOL_FAIR.isMarshallable(dataSourceNode) ||
                         POOL_USE_STRICT_MIN.isMarshallable(dataSourceNode) ||
                         POOL_FLUSH_STRATEGY.isMarshallable(dataSourceNode) ||
                         ALLOW_MULTIPLE_USERS.isMarshallable(dataSourceNode) ||
@@ -335,6 +338,7 @@ public class DataSourcesExtension implements Extension {
                     INITIAL_POOL_SIZE.marshallAsElement(dataSourceNode, writer);
                     MAX_POOL_SIZE.marshallAsElement(dataSourceNode, writer);
                     POOL_PREFILL.marshallAsElement(dataSourceNode, writer);
+                    POOL_FAIR.marshallAsElement(dataSourceNode, writer);
                     POOL_USE_STRICT_MIN.marshallAsElement(dataSourceNode, writer);
                     POOL_FLUSH_STRATEGY.marshallAsElement(dataSourceNode, writer);
                     ALLOW_MULTIPLE_USERS.marshallAsElement(dataSourceNode, writer);

@@ -32,6 +32,7 @@ import static org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_I
 import static org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_PROPERTIES;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.IDLETIMEOUTMINUTES;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.MIN_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FLUSH_STRATEGY;
@@ -287,7 +288,7 @@ public final class ResourceAdapterSubsystemParser implements XMLStreamConstants,
         writeNewConfigProperties(streamWriter, conDef);
 
         boolean poolRequired = INITIAL_POOL_SIZE.isMarshallable(conDef) || MAX_POOL_SIZE.isMarshallable(conDef) || MIN_POOL_SIZE.isMarshallable(conDef) ||
-                POOL_USE_STRICT_MIN.isMarshallable(conDef) || POOL_PREFILL.isMarshallable(conDef) || POOL_FLUSH_STRATEGY.isMarshallable(conDef);
+                POOL_USE_STRICT_MIN.isMarshallable(conDef) || POOL_PREFILL.isMarshallable(conDef) || POOL_FAIR.isMarshallable(conDef) || POOL_FLUSH_STRATEGY.isMarshallable(conDef);
         final boolean capacityRequired = CAPACITY_INCREMENTER_CLASS.isMarshallable(conDef) ||
                 CAPACITY_INCREMENTER_PROPERTIES.isMarshallable(conDef) ||
                 CAPACITY_DECREMENTER_CLASS.isMarshallable(conDef) ||
@@ -298,10 +299,11 @@ public final class ResourceAdapterSubsystemParser implements XMLStreamConstants,
             if (isXa) {
 
                 streamWriter.writeStartElement(ConnectionDefinition.Tag.XA_POOL.getLocalName());
-                MIN_POOL_SIZE.marshallAsElement(conDef, streamWriter);
+                MIN_POOL_SIZE.marshallAsElement( conDef, streamWriter);
                 INITIAL_POOL_SIZE.marshallAsElement(conDef, streamWriter);
                 MAX_POOL_SIZE.marshallAsElement(conDef, streamWriter);
                 POOL_PREFILL.marshallAsElement(conDef, streamWriter);
+                POOL_FAIR.marshallAsElement(conDef, streamWriter);
                 POOL_USE_STRICT_MIN.marshallAsElement(conDef, streamWriter);
                 POOL_FLUSH_STRATEGY.marshallAsElement(conDef, streamWriter);
 
@@ -440,7 +442,8 @@ public final class ResourceAdapterSubsystemParser implements XMLStreamConstants,
                 case RESOURCEADAPTERS_1_1:
                 case RESOURCEADAPTERS_2_0:
                 case RESOURCEADAPTERS_3_0:
-                case RESOURCEADAPTERS_4_0:{
+                case RESOURCEADAPTERS_4_0:
+                case RESOURCEADAPTERS_4_1:{
                     localName = reader.getLocalName();
                     final Element element = Element.forName(reader.getLocalName());
                     SUBSYSTEM_RA_LOGGER.tracef("%s -> %s", localName, element);

@@ -36,6 +36,7 @@ import static org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_S
 import static org.jboss.as.connector.subsystems.common.pool.Constants.MIN_POOL_SIZE;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FLUSH_STRATEGY;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_PREFILL;
+import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.POOL_USE_STRICT_MIN;
 import static org.jboss.as.connector.subsystems.common.pool.Constants.USE_FAST_FAIL;
 import static org.jboss.as.connector.subsystems.datasources.Constants.ALLOCATION_RETRY;
@@ -218,6 +219,7 @@ public class DsParser extends AbstractParser {
                                     parseDataSource_3_0(reader, list, parentAddress);
                                     break;
                                 case DATASOURCES_4_0:
+                                case DATASOURCES_4_1:
                                     parseDataSource_4_0(reader, list, parentAddress);
                                     break;
                             }
@@ -236,6 +238,7 @@ public class DsParser extends AbstractParser {
                                     parseXADataSource_3_0(reader, list, parentAddress);
                                     break;
                                 case DATASOURCES_4_0:
+                                case DATASOURCES_4_1:
                                     parseXADataSource_4_0(reader, list, parentAddress);
                                     break;
                             }
@@ -1948,7 +1951,6 @@ public class DsParser extends AbstractParser {
         throw new ParserException(bundle.unexpectedEndOfDocument());
     }
 
-
     private void parsePool(XMLExtendedStreamReader reader, final ModelNode operation) throws XMLStreamException, ParserException,
             ValidateException {
 
@@ -1985,6 +1987,11 @@ public class DsParser extends AbstractParser {
                         case PREFILL: {
                             String value = rawElementText(reader);
                             POOL_PREFILL.parseAndSetParameter(value, operation, reader);
+                            break;
+                        }
+                        case FAIR: {
+                            String value = rawElementText(reader);
+                            POOL_FAIR.parseAndSetParameter(value, operation, reader);
                             break;
                         }
                         case USE_STRICT_MIN: {
@@ -2061,6 +2068,11 @@ public class DsParser extends AbstractParser {
                         case PREFILL: {
                             String value = rawElementText(reader);
                             POOL_PREFILL.parseAndSetParameter(value, operation, reader);
+                            break;
+                        }
+                        case FAIR: {
+                            String value = rawElementText(reader);
+                            POOL_FAIR.parseAndSetParameter(value, operation, reader);
                             break;
                         }
                         case USE_STRICT_MIN: {

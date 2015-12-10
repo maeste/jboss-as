@@ -59,7 +59,7 @@ public class DatasourcesSubsystemTestCase extends AbstractSubsystemBaseTest {
 
     @Override
     protected String getSubsystemXsdPath() throws Exception {
-        return "schema/wildfly-datasources_4_0.xsd";
+        return "schema/wildfly-datasources_4_1.xsd";
     }
 
     @Override

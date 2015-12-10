@@ -71,6 +71,7 @@ public class ModifiableXaDataSource extends XADataSourceImpl implements XaDataSo
      * @param spy                          spy
      * @param useCcm                       useCcm
      * @param mcp mcp
+     * @param fair fair
      * @param enlistmentTrace enlistmentTrace
      * @param xaDataSourceProperty         xaDataSourceProperty
      * @param xaDataSourceClass            xaDataSourceClass
@@ -83,12 +84,12 @@ public class ModifiableXaDataSource extends XADataSourceImpl implements XaDataSo
     public ModifiableXaDataSource(TransactionIsolation transactionIsolation, TimeOut timeOut, DsSecurity security,
                                   Statement statement, Validation validation, String urlDelimiter, String urlProperty, String urlSelectorStrategyClassName,
                                   Boolean useJavaContext, String poolName, Boolean enabled, String jndiName, Boolean spy, Boolean useCcm,
-                                  final Boolean connectable, final Boolean tracking, String mcp, Boolean enlistmentTrace,
+                                  final Boolean connectable, final Boolean tracking, String mcp, Boolean fair, Boolean enlistmentTrace,
                                   Map<String, String> xaDataSourceProperty, String xaDataSourceClass, String driver, String newConnectionSql,
                                   DsXaPool xaPool, Recovery recovery) throws ValidateException {
         super(transactionIsolation, timeOut, security, statement, validation, urlDelimiter,
                 urlProperty, urlSelectorStrategyClassName, useJavaContext, poolName, enabled, jndiName, spy, useCcm,
-                connectable, tracking, mcp, enlistmentTrace,
+                connectable, tracking, mcp, fair, enlistmentTrace,
                 xaDataSourceProperty, xaDataSourceClass, driver, newConnectionSql,
                 xaPool, recovery);
     }
@@ -111,7 +112,7 @@ public class ModifiableXaDataSource extends XADataSourceImpl implements XaDataSo
 
         return new XADataSourceImpl(transactionIsolation, timeOut, security,
                 statement, validation, urlDelimiter, urlProperty, urlSelectorStrategyClassName,
-                useJavaContext, poolName, enabled, jndiName, spy, useCcm, connectable, tracking, mcp, enlistmentTrace,
+                useJavaContext, poolName, enabled, jndiName, spy, useCcm, connectable, tracking, mcp, fair, enlistmentTrace,
                 xaDataSourceProperty, xaDataSourceClass, driver, newConnectionSql,
                 getXaPool(), recovery);
 

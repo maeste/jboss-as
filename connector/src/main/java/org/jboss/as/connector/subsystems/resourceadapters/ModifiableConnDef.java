@@ -77,6 +77,8 @@ public class ModifiableConnDef implements ConnectionDefinition {
 
     private final Boolean enlistmentTrace;
 
+    private final Boolean fair;
+
     private final String mcp;
 
 
@@ -99,7 +101,7 @@ public class ModifiableConnDef implements ConnectionDefinition {
     public ModifiableConnDef(Map<String, String> configProperties, String className, String jndiName,
                              String poolName, Boolean enabled, Boolean useJavaContext, Boolean useCcm, Pool pool, TimeOut timeOut,
                              Validation validation, Security security, Recovery recovery, Boolean sharable, Boolean enlistment,
-                             final Boolean connectable, final Boolean tracking, final String mcp, Boolean enlistmentTrace) throws ValidateException {
+                             final Boolean connectable, final Boolean tracking, final String mcp, Boolean fair, Boolean enlistmentTrace) throws ValidateException {
         super();
         if (configProperties != null) {
             this.configProperties = new ConcurrentHashMap<String, String>(configProperties.size());
@@ -123,6 +125,7 @@ public class ModifiableConnDef implements ConnectionDefinition {
         this.connectable = connectable;
         this.tracking = tracking;
         this.mcp = mcp;
+        this.fair = fair;
         this.enlistmentTrace = enlistmentTrace;
 
     }
@@ -282,6 +285,11 @@ public class ModifiableConnDef implements ConnectionDefinition {
     }
 
     @Override
+    public Boolean isFair() {
+        return fair;
+    }
+
+    @Override
     public Boolean isEnlistmentTrace() {
         return enlistmentTrace;
     }
@@ -311,6 +319,7 @@ public class ModifiableConnDef implements ConnectionDefinition {
         result = prime * result + ((tracking == null) ? 0 : tracking.hashCode());
 
         result = prime * result + ((mcp == null) ? 0 : mcp.hashCode());
+        result = prime * result + ((fair == null) ? 0 : fair.hashCode());
         result = prime * result + ((enlistmentTrace == null) ? 0 : enlistmentTrace.hashCode());
 
         return result;
@@ -418,6 +427,11 @@ public class ModifiableConnDef implements ConnectionDefinition {
                 return false;
         } else if (!mcp.equals(other.mcp))
             return false;
+        if (fair == null) {
+            if (other.fair != null)
+                return false;
+        } else if (!fair.equals(other.fair))
+            return false;
         if (enlistmentTrace == null) {
             if (other.enlistmentTrace != null)
                 return false;
@@ -468,6 +482,10 @@ public class ModifiableConnDef implements ConnectionDefinition {
 
         if (mcp != null)
             sb.append(" ").append(ConnectionDefinition.Attribute.MCP).append("=\"").append(mcp).append("\"");
+
+        if (fair != null)
+            sb.append(" ").append(ConnectionDefinition.Attribute.FAIR).append("=\"")
+                    .append(fair).append("\"");
 
         if (enlistmentTrace != null)
             sb.append(" ").append(ConnectionDefinition.Attribute.ENLISTMENT_TRACE).append("=\"")

@@ -238,9 +238,9 @@ public class Constants {
 
     @Deprecated
     static final SimpleAttributeDefinition PROFILE = SimpleAttributeDefinitionBuilder.create("profile", ModelType.STRING)
-                .setAllowNull(true)
-                .setAllowExpression(true)
-                .setDeprecated(ModelVersion.create(4, 0, 0))
+            .setAllowNull(true)
+            .setAllowExpression(true)
+            .setDeprecated(ModelVersion.create(4, 0, 0))
             .build();
 
     public static final String STATISTICS = "statistics";
@@ -598,7 +598,8 @@ public class Constants {
             URL_SELECTOR_STRATEGY_CLASS_NAME, USE_JAVA_CONTEXT,
             JTA, org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_SIZE,
             org.jboss.as.connector.subsystems.common.pool.Constants.MIN_POOL_SIZE, org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE,
-            org.jboss.as.connector.subsystems.common.pool.Constants.POOL_PREFILL, org.jboss.as.connector.subsystems.common.pool.Constants.POOL_USE_STRICT_MIN,
+            org.jboss.as.connector.subsystems.common.pool.Constants.POOL_PREFILL, org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR,
+            org.jboss.as.connector.subsystems.common.pool.Constants.POOL_USE_STRICT_MIN,
             org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS, org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
             USERNAME, PASSWORD, SECURITY_DOMAIN,
             REAUTH_PLUGIN_CLASSNAME,
@@ -677,7 +678,8 @@ public class Constants {
             NEW_CONNECTION_SQL, URL_DELIMITER,
             URL_SELECTOR_STRATEGY_CLASS_NAME, USE_JAVA_CONTEXT,
             org.jboss.as.connector.subsystems.common.pool.Constants.MAX_POOL_SIZE, org.jboss.as.connector.subsystems.common.pool.Constants.MIN_POOL_SIZE, org.jboss.as.connector.subsystems.common.pool.Constants.INITIAL_POOL_SIZE,
-            org.jboss.as.connector.subsystems.common.pool.Constants.POOL_PREFILL, org.jboss.as.connector.subsystems.common.pool.Constants.POOL_USE_STRICT_MIN, INTERLEAVING,
+            org.jboss.as.connector.subsystems.common.pool.Constants.POOL_PREFILL, org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR,
+            org.jboss.as.connector.subsystems.common.pool.Constants.POOL_USE_STRICT_MIN, INTERLEAVING,
             org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_INCREMENTER_CLASS, org.jboss.as.connector.subsystems.common.pool.Constants.CAPACITY_DECREMENTER_CLASS,
             NO_TX_SEPARATE_POOL, PAD_XID, SAME_RM_OVERRIDE,
             WRAP_XA_RESOURCE, USERNAME, PASSWORD,
@@ -724,7 +726,7 @@ public class Constants {
     static final SimpleAttributeDefinition DRIVER_NAME = new SimpleAttributeDefinitionBuilder(DRIVER_NAME_NAME, ModelType.STRING)
             .setXmlName(Driver.Attribute.NAME.getLocalName())
             .setAllowNull(false)
-                    //.setResourceOnly()
+            //.setResourceOnly()
             .build();
 
     static final SimpleAttributeDefinition DRIVER_MODULE_NAME = new SimpleAttributeDefinitionBuilder(DRIVER_MODULE_NAME_NAME, ModelType.STRING)

@@ -109,6 +109,8 @@ public class Constants {
 
     private static final String ENLISTMENT_TRACE_NAME = "enlistment-trace";
 
+    private static final String FAIR_NAME = "fair";
+
     private static final String MCP_NAME = "mcp";
 
     private static final String CONFIG_PROPERTIES_NAME = "config-properties";

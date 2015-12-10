@@ -292,6 +292,7 @@ public class ResourceAdapterParser extends CommonIronJacamarParser {
                                     parseConnectionDefinitions_3_0(reader, connectionDefinitionsOperations, cfConfigPropertiesOperations, isXa);
                                     break;
                                 case RESOURCEADAPTERS_4_0:
+                                case RESOURCEADAPTERS_4_1:
                                     parseConnectionDefinitions_4_0(reader, connectionDefinitionsOperations, cfConfigPropertiesOperations, isXa);
                                     break;
                             }

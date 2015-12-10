@@ -1,4 +1,4 @@
-<subsystem xmlns="urn:jboss:domain:resource-adapters:4.0">
+<subsystem xmlns="urn:jboss:domain:resource-adapters:4.1">
   <!--Optional:-->
   <resource-adapters>
     <!--1 or more repetitions:-->
@@ -30,6 +30,8 @@
                 <max-pool-size>${test.expr:200}</max-pool-size>
                 <!--Optional:-->
                 <prefill>${test.expr:true}</prefill>
+                <!--Optional:-->
+                <fair>${test.expr:true}</fair>
                 <!--Optional:-->
                 <use-strict-min>${test.expr:true}</use-strict-min>
                 <!--Optional:-->
