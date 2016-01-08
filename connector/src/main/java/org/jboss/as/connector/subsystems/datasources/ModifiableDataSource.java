@@ -93,7 +93,6 @@ public class ModifiableDataSource extends DataSourceAbstractImpl implements Data
      * @param useccm                       useccm
      * @param jta                          jta
      * @param mcp mcp
-     * @param fair fair
      * @param enlistmentTrace enlistmentTrace
      * @param pool                         pool
      * @throws org.jboss.jca.common.api.validator.ValidateException
@@ -105,11 +104,11 @@ public class ModifiableDataSource extends DataSourceAbstractImpl implements Data
                                 String urlDelimiter, String urlSelectorStrategyClassName, String newConnectionSql,
                                 Boolean useJavaContext, String poolName, Boolean enabled, String jndiName,
                                 Boolean spy, Boolean useccm, Boolean jta, final Boolean connectable, final Boolean tracking, String mcp,
-                                Boolean fair, Boolean enlistmentTrace, DsPool pool)
+                                Boolean enlistmentTrace, DsPool pool)
             throws ValidateException {
         super(transactionIsolation, timeOut, security, statement, validation, urlDelimiter,
                 urlSelectorStrategyClassName, useJavaContext, poolName, enabled, jndiName, spy, useccm, driver,
-                newConnectionSql, connectable, tracking, mcp, fair, enlistmentTrace);
+                newConnectionSql, connectable, tracking, mcp, enlistmentTrace);
         this.jta = jta;
         this.connectionUrl = connectionUrl;
         this.driverClass = driverClass;
@@ -453,7 +452,7 @@ public class ModifiableDataSource extends DataSourceAbstractImpl implements Data
                 timeOut, security, statement, validation,
                 urlDelimiter, urlSelectorStrategyClassName, newConnectionSql,
                 useJavaContext, poolName, enabled, jndiName,
-                spy, useCcm, jta, connectable, tracking, mcp, fair, enlistmentTrace, pool);
+                spy, useCcm, jta, connectable, tracking, mcp, enlistmentTrace, pool);
 
     }
 }

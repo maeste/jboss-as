@@ -53,7 +53,6 @@ public class ParseUtils {
         params.put("min-pool-size","1");
         params.put("max-pool-size","5");
         params.put("pool-prefill","true");
-//        params.put("pool-fair","true");
         params.put("pool-use-strict-min","true");
         params.put("flush-strategy","EntirePool");
         //security
@@ -153,7 +152,6 @@ public class ParseUtils {
         params.put("min-pool-size","1");
         params.put("max-pool-size","5");
         params.put("pool-prefill","true");
-//        params.put("pool-fair","true");
         params.put("pool-use-strict-min","true");
         params.put("flush-strategy","IdleConnections");
         //xa-pool

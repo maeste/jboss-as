@@ -46,6 +46,7 @@
                 <pad-xid>${test.expr:true}</pad-xid>
                 <!--Optional:-->
                 <wrap-xa-resource>${test.expr:false}</wrap-xa-resource>
+
             </xa-pool>
           <!--Optional:-->
 

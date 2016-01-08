@@ -38,6 +38,7 @@
                         <prefill>
                             true
                         </prefill>
+
                         <use-strict-min>
                             true
                         </use-strict-min>

@@ -191,6 +191,7 @@ public class Constants {
     public static final SimpleAttributeDefinition POOL_PREFILL = new SimpleAttributeDefinitionBuilder(POOL_PREFILL_NAME, ModelType.BOOLEAN, true)
             .setDefaultValue(new ModelNode(Defaults.PREFILL))
             .setAllowExpression(true)
+            .setAllowNull(true)
             .setXmlName(Pool.Tag.PREFILL.getLocalName())
             .build();
 
@@ -203,6 +204,7 @@ public class Constants {
     public static final SimpleAttributeDefinition POOL_USE_STRICT_MIN = new SimpleAttributeDefinitionBuilder(POOL_USE_STRICT_MIN_NAME, ModelType.BOOLEAN, true)
             .setDefaultValue(new ModelNode(Defaults.USE_STRICT_MIN))
             .setAllowExpression(true)
+            .setAllowNull(true)
             .setXmlName(Pool.Tag.USE_STRICT_MIN.getLocalName())
             .build();
 

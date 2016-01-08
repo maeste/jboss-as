@@ -222,7 +222,7 @@ class DataSourceModelNodeUtil {
 
         return new ModifiableDataSource(connectionUrl, driverClass, dataSourceClass, driver, transactionIsolation, connectionProperties, timeOut,
                 security, statement, validation, urlDelimiter, urlSelectorStrategyClassName, newConnectionSql, useJavaContext,
-                poolName, enabled, jndiName, spy, useCcm, jta, connectable, tracking, mcp, fair, enlistmentTrace, pool);
+                poolName, enabled, jndiName, spy, useCcm, jta, connectable, tracking, mcp, enlistmentTrace, pool);
     }
 
     static ModifiableXaDataSource xaFrom(final OperationContext operationContext, final ModelNode dataSourceNode, final String dsName) throws OperationFailedException, ValidateException {
@@ -337,7 +337,7 @@ class DataSourceModelNodeUtil {
         }
         return new ModifiableXaDataSource(transactionIsolation, timeOut, security, statement, validation, urlDelimiter, urlProperty,
                 urlSelectorStrategyClassName, useJavaContext, poolName, enabled, jndiName, spy, useCcm,
-                connectable, tracking, mcp, fair, enlistmentTrace, xaDataSourceProperty,
+                connectable, tracking, mcp, enlistmentTrace, xaDataSourceProperty,
                 xaDataSourceClass, module, newConnectionSql, xaPool, recovery);
     }
 

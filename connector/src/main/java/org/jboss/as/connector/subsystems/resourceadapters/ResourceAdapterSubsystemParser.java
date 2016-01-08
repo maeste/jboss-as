@@ -299,7 +299,7 @@ public final class ResourceAdapterSubsystemParser implements XMLStreamConstants,
             if (isXa) {
 
                 streamWriter.writeStartElement(ConnectionDefinition.Tag.XA_POOL.getLocalName());
-                MIN_POOL_SIZE.marshallAsElement( conDef, streamWriter);
+                MIN_POOL_SIZE.marshallAsElement(conDef, streamWriter);
                 INITIAL_POOL_SIZE.marshallAsElement(conDef, streamWriter);
                 MAX_POOL_SIZE.marshallAsElement(conDef, streamWriter);
                 POOL_PREFILL.marshallAsElement(conDef, streamWriter);

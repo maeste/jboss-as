@@ -269,7 +269,7 @@ public class RaOperationUtil {
             recovery = new Recovery(credential, recoverPlugin, noRecovery);
         }
         ModifiableConnDef connectionDefinition = new ModifiableConnDef(configProperties, className, jndiName, poolName,
-                enabled, useJavaContext, useCcm, pool, timeOut, validation, security, recovery, sharable, enlistment, connectable, tracking, mcp, fair, enlistmentTrace);
+                enabled, useJavaContext, useCcm, pool, timeOut, validation, security, recovery, sharable, enlistment, connectable, tracking, mcp, enlistmentTrace);
 
         return connectionDefinition;
 

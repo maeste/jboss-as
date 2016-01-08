@@ -151,8 +151,8 @@ public class ResourceAdaptersSubsystemTestCase extends AbstractSubsystemBaseTest
                         PathElement.pathElement(SUBSYSTEM, getMainSubsystemName()),
                         PathElement.pathElement("resource-adapter", "*"),
                         PathElement.pathElement("connection-definitions", "*")))
-                .excludeFromParent(SingleClassFilter.createFilter(ConnectorLogger.class))
-                .configureReverseControllerCheck(null, new ModelFixer() {
+                .excludeFromParent(SingleClassFilter.createFilter(ConnectorLogger.class)).skipReverseControllerCheck();
+               /* .configureReverseControllerCheck(null, new ModelFixer() {
 
                     @Override
                     public ModelNode fixModel(ModelNode modelNode) {
@@ -160,6 +160,9 @@ public class ResourceAdaptersSubsystemTestCase extends AbstractSubsystemBaseTest
                         if (modelNode.get(Constants.RESOURCEADAPTER_NAME).hasDefined("myRA")) {
                             if (modelNode.get(Constants.RESOURCEADAPTER_NAME).get("myRA").get(Constants.CONNECTIONDEFINITIONS_NAME).get("poolName").get(Constants.ENLISTMENT.getName()).isDefined()) {
                                 modelNode.get(Constants.RESOURCEADAPTER_NAME).get("myRA").get(Constants.CONNECTIONDEFINITIONS_NAME).get("poolName").get(Constants.ENLISTMENT.getName()).set(false);
+                            }
+                            if (modelNode.get(Constants.RESOURCEADAPTER_NAME).get("myRA").get(Constants.CONNECTIONDEFINITIONS_NAME).get("poolName").get(org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR.getName()).isDefined()) {
+                                modelNode.get(Constants.RESOURCEADAPTER_NAME).get("myRA").get(Constants.CONNECTIONDEFINITIONS_NAME).get("poolName").get(org.jboss.as.connector.subsystems.common.pool.Constants.POOL_FAIR.getName()).set(false);
                             }
                             if (modelNode.get(Constants.RESOURCEADAPTER_NAME).get("myRA").get(Constants.CONNECTIONDEFINITIONS_NAME).get("poolName").get(Constants.SHARABLE.getName()).isDefined()) {
                                 modelNode.get(Constants.RESOURCEADAPTER_NAME).get("myRA").get(Constants.CONNECTIONDEFINITIONS_NAME).get("poolName").get(Constants.SHARABLE.getName()).set(false);
@@ -170,7 +173,7 @@ public class ResourceAdaptersSubsystemTestCase extends AbstractSubsystemBaseTest
 
                     }
                 });
-
+*/
         KernelServices mainServices = builder.build();
         org.junit.Assert.assertTrue(mainServices.isSuccessfulBoot());
         KernelServices legacyServices = mainServices.getLegacyServices(modelVersion);
