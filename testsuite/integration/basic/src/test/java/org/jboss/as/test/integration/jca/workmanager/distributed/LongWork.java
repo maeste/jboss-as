@@ -2,12 +2,12 @@ package org.jboss.as.test.integration.jca.workmanager.distributed;
 
 import org.jboss.logging.Logger;
 
-import javax.resource.spi.work.Work;
+import javax.resource.spi.work.DistributableWork;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-public class LongWork implements Work, Serializable {
-    private static final Logger log = Logger.getLogger(LongWork.class.getCanonicalName());
+public class LongWork implements DistributableWork, Serializable {
+    //private static final Logger log = Logger.getLogger(LongWork.class.getCanonicalName());
 
     private boolean quit = false;
     private long workTimeout = 5000L; // 5 seconds
@@ -26,6 +26,7 @@ public class LongWork implements Work, Serializable {
 
     @Override
     public void run() {
+        Logger log = Logger.getLogger(this.getClass().getCanonicalName());
         long startTime = System.currentTimeMillis();
         long finishTime = startTime + workTimeout;
 

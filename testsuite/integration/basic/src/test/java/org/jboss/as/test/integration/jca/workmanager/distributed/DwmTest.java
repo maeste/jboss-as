@@ -186,7 +186,7 @@ public class DwmTest {
             ModelNode addBasicDwm = addBasicDwm();
             ModelNode setUpPolicy = setUpPolicy(Policy.ALWAYS);
             ModelNode setUpSelector = setUpSelector(Selector.MAX_FREE_THREADS);
-            ModelNode setUpShortRunningThreads = setUpShortRunningThreads(10, 10);
+            ModelNode setUpShortRunningThreads = setUpShortRunningThreads(2, 10);
 
             ModelNode compositeOp = ModelUtil.createCompositeNode(
                     new ModelNode[] {addBasicDwm, setUpPolicy, setUpSelector, setUpShortRunningThreads});
@@ -196,8 +196,8 @@ public class DwmTest {
             result = mcc.execute(setUpCustomContext());
             log.info("Setting up CustomContext: " + result);
 
-            ServerReload.executeReloadAndWaitForCompletion(mcc, 60000, false,
-                    TestSuiteEnvironment.getServerAddress(), serverPort);
+            /*ServerReload.executeReloadAndWaitForCompletion(mcc, 120000, false,
+                    TestSuiteEnvironment.getServerAddress(), serverPort);*/
         }
 
         private static void tearDownServer(String containerId) throws Exception {
@@ -310,9 +310,9 @@ public class DwmTest {
         log.info("submitting " + workIteration + " long and " + workIteration + " short work instances (server 1)");
         for (int i = 0; i < workIteration; i++) {
             log.info("Starting long work " + i);
-            server1Proxy.scheduleWork(new LongWork().setName("longWorkS1" + i));
+            server1Proxy.scheduleWork(new LongWork().setName("longWorkS1-" + i));
             log.info("Starting short work " + i);
-            server1Proxy.scheduleWork(new ShortWork().setName("shortWorkS1" + i));
+            server1Proxy.scheduleWork(new ShortWork().setName("shortWorkS1-" + i));
         }
         log.info("work scheduled");
 
@@ -324,9 +324,9 @@ public class DwmTest {
         log.info("submitting " + workIteration + " long and " + workIteration + " short work instances (server2)");
         for (int i = 0; i < workIteration; i++) {
             log.info("Starting long work " + i);
-            server2Proxy.scheduleWork(new LongWork().setName("longWorkS2" + i));
+            server2Proxy.scheduleWork(new LongWork().setName("longWorkS2-" + i));
             log.info("Starting short work " + i);
-            server2Proxy.scheduleWork(new ShortWork().setName("shortWorkS2" + i));
+            server2Proxy.scheduleWork(new ShortWork().setName("shortWorkS2-" + i));
         }
         log.info("work scheduled");
 
