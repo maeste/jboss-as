@@ -21,18 +21,18 @@
  */
 package org.jboss.as.test.integration.jca.workmanager.distributed;
 
-import org.jboss.as.connector.services.workmanager.NamedDistributedWorkManager;
-import org.jboss.as.test.integration.jca.rar.DistributedAdminObject1;
-import org.jboss.as.test.integration.jca.rar.DistributedAdminObject1Impl;
-import org.jboss.as.test.integration.jca.rar.DistributedResourceAdapter1;
-import org.jboss.logging.Logger;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
+
+import org.jboss.as.connector.services.workmanager.NamedDistributedWorkManager;
+import org.jboss.as.test.integration.jca.rar.distributed.DistributedAdminObject1;
+import org.jboss.as.test.integration.jca.rar.distributed.DistributedAdminObject1Impl;
+import org.jboss.as.test.integration.jca.rar.distributed.DistributedResourceAdapter1;
+import org.jboss.logging.Logger;
 
 @Stateless
 @Remote

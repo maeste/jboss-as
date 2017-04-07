@@ -52,7 +52,7 @@ import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.as.test.integration.jca.rar.DistributedConnection1;
+import org.jboss.as.test.integration.jca.rar.distributed.DistributedConnection1;
 import org.jboss.as.test.integration.management.util.ModelUtil;
 import org.jboss.as.test.shared.ServerReload;
 import org.jboss.as.test.shared.TestSuiteEnvironment;
@@ -72,7 +72,11 @@ import org.junit.runner.RunWith;
 import org.wildfly.test.api.Authentication;
 
 /**
- * TODO: doc, make sure to include the description of the EJB mechanism of admin object lookup and why that's so
+ * Tests distributed work manager and whether it really distributes work over multiple nodes. Test cases use two servers
+ * both with a deployed resource adapter configured to use the DWM.
+ *
+ * Work is scheduled via a stateless ejb proxy. This allows us to schedule work from within the test, without the need
+ * to marshall anything not serializable (such as the resource adapter).
  */
 @ServerSetup(DwmTest.DwmServerSetupTask.class)
 @RunWith(Arquillian.class)

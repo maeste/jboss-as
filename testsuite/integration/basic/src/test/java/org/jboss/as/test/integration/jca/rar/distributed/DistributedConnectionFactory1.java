@@ -19,18 +19,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.integration.jca.rar;
+package org.jboss.as.test.integration.jca.rar.distributed;
 
 import javax.resource.Referenceable;
+import javax.resource.ResourceException;
 import java.io.Serializable;
 
-/**
- * DistributedAdminObject1 allows the tester to use the resource adapter and workmanager from
- * outside EAP.
- */
-public interface DistributedAdminObject1 extends Referenceable, Serializable {
+public interface DistributedConnectionFactory1 extends Serializable, Referenceable {
 
-    void setName(String name);
-
-    String getName();
+    DistributedConnection1 getConnection() throws ResourceException;
 }

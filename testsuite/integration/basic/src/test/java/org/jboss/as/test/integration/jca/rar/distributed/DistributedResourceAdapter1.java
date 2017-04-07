@@ -19,10 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.integration.jca.rar;
-
-import org.jboss.as.connector.services.workmanager.NamedDistributedWorkManager;
-import org.jboss.logging.Logger;
+package org.jboss.as.test.integration.jca.rar.distributed;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
@@ -32,6 +29,9 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
+
+import org.jboss.as.connector.services.workmanager.NamedDistributedWorkManager;
+import org.jboss.logging.Logger;
 
 /**
  * DistributedResourceAdapter1 for use with DistributableWorkManager.
