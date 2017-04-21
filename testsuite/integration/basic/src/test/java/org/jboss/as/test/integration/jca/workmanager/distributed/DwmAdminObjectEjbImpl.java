@@ -121,7 +121,6 @@ public class DwmAdminObjectEjbImpl implements DwmAdminObjectEjb {
         return dwm.getDistributedStatistics().getScheduleWorkRejected();
     }
 
-
     @Override
     public boolean isDoWorkDistributionEnabled() {
         return dwm.isDoWorkDistributionEnabled();
