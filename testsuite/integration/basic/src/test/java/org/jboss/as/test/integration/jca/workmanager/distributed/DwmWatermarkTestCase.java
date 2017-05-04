@@ -59,7 +59,7 @@ public class DwmWatermarkTestCase extends AbstractDwmTestCase {
      * expected node (this one since Policy.WATERMARK)
      */
     @Test
-    @InSequence(1)
+    @InSequence(11)
     public void testDoWork() throws IOException, NamingException, WorkException, InterruptedException {
         log.info("Running testDoWork()");
 
@@ -72,12 +72,14 @@ public class DwmWatermarkTestCase extends AbstractDwmTestCase {
         Assert.assertTrue("Expected time >= " + (startTime + LongWork.WORK_TIMEOUT) + ", actual: " + System.currentTimeMillis(),
                 startTime + LongWork.WORK_TIMEOUT <= System.currentTimeMillis());
 
+        Thread.sleep(LongWork.WORK_TIMEOUT + 100); // wait for the scheduled work to start and finish, so it doesn't mess up our statistics for other tests
+
         logWorkStats();
 
-        Assert.assertTrue("Expected doWorkAccepted = " + (doWorkAccepted + 1) + " but was: " + server1Proxy.getDoWorkAccepted(),
-                server1Proxy.getDoWorkAccepted() == doWorkAccepted + 1);
-        Assert.assertTrue("Expected distributedDoWorkAccepted = " + (distributedDoWorkAccepted + 1) + " but was: " + server2Proxy.getDistributedDoWorkAccepted(),
-                server2Proxy.getDistributedDoWorkAccepted() == distributedDoWorkAccepted + 1);
+        Assert.assertTrue("Expected doWorkAccepted = " + (doWorkAccepted + 1) + " but was: " + server2Proxy.getDoWorkAccepted(),
+                server2Proxy.getDoWorkAccepted() == doWorkAccepted + 1);
+        Assert.assertTrue("Expected distributedDoWorkAccepted = " + (distributedDoWorkAccepted + 1) + " but was: " + server1Proxy.getDistributedDoWorkAccepted(),
+                server1Proxy.getDistributedDoWorkAccepted() == distributedDoWorkAccepted + 1);
     }
 
     /**
@@ -89,7 +91,7 @@ public class DwmWatermarkTestCase extends AbstractDwmTestCase {
      * the watermark limit, and the other node is selected.
      */
     @Test
-    @InSequence(11)
+    @InSequence(1)
     public void testWatermarkPolicy() throws WorkException, InterruptedException {
         log.info("Running testWatermarkPolicy()");
 
